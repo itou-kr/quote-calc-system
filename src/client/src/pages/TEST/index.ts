@@ -1,0 +1,1 @@
+export { default } from '@front/components/pages/TEST/Test';

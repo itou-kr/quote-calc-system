@@ -1,0 +1,15 @@
+generatorName: typescript-axios
+inputSpec: ../../docs/openapi/index.yml
+outputDir: ./src/openapi
+globalproperties:
+  apis: ""
+  models: ""
+  supportingFiles: "index.ts,configuration.ts,base.ts,common.ts,api.ts,openapi-generator-ignore"
+additionalProperties:
+  apiPackage: apis
+  modelPackage: models
+  modelPropertyNaming: original
+  withSeparateModelsAndApi: true
+# openapi/typescript-axios は ↓ を調整したテンプレート
+# https://github.com/OpenAPITools/openapi-generator/tree/v7.10.0/modules/openapi-generator/src/main/resources/typescript-axios
+templateDir: openapi/typescript-axios

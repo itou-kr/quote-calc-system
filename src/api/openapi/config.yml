@@ -1,0 +1,41 @@
+generatorName: typescript-node
+inputSpec: openapi/openapi.yml
+outputDir: .
+globalProperties:
+  apis: ""
+  models: ""
+  supportingFiles: "byteBuffer.ts,index.ts,.openapi-generator-ignore"
+additionalProperties:
+  apiPackage: src/apis
+  modelPackage: models
+  modelPropertyNaming: original
+templateDir: openapi/templates
+typeMappings:
+  date: Date
+  string+byte: ByteBuffer
+files: 
+  api.mustache:
+    templateType: API
+    folder: src/apis
+    destinationFilename: /type.ts
+  api_impl.mustache:
+    templateType: API
+    folder: src/apis
+    destinationFilename: /index.ts
+  apis.mustache:
+    templateType: SupportingFiles
+    folder: src/apis
+    destinationFilename: /index.ts
+  model.mustache:
+    templateType: Model
+    folder: src/models
+    destinationFilename: .ts
+  models.mustache:
+    templateType: SupportingFiles
+    folder: src/models
+    destinationFilename: index.ts    
+  byteBuffer.mustache:
+    templateType: SupportingFiles
+    folder: src/models
+    destinationFilename: byteBuffer.ts  
+

@@ -1,0 +1,13 @@
+.gitignore
+.npmignore
+api.ts
+apis/test-api.ts
+base.ts
+common.ts
+configuration.ts
+docs/TestApi.md
+docs/User.md
+git_push.sh
+index.ts
+models/index.ts
+models/user.ts
