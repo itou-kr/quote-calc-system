@@ -1,0 +1,8 @@
+openapi: 3.0.0
+info:
+  title: 見積算出システム API
+  description: ...
+  version: 1.0.0
+paths:
+ /api/TEST/test:
+  $ref: ./TEST.yml#/paths/~1TEST~1test

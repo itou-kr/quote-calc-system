@@ -1,0 +1,49 @@
+openapi: 3.0.0
+info:
+  title: TEST API
+  version: 1.0.0
+tags:
+  - name: test
+    description: ...
+paths:
+  /TEST/test:
+    get:
+      tags:
+        - test
+      summary: テスト
+      responses:
+        '200':
+          description: テスト
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      tags:
+        - test
+      summary: テスト
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: テスト
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
