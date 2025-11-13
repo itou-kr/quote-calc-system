@@ -22,7 +22,7 @@ export default [
         sourceType: "module",
         ecmaFeatures: { jsx: true },
       },
-      globals: { ...globals.browser, React: "readonly" }, // ← 追加でno-undef対策
+      globals: { ...globals.browser, React: "readonly", JSX: "readonly" }, // ← JSX を追加
     },
     plugins: {
       "@typescript-eslint": tsPlugin,
@@ -70,17 +70,17 @@ export default [
   {
     files: ["**/*.{ts,tsx,js,jsx}"],
     plugins: {
-      react, // ← 追加
+      react,
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
     },
     settings: {
       react: {
-        version: "detect", // ← これがポイント！
+        version: "detect",
       },
     },
     rules: {
-      ...react.configs.recommended.rules, // ← eslint-plugin-react の推奨ルールを追加
+      ...react.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "react/display-name": "off",

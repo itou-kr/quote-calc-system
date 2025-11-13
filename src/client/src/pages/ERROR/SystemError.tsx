@@ -3,7 +3,7 @@ import type { ReactElement } from 'react';
 import { FallbackProps } from 'react-error-boundary';
 import { Container, Alert, AlertTitle } from '@mui/material';
 
-import StyleMessageAutoLineBreak from '@front/components/styles/StyleMessageAutoLineBreak';
+import StyleMessageAutoLineBreak from '@front/components/styles/StyledMessageAutoLineBreak';
 import { errorMessage } from '@front/utils/errorMessage';
 
 function SystemError(props: FallbackProps): ReactElement {

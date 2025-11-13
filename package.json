@@ -1,5 +1,7 @@
 {
   "devDependencies": {
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
     "eslint": "^9.39.1",
     "eslint-plugin-react": "^7.37.5"
   },
@@ -8,6 +10,7 @@
     "@emotion/styled": "^11.14.1",
     "@mui/material": "^7.3.5",
     "@mui/styled-engine": "^7.3.5",
-    "@mui/system": "^7.3.5"
+    "@mui/system": "^7.3.5",
+    "react-router-dom": "^7.9.5"
   }
 }

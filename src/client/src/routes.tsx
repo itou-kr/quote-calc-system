@@ -1,33 +1,40 @@
 import { lazy, Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, RouteObject } from "react-router-dom";
 
-import NowLoading from '@front/components/ui/NowLoading';
+// import NowLoading from '@front/components/ui/NowLoading';
 import DefaultLayout from '@front/layouts/DefaultLayout';
 import { NotFoundError, SystemError } from '@front/pages/ERROR';
+// import TEST from './pages/TEST';
 
-function LazyPage({ viewId }: { viewId: string }) {
-    const Component = lazy(() => import(`./pages/${viewId}/index.ts`));
+type MainContentProps = {
+    component: ReturnType<typeof lazy>
+};
+
+function MainContent({ component: Component }: MainContentProps) {
     return (
-        <Suspense fallback={<NowLoading vertical fullHeight />}>
+        <Suspense>
             <Component />
         </Suspense>
     );
 }
 
-function getRoutes(menu: { viewId: string }[]) {
-    const children = menu.map(({ viewId }) => ({
-        path: viewId,
-        element: <LazyPage viewId={viewId} />,
-    }));
+const lazyComponent = (viewId: string) => lazy(() => import(`./pages/${viewId}/index.ts`));
 
-    // example static route still present in original file
-    // example static route still present in original file
-    children.push({
-        path: "TEST",
-        element: <LazyPage viewId="TEST" />,
-    });
-    return children;
+function getRoutes(menu: { viewId: string }[]): RouteObject[] {
+    const routes = menu //
+        .map(({ viewId }) => ({
+            path: viewId,
+            element: <MainContent component={lazyComponent(viewId)} />,
+        }));
+
+    return [
+        {
+            path: 'TEST',
+            element: <MainContent component={lazyComponent('TEST')} />,
+        },
+        ...routes,
+    ];
 }
 
 /**
