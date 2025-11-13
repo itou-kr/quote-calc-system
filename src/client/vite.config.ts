@@ -33,12 +33,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    exclude: [
-      '@mui/system',
-      '@mui/styled-engine',
-      '@mui/material',
-      '@emotion/react',
-      '@emotion/styled',
-    ],
+    include: ['hoist-non-react-statics'],
+    exclude: [],
   },
 });
