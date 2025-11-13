@@ -43,6 +43,7 @@ function getRoutes(menu: { viewId: string }[]): RouteObject[] {
  */
 export function createRouter(menu: { viewId: string }[]) {
     const routes = getRoutes(menu);
+    console.log(routes);
     return createBrowserRouter(
         [
             {
