@@ -1,111 +1,111 @@
 import { useMemo } from 'react';
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import Box from '@mui/material/Box';
+import { Box, Stack, Grid2 as Grid } from '@mui/material';
 
-// import FormContainerProvider from '@front/components/ui/Layout/Form/FormContainerProvider';
+import { useImportFile } from '@front/hooks/TEST/test';
 import { useExportFile } from '@front/hooks/TEST/test';
-import ExportButton from '@front/components/ui/Button/ExportButton';
 import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
 
+import ImportButton from '@front/components/ui/Button/ImportButton';
+import ExportButton from '@front/components/ui/Button/ExportButton';
+import FileUpload from '@front/components/ui/FileUpload';
+import FormContent, { Record } from '@front/components/ui/Layout/Form/Content';
+import TextField from '@front/components/ui/TextField';
+import { t } from 'i18next';
+
 const setupYupScheme = () => {
-    return yup.object({
-        /**入力項目 */
-        inputItems: yup.string(),
-        /** 自動算出 */
-        autoCalculation: yup.string(),
-        /** プロジェクト名 */
-        projectName: yup.string(),
-        /** 生産性(FP/月) */
-        productivityFPPerMonth: yup.number(),
-        /** プロジェクト種別 */
-        projectType: yup.string(),
-        /** 総FP */
-        totalFP: yup.number(),
-        /** 総工数(人月) */
-        totalManMonths: yup.number(),
-        /** 工数計算 */
-        effortCalculation: yup.string(),
-        /** エクスポートボタン */
-        exportButton: yup.string(),
-        /** 参照ボタン */
-        browseButton: yup.string(),
-        /** インポートボタン */
-        importButton: yup.string(),
-        /** 比率 基本設計 */
-        ratioBasicDesign: yup.number(),
-        /** 比率 詳細設計 */
-        ratioDetailedDesign: yup.number(),
-        /** 比率 実装 */
-        ratioImplementation: yup.number(),
-        /** 比率 結合テスト */
-        ratioIntegrationTest: yup.number(),
-        /** 比率 総合テスト */
-        ratioSystemTest: yup.number(),
-        /** 工数 基本設計 */
-        effortBasicDesign: yup.number(),
-        /** 工数 詳細設計 */
-        effortDetailedDesign: yup.number(),
-        /** 工数 実装 */
-        effortImplementation: yup.number(),
-        /** 工数 結合テスト */
-        effortIntegrationTest: yup.number(),
-        /** 工数 総合テスト */
-        effortSystemTest: yup.number(),
-        /** 工期 基本設計 */
-        durationBasicDesign: yup.number(),
-        /** 工期 詳細設計 */
-        durationDetailedDesign: yup.number(),
-        /** 工期 実装 */
-        durationImplementation: yup.number(),
-        /** 工期 結合テスト */
-        durationIntegrationTest: yup.number(),
-        /** 工期 総合テスト */
-        durationSystemTest: yup.number()
-    })
-}
+  return yup.object({
+    projectName: yup.string(),
+    productivityFPPerMonth: yup.number(),
+    projectType: yup.string(),
+    totalFP: yup.number(),
+    fileUpload: yup.mixed(),
+  });
+};
 
 export type FormType = yup.InferType<ReturnType<typeof setupYupScheme>>;
 
 type Props = {
-    viewId: ViewIdType | 'TEST';
-    data?: FormType& {
-    };
-    isDirty: boolean;
+  viewId: ViewIdType | 'TEST';
+  data?: FormType;
+  isDirty: boolean;
 };
 
 function TestForm(props: Props) {
-    const { viewId } = props;
-    const yupSchema = useMemo(() => {
-        return setupYupScheme();
-    }, []);
+  const { viewId } = props;
 
-    const exportFile = useExportFile(viewId);
+  const schema = useMemo(() => setupYupScheme(), []);
 
-    const methods = useForm({
-        mode: 'onSubmit',
-        reValidateMode: 'onSubmit',
-        resolver: yupResolver(yupSchema),
+  const importFile = useImportFile(viewId);
+  const exportFile = useExportFile(viewId);
+
+  const methods = useForm<FormType>({
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit',
+    resolver: yupResolver(schema),
+    defaultValues: props.data, // ← 初期値
+  });
+  const { control, trigger } = methods;
+
+  /** ▼ インポート処理 */
+  const onImportButtonClick = async (file: File) => {
+    const result = await importFile(file);
+    console.log('import result:', result);
+
+    try {
+      const json = JSON.parse(result.content);
+      methods.reset(json); // ← フォームに値を反映させる
+    } catch (e) {
+      console.error('JSON parse error:', e);
+    }
+  };
+
+  /** ▼ エクスポート処理 */
+  const onExportButtonClick = async () => {
+    const data = methods.getValues();
+    await exportFile({
+      name: 'export.json',
+      content: JSON.stringify(data, null, 2),
     });
+  };
 
-    const onExportButtonClick = async(model: FormType) => {
-        await exportFile({
-            name: 'export.json',
-            content: JSON.stringify(model)
-        });
-    };
-
-    // const { data, isDirty} = props;
-    return (
-        // <FormContainerProvider blockNavigation={ isDirty ? false : true } {...methods} >
-            <Box>
-                <ExportButton
-                    onClick={() => onExportButtonClick(methods.getValues())}
-                />
-            </Box>
-        // </FormContainerProvider>
-    );
+  return (
+    <Grid container direction="column" spacing={2}>
+      <FormProvider {...methods}>
+        <FormContent>
+          <Record label="案件名">
+            <TextField name="projectName" control={control} trigger={trigger} t={t} />
+          </Record>
+          <Record label="生産性（FP/月）">
+            <TextField name="productivityFPPerMonth" control={control} trigger={trigger} t={t} />
+          </Record>
+          <Record label="案件種別">
+            <TextField name="projectType" control={control} trigger={trigger} t={t} />
+          </Record>
+          <Record label="アップロードファイル">
+            <FileUpload name="fileUpload" control={control} trigger={trigger} t={t} />
+          </Record>
+        </FormContent>
+        <Stack direction="row" spacing={2}>
+          <Box>
+            {/* ファイルを受け取れる Import ボタン */}
+            <ImportButton
+              onFileSelect={onImportButtonClick}
+              onClick={() => {}}
+            >
+              インポート
+            </ImportButton> 
+          </Box>
+          <Box>       
+            {/* 計算済みフォーム内容を返す Export ボタン */}
+            <ExportButton onClick={onExportButtonClick} />
+          </Box>
+        </Stack>
+      </FormProvider>
+    </Grid>
+  );
 }
 
-export default TestForm; 
+export default TestForm;

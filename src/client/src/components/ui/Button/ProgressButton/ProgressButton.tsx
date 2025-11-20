@@ -35,7 +35,7 @@ function ProgressButton(props: Props) {
         <Button {...buttonProps} onClick={handleClick} disabled={progress || disabled}>
             {children}
         </Button>
-    )
+    );
 }
 
 export default ProgressButton;
