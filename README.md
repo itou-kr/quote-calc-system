@@ -53,6 +53,30 @@
 ※ {PORT} は出力されたログのURLの物に置き換える
 
 
+## パフォーマンス最適化
+
+アプリケーションのパフォーマンスを向上させるため、以下の最適化を実装しています：
+
+### 実装済みの最適化
+1. **ルーティングのメモ化** - ページ遷移の高速化
+2. **Progress表示の最適化** - 体感速度の向上（300ms以下の処理では非表示）
+3. **React Query の導入** - APIレスポンスのキャッシング戦略
+4. **Code Splitting の改善** - 初期ロード時間の短縮
+
+### 詳細情報
+- [パフォーマンス最適化ガイド](./docs/PERFORMANCE_OPTIMIZATION.md)
+- [実装サマリー](./docs/OPTIMIZATION_SUMMARY.md)
+
+### React Query の使用例
+```typescript
+import { useApiQuery } from '@front/hooks/query';
+
+const { data, isLoading } = useApiQuery(
+  ['users', userId],
+  () => fetchUser(userId)
+);
+```
+
 ## コーディング規約
 
 ESLint, Prettierに設定されているコーディングルールを守ること。
