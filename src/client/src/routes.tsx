@@ -33,6 +33,10 @@ function getRoutes(menu: { viewId: string }[]): RouteObject[] {
             path: 'TEST',
             element: <MainContent component={lazyComponent('TEST')} />,
         },
+        {
+            path: 'CALC',
+            element: <MainContent component={lazyComponent('CALC')} />,
+        },
         ...routes,
     ];
 }
