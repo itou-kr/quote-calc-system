@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, memo, Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { createBrowserRouter, RouteObject } from "react-router-dom";
 
@@ -11,15 +11,23 @@ type MainContentProps = {
     component: ReturnType<typeof lazy>
 };
 
-function MainContent({ component: Component }: MainContentProps) {
+// Memoize MainContent to prevent unnecessary re-renders
+const MainContent = memo(({ component: Component }: MainContentProps) => {
     return (
         <Suspense>
             <Component />
         </Suspense>
     );
-}
+});
 
-const lazyComponent = (viewId: string) => lazy(() => import(`./pages/${viewId}/index.ts`));
+// Cache lazy components to avoid recreating them
+const lazyComponentCache = new Map<string, ReturnType<typeof lazy>>();
+const lazyComponent = (viewId: string) => {
+    if (!lazyComponentCache.has(viewId)) {
+        lazyComponentCache.set(viewId, lazy(() => import(`./pages/${viewId}/index.ts`)));
+    }
+    return lazyComponentCache.get(viewId)!;
+};
 
 function getRoutes(menu: { viewId: string }[]): RouteObject[] {
     const routes = menu //
