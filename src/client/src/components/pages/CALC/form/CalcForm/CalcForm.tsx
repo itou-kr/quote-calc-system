@@ -21,6 +21,7 @@ const setupYupScheme = () => {
     projectName: yup.string().required('案件名を入力してください'),
     projectType: yup.string(),
     productivityFPPerMonth: yup.number().positive('正の数を入力してください'),
+    unitPrice: yup.number().positive('正の数を入力してください'),
     
     // FP計算
     externalInputFP: yup.number().min(0, '0以上の値を入力してください'),
@@ -32,7 +33,6 @@ const setupYupScheme = () => {
     
     // 工数・費用計算
     developmentMonths: yup.number().min(0, '0以上の値を入力してください'),
-    unitPrice: yup.number().min(0, '0以上の値を入力してください'),
     totalCost: yup.number(),
     
     // その他
@@ -77,11 +77,11 @@ function CalcForm(props: Props) {
   /** ▼ FP合計を計算 */
   const calculateTotalFP = () => {
     const total = 
-      (parseFloat(String(externalInputFP)) || 0) + 
-      (parseFloat(String(externalOutputFP)) || 0) + 
-      (parseFloat(String(externalInquiryFP)) || 0) + 
-      (parseFloat(String(internalLogicalFileFP)) || 0) + 
-      (parseFloat(String(externalInterfaceFileFP)) || 0);
+      (Number(externalInputFP) || 0) + 
+      (Number(externalOutputFP) || 0) + 
+      (Number(externalInquiryFP) || 0) + 
+      (Number(internalLogicalFileFP) || 0) + 
+      (Number(externalInterfaceFileFP) || 0);
     setValue('totalFP', total);
     return total;
   };
@@ -90,7 +90,7 @@ function CalcForm(props: Props) {
   const calculateDevelopmentMonths = (totalFP: number) => {
     if (productivityFPPerMonth > 0) {
       const months = totalFP / productivityFPPerMonth;
-      setValue('developmentMonths', Number(months.toFixed(2)));
+      setValue('developmentMonths', Math.round(months * 100) / 100);
       return months;
     }
     setValue('developmentMonths', 0);
@@ -101,7 +101,7 @@ function CalcForm(props: Props) {
   const calculateTotalCost = (developmentMonths: number) => {
     if (unitPrice > 0 && developmentMonths > 0) {
       const cost = developmentMonths * unitPrice;
-      setValue('totalCost', Number(cost.toFixed(0)));
+      setValue('totalCost', Math.round(cost));
     } else {
       setValue('totalCost', 0);
     }
