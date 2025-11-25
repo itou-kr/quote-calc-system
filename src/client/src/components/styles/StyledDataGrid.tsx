@@ -7,7 +7,8 @@ import { styled } from '@mui/material/styles';
 const StyledDataGrid = styled(MuiDataGrid)<{ browserhorizontalscroll?: boolean }>(({ theme, browserhorizontalscroll: browserHorizontalScroll }) => ({
     ...(browserHorizontalScroll ? { minWidth: '100%', width: 'calc(var(--DataGrid-columnsTotalWidth) + var(--DataGrid-scrollbarSize) * var(--DataGrid-hasScrollY) + 4px)' } : {}),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [`& .${gridClasses.columnHeaders} [role=row]`]: {background: ((theme.vars || theme).palette.primary as any)[900], color: (theme.vars || theme).palette.primary.contrastText },
+    // [`& .${gridClasses.columnHeaders} [role=row]`]: {background: ((theme.vars || theme).palette.primary as any)[900], color: (theme.vars || theme).palette.primary.contrastText },
+    [`& .${gridClasses.columnHeaders} [role=row]`]: {background: ((theme.vars || theme).palette.primary as any)[900], color: '#000000' },
     [`& .${gridClasses['columnSeparator--sideRight']}`]: { display: 'none' },
     [`& .${gridClasses.cell}:focus, & .${gridClasses.cell}:focus-within, & .${gridClasses.columnHeader}:focus, & .${gridClasses.columnHeader}:focus-within`]: {
         outline: 'none',
