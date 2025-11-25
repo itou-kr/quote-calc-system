@@ -2,42 +2,52 @@ import * as yup from 'yup';
 import { useImportFile } from '@front/hooks/TEST/test';
 import { useExportFile } from '@front/hooks/TEST/test';
 import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
-import { useMemo } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { useMemo, useState } from 'react';
+import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Stack, Grid2 as Grid, Paper, Typography, Divider } from '@mui/material';
+import { 
+  Box, 
+  Stack, 
+  Paper, 
+  Typography, 
+  Divider,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  Checkbox,
+  Select,
+  MenuItem,
+  Tabs,
+  Tab
+} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import ImportButton from '@front/components/ui/Button/ImportButton';
 import ExportButton from '@front/components/ui/Button/ExportButton';
 import Button from '@front/components/ui/Button';
-import FileUpload from '@front/components/ui/FileUpload';
-import FormContent, { Record, RecordTitle, Separator } from '@front/components/ui/Layout/Form/Content';
 import TextField from '@front/components/ui/TextField';
 import { t } from 'i18next';
 
 const setupYupScheme = () => {
   return yup.object({
-    // 基本情報
+    // 案件情報
     projectName: yup.string().required('案件名を入力してください'),
-    projectType: yup.string(),
-    productivityFPPerMonth: yup.number().positive('正の数を入力してください'),
-    unitPrice: yup.number().positive('正の数を入力してください'),
+    productivityFPPerMonth: yup.number().positive('正の数を入力してください').required('生産性を入力してください'),
+    projectType: yup.string().required('案件種別を選択してください'),
     
-    // FP計算
-    externalInputFP: yup.number().min(0, '0以上の値を入力してください'),
-    externalOutputFP: yup.number().min(0, '0以上の値を入力してください'),
-    externalInquiryFP: yup.number().min(0, '0以上の値を入力してください'),
-    internalLogicalFileFP: yup.number().min(0, '0以上の値を入力してください'),
-    externalInterfaceFileFP: yup.number().min(0, '0以上の値を入力してください'),
-    totalFP: yup.number(),
-    
-    // 工数・費用計算
-    developmentMonths: yup.number().min(0, '0以上の値を入力してください'),
-    totalCost: yup.number(),
-    
-    // その他
-    remarks: yup.string(),
-    fileUpload: yup.mixed(),
+    // 画面情報
+    screens: yup.array().of(
+      yup.object({
+        selected: yup.boolean(),
+        name: yup.string(),
+        updateType: yup.string(),
+        fpValue: yup.number().min(0, '0以上の値を入力してください'),
+        remarks: yup.string(),
+      })
+    ),
   });
 };
 
@@ -51,6 +61,7 @@ type Props = {
 
 function CalcForm(props: Props) {
   const { viewId } = props;
+  const [tabValue, setTabValue] = useState(0);
 
   const schema = useMemo(() => setupYupScheme(), []);
 
@@ -61,57 +72,76 @@ function CalcForm(props: Props) {
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
     resolver: yupResolver(schema),
-    defaultValues: props.data, // ← 初期値
+    defaultValues: {
+      projectName: '',
+      productivityFPPerMonth: undefined,
+      projectType: '新規開発',
+      screens: [
+        { selected: false, name: '社員マスタ', updateType: '更新あり', fpValue: 0, remarks: '' },
+        { selected: false, name: '部署マスタ', updateType: '更新あり', fpValue: 0, remarks: '' },
+        { selected: true, name: '画面名称を入力', updateType: '参照のみ', fpValue: 0, remarks: '' },
+        { selected: false, name: '画面名称を入力', updateType: '選択してください', fpValue: 0, remarks: '' },
+        { selected: false, name: '画面名称を入力', updateType: '選択してください', fpValue: 0, remarks: '' },
+        { selected: false, name: '画面名称を入力', updateType: '選択してください', fpValue: 0, remarks: '' },
+        { selected: false, name: '画面名称を入力', updateType: '選択してください', fpValue: 0, remarks: '' },
+        { selected: false, name: '画面名称を入力', updateType: '選択してください', fpValue: 0, remarks: '' },
+      ],
+      ...props.data,
+    },
   });
-  const { control, trigger, watch, setValue } = methods;
+  
+  const { control, trigger, watch, setValue, getValues } = methods;
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'screens',
+  });
 
-  // フォームの値を監視
-  const externalInputFP = watch('externalInputFP') || 0;
-  const externalOutputFP = watch('externalOutputFP') || 0;
-  const externalInquiryFP = watch('externalInquiryFP') || 0;
-  const internalLogicalFileFP = watch('internalLogicalFileFP') || 0;
-  const externalInterfaceFileFP = watch('externalInterfaceFileFP') || 0;
+  const screens = watch('screens') || [];
   const productivityFPPerMonth = watch('productivityFPPerMonth') || 0;
-  const unitPrice = watch('unitPrice') || 0;
 
   /** ▼ FP合計を計算 */
   const calculateTotalFP = () => {
-    const total = 
-      (Number(externalInputFP) || 0) + 
-      (Number(externalOutputFP) || 0) + 
-      (Number(externalInquiryFP) || 0) + 
-      (Number(internalLogicalFileFP) || 0) + 
-      (Number(externalInterfaceFileFP) || 0);
-    setValue('totalFP', total);
+    const total = screens.reduce((sum, screen) => sum + (Number(screen.fpValue) || 0), 0);
     return total;
   };
 
-  /** ▼ 開発月数を計算 */
-  const calculateDevelopmentMonths = (totalFP: number) => {
+  /** ▼ 工数を計算 */
+  const calculateManMonths = () => {
+    const totalFP = calculateTotalFP();
     if (productivityFPPerMonth > 0) {
-      const months = totalFP / productivityFPPerMonth;
-      setValue('developmentMonths', Math.round(months * 100) / 100);
-      return months;
+      return Math.round((totalFP / productivityFPPerMonth) * 100) / 100;
     }
-    setValue('developmentMonths', 0);
     return 0;
   };
 
-  /** ▼ 総費用を計算 */
-  const calculateTotalCost = (developmentMonths: number) => {
-    if (unitPrice > 0 && developmentMonths > 0) {
-      const cost = developmentMonths * unitPrice;
-      setValue('totalCost', Math.round(cost));
-    } else {
-      setValue('totalCost', 0);
-    }
+  /** ▼ 工数計算実行 */
+  const onCalculateClick = () => {
+    // 計算実行時の処理（現状は自動計算のため、トリガーのみ）
+    trigger();
   };
 
-  /** ▼ 全体の計算実行 */
-  const onCalculateClick = () => {
-    const totalFP = calculateTotalFP();
-    const devMonths = calculateDevelopmentMonths(totalFP);
-    calculateTotalCost(devMonths);
+  /** ▼ 行追加 */
+  const onAddRow = () => {
+    append({ 
+      selected: false, 
+      name: '画面名称を入力', 
+      updateType: '選択してください', 
+      fpValue: 0, 
+      remarks: '' 
+    });
+  };
+
+  /** ▼ 選択削除 */
+  const onDeleteSelected = () => {
+    const values = getValues('screens');
+    if (!values) return;
+    
+    const indicesToRemove = values
+      .map((screen, index) => (screen.selected ? index : -1))
+      .filter(index => index !== -1)
+      .reverse(); // 後ろから削除
+    
+    indicesToRemove.forEach(index => remove(index));
   };
 
   /** ▼ インポート処理 */
@@ -121,7 +151,7 @@ function CalcForm(props: Props) {
 
     try {
       const json = JSON.parse(result.content);
-      methods.reset(json); // ← フォームに値を反映させる
+      methods.reset(json);
     } catch (e) {
       console.error('JSON parse error:', e);
     }
@@ -136,224 +166,334 @@ function CalcForm(props: Props) {
     });
   };
 
+  const totalFP = calculateTotalFP();
+  const manMonths = calculateManMonths();
+
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <FormProvider {...methods}>
-        <Grid container direction="column" spacing={3}>
-          {/* ヘッダー部分 */}
-          <Grid>
-            <Paper elevation={3} sx={{ p: 2 }}>
-              <Typography variant="h5" gutterBottom>
-                見積計算システム
+        {/* ヘッダー */}
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            bgcolor: '#1976d2', 
+            color: 'white', 
+            p: 2,
+            borderRadius: 0
+          }}
+        >
+          <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+            FP見積システム
+          </Typography>
+        </Paper>
+
+        {/* タブエリア */}
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: '#f5f5f5' }}>
+          <Tabs value={tabValue} onChange={(_, newValue) => setTabValue(newValue)}>
+            <Tab 
+              icon={<Box component="span" sx={{ mr: 1 }}>✎</Box>}
+              label="入力編（青枠）" 
+              sx={{ 
+                border: '2px solid #1976d2',
+                borderBottom: 'none',
+                borderRadius: '4px 4px 0 0',
+                mr: 1,
+                bgcolor: tabValue === 0 ? 'white' : 'transparent'
+              }}
+            />
+            <Tab 
+              icon={<Box component="span" sx={{ mr: 1 }}>⚙</Box>}
+              label="自動計算編（グレー背景）" 
+              sx={{ 
+                bgcolor: '#e0e0e0',
+                borderRadius: '4px 4px 0 0',
+                mr: 1
+              }}
+            />
+            <Tab 
+              icon={<Box component="span" sx={{ mr: 1 }}>ⓘ</Box>}
+              label="計算ボタンを押すと自動で値が更新されます"
+              disabled
+              sx={{ flexGrow: 1, textAlign: 'left' }}
+            />
+          </Tabs>
+        </Box>
+
+        {/* メインコンテンツエリア */}
+        <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+          {/* 左サイドバー - 案件情報 */}
+          <Box 
+            sx={{ 
+              width: 320, 
+              borderRight: 1, 
+              borderColor: 'divider',
+              p: 2,
+              overflow: 'auto',
+              bgcolor: 'white'
+            }}
+          >
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
+              案件情報
+            </Typography>
+
+            {/* 案件名 */}
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 'bold' }}>
+                案件名 <Typography component="span" color="error">*</Typography>
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Function Point法による開発工数・費用の見積計算
+              <TextField 
+                name="projectName" 
+                control={control} 
+                trigger={trigger} 
+                t={t}
+                sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }}
+              />
+            </Box>
+
+            {/* 生産性 */}
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 'bold' }}>
+                生産性(FP/月) <Typography component="span" color="error">*</Typography>
               </Typography>
-            </Paper>
-          </Grid>
+              <TextField 
+                name="productivityFPPerMonth" 
+                control={control} 
+                trigger={trigger} 
+                t={t}
+                type="number"
+              />
+            </Box>
 
-          {/* 基本情報セクション */}
-          <Grid>
-            <Paper elevation={2} sx={{ p: 2 }}>
-              <FormContent>
-                <RecordTitle colSpan={3}>
-                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                    基本情報
-                  </Typography>
-                </RecordTitle>
-                <Record label="案件名" labelVerticalAlign="top">
-                  <TextField 
-                    name="projectName" 
-                    control={control} 
-                    trigger={trigger} 
-                    t={t} 
-                    required
-                  />
-                </Record>
-                <Record label="案件種別">
-                  <TextField 
-                    name="projectType" 
-                    control={control} 
-                    trigger={trigger} 
-                    t={t} 
-                  />
-                </Record>
-                <Record label="生産性（FP/月）">
-                  <TextField 
-                    name="productivityFPPerMonth" 
-                    control={control} 
-                    trigger={trigger} 
-                    t={t}
-                    type="number"
-                  />
-                </Record>
-                <Record label="単価（円/月）">
-                  <TextField 
-                    name="unitPrice" 
-                    control={control} 
-                    trigger={trigger} 
-                    t={t}
-                    type="number"
-                  />
-                </Record>
-              </FormContent>
-            </Paper>
-          </Grid>
+            {/* 案件種別 */}
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 'bold' }}>
+                案件種別 <Typography component="span" color="error">*</Typography>
+              </Typography>
+              <Select
+                value={watch('projectType') || '新規開発'}
+                onChange={(e) => setValue('projectType', e.target.value)}
+                fullWidth
+                size="small"
+                sx={{ bgcolor: 'white' }}
+              >
+                <MenuItem value="新規開発">新規開発</MenuItem>
+                <MenuItem value="機能追加">機能追加</MenuItem>
+                <MenuItem value="改修">改修</MenuItem>
+              </Select>
+            </Box>
 
-          {/* FP計算セクション */}
-          <Grid>
-            <Paper elevation={2} sx={{ p: 2 }}>
-              <FormContent>
-                <RecordTitle colSpan={3}>
-                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                    ファンクションポイント（FP）計算
-                  </Typography>
-                </RecordTitle>
-                <Record label="外部入力（EI）">
-                  <TextField 
-                    name="externalInputFP" 
-                    control={control} 
-                    trigger={trigger} 
-                    t={t}
-                    type="number"
-                  />
-                </Record>
-                <Record label="外部出力（EO）">
-                  <TextField 
-                    name="externalOutputFP" 
-                    control={control} 
-                    trigger={trigger} 
-                    t={t}
-                    type="number"
-                  />
-                </Record>
-                <Record label="外部照会（EQ）">
-                  <TextField 
-                    name="externalInquiryFP" 
-                    control={control} 
-                    trigger={trigger} 
-                    t={t}
-                    type="number"
-                  />
-                </Record>
-                <Record label="内部論理ファイル（ILF）">
-                  <TextField 
-                    name="internalLogicalFileFP" 
-                    control={control} 
-                    trigger={trigger} 
-                    t={t}
-                    type="number"
-                  />
-                </Record>
-                <Record label="外部インターフェースファイル（EIF）">
-                  <TextField 
-                    name="externalInterfaceFileFP" 
-                    control={control} 
-                    trigger={trigger} 
-                    t={t}
-                    type="number"
-                  />
-                </Record>
-                <Separator />
-                <Record label="合計FP">
-                  <TextField 
-                    name="totalFP" 
-                    control={control} 
-                    trigger={trigger} 
-                    t={t}
-                    type="number"
-                    readOnly
-                    sx={{ backgroundColor: '#f5f5f5' }}
-                  />
-                </Record>
-              </FormContent>
-            </Paper>
-          </Grid>
+            {/* インポート/エクスポート */}
+            <Stack direction="row" spacing={1} sx={{ mb: 3 }}>
+              <ImportButton
+                onFileSelect={onImportButtonClick}
+                onClick={() => {}}
+                size="small"
+              >
+                インポート
+              </ImportButton>
+              <ExportButton 
+                onClick={onExportButtonClick}
+                size="small"
+              />
+            </Stack>
 
-          {/* 計算結果セクション */}
-          <Grid>
-            <Paper elevation={2} sx={{ p: 2 }}>
-              <FormContent>
-                <RecordTitle colSpan={3}>
-                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                    計算結果
-                  </Typography>
-                </RecordTitle>
-                <Record label="開発月数">
-                  <TextField 
-                    name="developmentMonths" 
-                    control={control} 
-                    trigger={trigger} 
-                    t={t}
-                    type="number"
-                    readOnly
-                    sx={{ backgroundColor: '#f5f5f5' }}
-                  />
-                </Record>
-                <Record label="総費用（円）">
-                  <TextField 
-                    name="totalCost" 
-                    control={control} 
-                    trigger={trigger} 
-                    t={t}
-                    type="number"
-                    readOnly
-                    sx={{ backgroundColor: '#f5f5f5' }}
-                  />
-                </Record>
-              </FormContent>
-            </Paper>
-          </Grid>
+            <Divider sx={{ my: 2 }} />
 
-          {/* その他セクション */}
-          <Grid>
-            <Paper elevation={2} sx={{ p: 2 }}>
-              <FormContent>
-                <RecordTitle colSpan={3}>
-                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                    その他
-                  </Typography>
-                </RecordTitle>
-                <Record label="備考" labelVerticalAlign="top">
-                  <TextField 
-                    name="remarks" 
-                    control={control} 
-                    trigger={trigger} 
-                    t={t}
-                    multiline
-                    multilineRowsAuto
-                  />
-                </Record>
-                <Record label="アップロードファイル">
-                  <FileUpload name="fileUpload" control={control} trigger={trigger} t={t} />
-                </Record>
-              </FormContent>
-            </Paper>
-          </Grid>
+            {/* 計算結果サマリー */}
+            <Typography variant="body2" sx={{ mb: 2, fontWeight: 'bold' }}>
+              計算結果サマリー
+            </Typography>
+            
+            <Box sx={{ mb: 2, p: 1.5, bgcolor: '#f5f5f5', borderRadius: 1 }}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Typography variant="body2">総FP</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                  {totalFP}
+                </Typography>
+              </Stack>
+            </Box>
 
-          {/* ボタンエリア */}
-          <Grid>
-            <Paper elevation={2} sx={{ p: 2 }}>
-              <Stack direction="row" spacing={2} justifyContent="center">
+            <Box sx={{ mb: 2, p: 1.5, bgcolor: '#f5f5f5', borderRadius: 1 }}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Typography variant="body2">工数(人月)</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                  {manMonths}
+                </Typography>
+              </Stack>
+            </Box>
+
+            {/* 工数計算実行ボタン */}
+            <Button 
+              variant="contained" 
+              color="primary" 
+              onClick={onCalculateClick}
+              sx={{ mt: 2, width: '100%' }}
+            >
+              工数計算を実行
+            </Button>
+          </Box>
+
+          {/* 右メインエリア - 画面情報入力 */}
+          <Box sx={{ flex: 1, p: 2, overflow: 'auto', bgcolor: '#fafafa' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                画面情報入力
+              </Typography>
+              <Stack direction="row" spacing={1}>
                 <Button 
                   variant="contained" 
-                  color="primary" 
+                  color="primary"
+                  startIcon={<AddIcon />}
+                  onClick={onAddRow}
+                  size="small"
+                >
+                  行追加
+                </Button>
+                <Button 
+                  variant="contained" 
+                  color="error"
+                  startIcon={<DeleteIcon />}
+                  onClick={onDeleteSelected}
+                  size="small"
+                >
+                  選択削除
+                </Button>
+              </Stack>
+            </Box>
+
+            {/* テーブル */}
+            <Paper elevation={1} sx={{ overflow: 'hidden' }}>
+              <Table stickyHeader size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell padding="checkbox" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold' }}>
+                      選択
+                    </TableCell>
+                    <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 60 }}>
+                      No
+                    </TableCell>
+                    <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 200 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Box component="span" sx={{ mr: 0.5 }}>✎</Box>
+                        名称
+                      </Box>
+                    </TableCell>
+                    <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 150 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Box component="span" sx={{ mr: 0.5 }}>✎</Box>
+                        更新種別
+                      </Box>
+                    </TableCell>
+                    <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 100 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Box component="span" sx={{ mr: 0.5 }}>⚙</Box>
+                        FP値
+                      </Box>
+                    </TableCell>
+                    <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 200 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Box component="span" sx={{ mr: 0.5 }}>✎</Box>
+                        備考
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {fields.map((field, index) => (
+                    <TableRow key={field.id} hover>
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={watch(`screens.${index}.selected`) || false}
+                          onChange={(e) => setValue(`screens.${index}.selected`, e.target.checked)}
+                        />
+                      </TableCell>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>
+                        <TextField
+                          name={`screens.${index}.name`}
+                          control={control}
+                          trigger={trigger}
+                          t={t}
+                          notFullWidth
+                          sx={{ 
+                            '& .MuiInputBase-root': { 
+                              bgcolor: index === 2 ? '#fff9c4' : 'white',
+                              minWidth: 180
+                            } 
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Select
+                          value={watch(`screens.${index}.updateType`) || '選択してください'}
+                          onChange={(e) => setValue(`screens.${index}.updateType`, e.target.value)}
+                          size="small"
+                          fullWidth
+                          sx={{ bgcolor: 'white', minWidth: 130 }}
+                        >
+                          <MenuItem value="選択してください">選択してください</MenuItem>
+                          <MenuItem value="更新あり">更新あり</MenuItem>
+                          <MenuItem value="参照のみ">参照のみ</MenuItem>
+                        </Select>
+                      </TableCell>
+                      <TableCell>
+                        <TextField
+                          name={`screens.${index}.fpValue`}
+                          control={control}
+                          trigger={trigger}
+                          t={t}
+                          type="number"
+                          notFullWidth
+                          sx={{ 
+                            '& .MuiInputBase-root': { 
+                              bgcolor: '#f5f5f5',
+                              minWidth: 80
+                            } 
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <TextField
+                          name={`screens.${index}.remarks`}
+                          control={control}
+                          trigger={trigger}
+                          t={t}
+                          notFullWidth
+                          sx={{ 
+                            '& .MuiInputBase-root': { 
+                              bgcolor: 'white',
+                              minWidth: 180
+                            } 
+                          }}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Paper>
+
+            {/* 下部ボタンエリア */}
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+              <Stack direction="row" spacing={2}>
+                <Button 
+                  variant="contained" 
+                  sx={{ bgcolor: '#546e7a', '&:hover': { bgcolor: '#455a64' } }}
                   onClick={onCalculateClick}
                 >
                   計算実行
                 </Button>
-                <Divider orientation="vertical" flexItem />
                 <ImportButton
                   onFileSelect={onImportButtonClick}
                   onClick={() => {}}
                 >
-                  インポート
+                  ファイルから入力
                 </ImportButton>
                 <ExportButton onClick={onExportButtonClick} />
               </Stack>
-            </Paper>
-          </Grid>
-        </Grid>
+            </Box>
+          </Box>
+        </Box>
       </FormProvider>
     </Box>
   );
