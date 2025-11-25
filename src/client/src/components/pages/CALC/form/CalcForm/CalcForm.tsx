@@ -31,6 +31,18 @@ import Button from '@front/components/ui/Button';
 import TextField from '@front/components/ui/TextField';
 import { t } from 'i18next';
 
+// 初期画面データ
+const DEFAULT_SCREENS = [
+  { selected: false, name: '社員マスタ', updateType: '更新あり', fpValue: 0, remarks: '' },
+  { selected: false, name: '部署マスタ', updateType: '更新あり', fpValue: 0, remarks: '' },
+  { selected: true, name: '画面名称を入力', updateType: '参照のみ', fpValue: 0, remarks: '', highlighted: true },
+  { selected: false, name: '画面名称を入力', updateType: '', fpValue: 0, remarks: '' },
+  { selected: false, name: '画面名称を入力', updateType: '', fpValue: 0, remarks: '' },
+  { selected: false, name: '画面名称を入力', updateType: '', fpValue: 0, remarks: '' },
+  { selected: false, name: '画面名称を入力', updateType: '', fpValue: 0, remarks: '' },
+  { selected: false, name: '画面名称を入力', updateType: '', fpValue: 0, remarks: '' },
+] as const;
+
 const setupYupScheme = () => {
   return yup.object({
     // 案件情報
@@ -46,6 +58,7 @@ const setupYupScheme = () => {
         updateType: yup.string(),
         fpValue: yup.number().min(0, '0以上の値を入力してください'),
         remarks: yup.string(),
+        highlighted: yup.boolean().optional(),
       })
     ),
   });
@@ -76,16 +89,7 @@ function CalcForm(props: Props) {
       projectName: '',
       productivityFPPerMonth: undefined,
       projectType: '新規開発',
-      screens: [
-        { selected: false, name: '社員マスタ', updateType: '更新あり', fpValue: 0, remarks: '' },
-        { selected: false, name: '部署マスタ', updateType: '更新あり', fpValue: 0, remarks: '' },
-        { selected: true, name: '画面名称を入力', updateType: '参照のみ', fpValue: 0, remarks: '' },
-        { selected: false, name: '画面名称を入力', updateType: '選択してください', fpValue: 0, remarks: '' },
-        { selected: false, name: '画面名称を入力', updateType: '選択してください', fpValue: 0, remarks: '' },
-        { selected: false, name: '画面名称を入力', updateType: '選択してください', fpValue: 0, remarks: '' },
-        { selected: false, name: '画面名称を入力', updateType: '選択してください', fpValue: 0, remarks: '' },
-        { selected: false, name: '画面名称を入力', updateType: '選択してください', fpValue: 0, remarks: '' },
-      ],
+      screens: [...DEFAULT_SCREENS],
       ...props.data,
     },
   });
@@ -114,9 +118,10 @@ function CalcForm(props: Props) {
     return 0;
   };
 
-  /** ▼ 工数計算実行 */
-  const onCalculateClick = () => {
-    // 計算実行時の処理（現状は自動計算のため、トリガーのみ）
+  /** ▼ 工数計算実行（バリデーショントリガー） */
+  const onExecuteCalculation = () => {
+    // フォームのバリデーションを実行
+    // 計算自体はリアクティブに自動実行される
     trigger();
   };
 
@@ -125,7 +130,7 @@ function CalcForm(props: Props) {
     append({ 
       selected: false, 
       name: '画面名称を入力', 
-      updateType: '選択してください', 
+      updateType: '', // 空文字列で未選択状態
       fpValue: 0, 
       remarks: '' 
     });
@@ -210,12 +215,12 @@ function CalcForm(props: Props) {
                 mr: 1
               }}
             />
-            <Tab 
-              icon={<Box component="span" sx={{ mr: 1 }}>ⓘ</Box>}
-              label="計算ボタンを押すと自動で値が更新されます"
-              disabled
-              sx={{ flexGrow: 1, textAlign: 'left' }}
-            />
+            <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', px: 2, color: 'text.secondary' }}>
+              <Box component="span" sx={{ mr: 1 }}>ⓘ</Box>
+              <Typography variant="body2">
+                計算ボタンを押すと自動で値が更新されます
+              </Typography>
+            </Box>
           </Tabs>
         </Box>
 
@@ -326,7 +331,7 @@ function CalcForm(props: Props) {
             <Button 
               variant="contained" 
               color="primary" 
-              onClick={onCalculateClick}
+              onClick={onExecuteCalculation}
               sx={{ mt: 2, width: '100%' }}
             >
               工数計算を実行
@@ -417,7 +422,7 @@ function CalcForm(props: Props) {
                           notFullWidth
                           sx={{ 
                             '& .MuiInputBase-root': { 
-                              bgcolor: index === 2 ? '#fff9c4' : 'white',
+                              bgcolor: watch(`screens.${index}.highlighted`) ? '#fff9c4' : 'white',
                               minWidth: 180
                             } 
                           }}
@@ -425,13 +430,14 @@ function CalcForm(props: Props) {
                       </TableCell>
                       <TableCell>
                         <Select
-                          value={watch(`screens.${index}.updateType`) || '選択してください'}
+                          value={watch(`screens.${index}.updateType`) || ''}
                           onChange={(e) => setValue(`screens.${index}.updateType`, e.target.value)}
                           size="small"
                           fullWidth
+                          displayEmpty
                           sx={{ bgcolor: 'white', minWidth: 130 }}
                         >
-                          <MenuItem value="選択してください">選択してください</MenuItem>
+                          <MenuItem value="">選択してください</MenuItem>
                           <MenuItem value="更新あり">更新あり</MenuItem>
                           <MenuItem value="参照のみ">参照のみ</MenuItem>
                         </Select>
@@ -479,7 +485,7 @@ function CalcForm(props: Props) {
                 <Button 
                   variant="contained" 
                   sx={{ bgcolor: '#546e7a', '&:hover': { bgcolor: '#455a64' } }}
-                  onClick={onCalculateClick}
+                  onClick={onExecuteCalculation}
                 >
                   計算実行
                 </Button>
