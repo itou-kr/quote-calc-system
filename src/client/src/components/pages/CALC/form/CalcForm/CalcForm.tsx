@@ -5,9 +5,11 @@ import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
 import { useMemo, useState } from 'react';
 import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Stack, Paper, Typography, Divider, Table, TableHead, TableBody, TableRow, TableCell, Checkbox, Select, MenuItem, Tabs, Tab } from '@mui/material';
+import { Box, Stack, Paper, Typography, Divider, Table, TableHead, TableBody, TableRow, TableCell, Checkbox, Select, MenuItem, Tabs, Tab, Collapse, IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 import ImportButton from '@front/components/ui/Button/ImportButton';
 import ExportButton from '@front/components/ui/Button/ExportButton';
@@ -78,7 +80,6 @@ type Props = {
 
 function CalcForm(props: Props) {
     const { viewId } = props;
-    const [tabValue, setTabValue] = useState(0);
 
     const schema = useMemo(() => setupYupScheme(), []);
 
@@ -116,6 +117,16 @@ function CalcForm(props: Props) {
     const productivityFPPerMonth = watch('productivityFPPerMonth') || 0;
     
     const [tableTabValue, setTableTabValue] = useState(0);
+    const [processBreakdownOpen, setProcessBreakdownOpen] = useState(false);
+
+    // 工程別の比率（デフォルト値）
+    const processRatios = {
+        basicDesign: 0.157,
+        detailedDesign: 0.189,
+        implementation: 0.354,
+        integrationTest: 0.164,
+        systemTest: 0.136,
+    };
 
     /** ▼ FP合計を計算 */
     const calculateTotalFP = () => {
@@ -131,6 +142,18 @@ function CalcForm(props: Props) {
             return Math.round((totalFP / productivityFPPerMonth) * 100) / 100;
         }
         return 0;
+    };
+
+    /** ▼ 工程別の工数を計算 */
+    const calculateProcessManMonths = (ratio: number) => {
+        const totalManMonths = calculateManMonths();
+        return Math.round(totalManMonths * ratio * 100) / 100;
+    };
+
+    /** ▼ 工程別の工期を計算（仮：工数と同じ値を表示） */
+    const calculateProcessDuration = (ratio: number) => {
+        const totalManMonths = calculateManMonths();
+        return Math.round(totalManMonths * ratio * 100) / 100;
     };
 
     /** ▼ 工数計算実行（バリデーショントリガー） */
@@ -216,16 +239,20 @@ function CalcForm(props: Props) {
                     <Typography variant="h5" sx={{ fontWeight: 'bold' }}>FP見積システム</Typography>
                 </Paper>
 
-                {/* タブエリア */}
-                <Box sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: '#f5f5f5' }}>
-                    <Tabs value={tabValue} onChange={(_, newValue) => setTabValue(newValue)}>
-                        <Tab icon={<Box component="span" sx={{ mr: 1 }}>✎</Box>} label="入力編（青枠）" sx={{ border: '2px solid #1976d2', borderBottom: 'none', borderRadius: '4px 4px 0 0', mr: 1, bgcolor: tabValue === 0 ? 'white' : 'transparent' }} />
-                        <Tab icon={<Box component="span" sx={{ mr: 1 }}>⚙</Box>} label="自動計算編（グレー背景）" sx={{ bgcolor: '#e0e0e0', borderRadius: '4px 4px 0 0', mr: 1 }} />
-                        <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', px: 2, color: 'text.secondary' }}>
-                            <Box component="span" sx={{ mr: 1 }}>ⓘ</Box>
-                            <Typography variant="body2">計算ボタンを押すと自動で値が更新されます</Typography>
-                        </Box>
-                    </Tabs>
+                {/* ラベルエリア */}
+                <Box sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: '#f5f5f5', display: 'flex', alignItems: 'center', py: 1.5, px: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                        <Box component="span" sx={{ mr: 1 }}>✎</Box>
+                        <Typography variant="body1">入力編（青枠）</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                        <Box component="span" sx={{ mr: 1 }}>⚙</Box>
+                        <Typography variant="body1">自動計算編（グレー背景）</Typography>
+                    </Box>
+                    <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
+                        <Box component="span" sx={{ mr: 1 }}>ⓘ</Box>
+                        <Typography variant="body2">計算ボタンを押すと自動で値が更新されます</Typography>
+                    </Box>
                 </Box>
 
                 {/* メインコンテンツエリア */}
@@ -256,8 +283,17 @@ function CalcForm(props: Props) {
                             </Select>
                         </Box>
 
+                        {/* 使用する工程別比率 */}
+                        <Box sx={{ mb: 2 }}>
+                            <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>使用する工程別比率</Typography>
+                            <Select defaultValue="中央値" size="small" fullWidth sx={{ bgcolor: 'white' }}>
+                                <MenuItem value="中央値">中央値</MenuItem>
+                                <MenuItem value="平均値">平均値</MenuItem>
+                            </Select>
+                        </Box>
+
                         {/* インポート/エクスポート */}
-                        <Stack direction="row" spacing={1} sx={{ mb: 3 }}>
+                        <Stack direction="row" spacing={1} sx={{ mb: 3, mt: 2 }}>
                             <ImportButton onFileSelect={onImportButtonClick} onClick={() => {}} size="small">インポート</ImportButton>
                             <ExportButton onClick={onExportButtonClick} size="small" />
                         </Stack>
@@ -283,63 +319,64 @@ function CalcForm(props: Props) {
 
                         {/* 工数計算実行ボタン */}
                         <Button variant="contained" color="primary" onClick={onExecuteCalculation} sx={{ mt: 2, width: '100%' }}>工数計算を実行</Button>
+                        
+                        {/* 工程別工数・工期表示ボタン */}
+                        <Button variant="contained" color="primary" onClick={() => setProcessBreakdownOpen(!processBreakdownOpen)} sx={{ mt: 2, width: '100%' }}>
+                            {processBreakdownOpen ? '工程別工数・工期を非表示' : '工程別工数・工期を表示'}
+                        </Button>
                     </Box>
 
                     {/* 右メインエリア - 画面情報入力 */}
-                    <Box sx={{ flex: 1, p: 2, overflow: 'auto', bgcolor: '#fafafa' }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                            <Stack direction="row" spacing={1}>
-                                <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={onAddRow} size="small">行追加</Button>
-                                <Button variant="contained" color="error" startIcon={<DeleteIcon />} onClick={onDeleteSelected} size="small">選択削除</Button>
-                            </Stack>
-                        </Box>
-                        
-                        {/* テーブルタブ */}
-                        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+                    <Box sx={{ flex: 1, p: 2, overflow: 'hidden', bgcolor: '#fafafa' }}>
+                        {/* テーブルタブと操作ボタン */}
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: 1, borderColor: 'divider', mb: 2 }}>
                             <Tabs value={tableTabValue} onChange={(_, newValue) => setTableTabValue(newValue)}>
                                 <Tab label="データファンクション" />
                                 <Tab label="トランザクションファンクション" />
                             </Tabs>
+                            <Stack direction="row" spacing={1} sx={{ mr: 2 }}>
+                                <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={onAddRow} size="small">行追加</Button>
+                                <Button variant="contained" color="error" startIcon={<DeleteIcon />} onClick={onDeleteSelected} size="small">行削除</Button>
+                            </Stack>
                         </Box>
 
-                        {/* テーブル */}
-                        <Paper elevation={1} sx={{ maxHeight: 'calc(100vh - 350px)', overflow: 'auto' }}>
+                        {/* ファンクション情報入力テーブル */}
+                        <Paper elevation={1} sx={{ maxHeight: processBreakdownOpen ? 'calc(100vh - 460px)' : 'calc(100vh - 300px)', overflow: 'auto', transition: 'max-height 300ms ease-in-out' }}>
                             <Table stickyHeader size="small">
                                 {tableTabValue === 0 ? (
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell padding="checkbox" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold' }}>選択</TableCell>
-                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 60 }}>No</TableCell>
-                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 200 }}>
+                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 60 }}>No</TableCell>
+                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 300 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                     <Box component="span" sx={{ mr: 0.5 }}>✎</Box>
                                                     名称
                                                 </Box>
                                             </TableCell>
-                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 150 }}>
+                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 150 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                     <Box component="span" sx={{ mr: 0.5 }}>✎</Box>
                                                     更新種別
                                                 </Box>
                                             </TableCell>
-                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 100 }}>
+                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 100 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                     <Box component="span" sx={{ mr: 0.5 }}>⚙</Box>
                                                     FP値
                                                 </Box>
                                             </TableCell>
-                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 200 }}>
+                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 300 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                     <Box component="span" sx={{ mr: 0.5 }}>✎</Box>
                                                     備考
                                                 </Box>
                                             </TableCell>
+                                            <TableCell align="center" padding="checkbox" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 80 }}>行選択</TableCell>
                                         </TableRow>
                                     </TableHead>
                                 ) : (
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell padding="checkbox" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold' }}>選択</TableCell>
                                             <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 60 }}>No</TableCell>
                                             <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 200 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -347,36 +384,37 @@ function CalcForm(props: Props) {
                                                     名称
                                                 </Box>
                                             </TableCell>
-                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 60 }}>
+                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 100 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                     <Box component="span" sx={{ mr: 0.5 }}>✎</Box>
                                                     外部入力
                                                 </Box>
                                             </TableCell>
-                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 60 }}>
+                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 100 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                     <Box component="span" sx={{ mr: 0.5 }}>✎</Box>
                                                     外部出力
                                                 </Box>
                                             </TableCell>
-                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 60 }}>
+                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 100 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                     <Box component="span" sx={{ mr: 0.5 }}>✎</Box>
                                                     外部照会
                                                 </Box>
                                             </TableCell>
-                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 100 }}>
+                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 100 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                     <Box component="span" sx={{ mr: 0.5 }}>⚙</Box>
                                                     FP値
                                                 </Box>
                                             </TableCell>
-                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 200 }}>
+                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 300 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                     <Box component="span" sx={{ mr: 0.5 }}>✎</Box>
                                                     備考
                                                 </Box>
                                             </TableCell>
+                                            <TableCell align="center" padding="checkbox" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 80 }}>行選択</TableCell>
                                         </TableRow>
                                     </TableHead>
                                 )}
@@ -384,52 +422,52 @@ function CalcForm(props: Props) {
                                     {tableTabValue === 0 ? (
                                         dataFields.map((field, index) => (
                                             <TableRow key={field.id} hover>
-                                                <TableCell padding="checkbox">
-                                                    <Checkbox checked={watch(`dataFunctions.${index}.selected`) || false} onChange={(e) => setValue(`dataFunctions.${index}.selected`, e.target.checked)} />
-                                                </TableCell>
                                                 <TableCell>{index + 1}</TableCell>
                                                 <TableCell>
-                                                    <TextField name={`dataFunctions.${index}.name`} control={control} trigger={trigger} t={t} notFullWidth sx={{ '& .MuiInputBase-root': { bgcolor: 'white', minWidth: 180 } }} />
+                                                    <TextField name={`dataFunctions.${index}.name`} control={control} trigger={trigger} t={t} sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <Select value={watch(`dataFunctions.${index}.updateType`) || ''} onChange={(e) => setValue(`dataFunctions.${index}.updateType`, e.target.value)} size="small" fullWidth displayEmpty sx={{ bgcolor: 'white', minWidth: 130 }}>
+                                                    <Select value={watch(`dataFunctions.${index}.updateType`) || ''} onChange={(e) => setValue(`dataFunctions.${index}.updateType`, e.target.value)} size="small" fullWidth displayEmpty sx={{ bgcolor: 'white' }}>
                                                         <MenuItem value="">選択してください</MenuItem>
                                                         <MenuItem value="更新あり">更新あり</MenuItem>
                                                         <MenuItem value="参照のみ">参照のみ</MenuItem>
                                                     </Select>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <TextField name={`dataFunctions.${index}.fpValue`} control={control} trigger={trigger} t={t} type="number" notFullWidth sx={{ '& .MuiInputBase-root': { bgcolor: '#f5f5f5', minWidth: 80 } }} />
+                                                    <TextField name={`dataFunctions.${index}.fpValue`} control={control} trigger={trigger} t={t} type="number" notFullWidth disabled sx={{ '& .MuiInputBase-root': { bgcolor: '#f5f5f5', width: 80 } }} />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <TextField name={`dataFunctions.${index}.remarks`} control={control} trigger={trigger} t={t} notFullWidth sx={{ '& .MuiInputBase-root': { bgcolor: 'white', minWidth: 180 } }} />
+                                                    <TextField name={`dataFunctions.${index}.remarks`} control={control} trigger={trigger} t={t} sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} />
+                                                </TableCell>
+                                                <TableCell align="center" padding="checkbox">
+                                                    <Checkbox checked={watch(`dataFunctions.${index}.selected`) || false} onChange={(e) => setValue(`dataFunctions.${index}.selected`, e.target.checked)} />
                                                 </TableCell>
                                             </TableRow>
                                         ))
                                     ) : (
                                         transactionFields.map((field, index) => (
                                             <TableRow key={field.id} hover>
-                                                <TableCell padding="checkbox">
-                                                    <Checkbox checked={watch(`transactionFunctions.${index}.selected`) || false} onChange={(e) => setValue(`transactionFunctions.${index}.selected`, e.target.checked)} />
-                                                </TableCell>
                                                 <TableCell>{index + 1}</TableCell>
                                                 <TableCell>
-                                                    <TextField name={`transactionFunctions.${index}.name`} control={control} trigger={trigger} t={t} notFullWidth sx={{ '& .MuiInputBase-root': { bgcolor: 'white', minWidth: 180 } }} />
+                                                    <TextField name={`transactionFunctions.${index}.name`} control={control} trigger={trigger} t={t} sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <TextField name={`transactionFunctions.${index}.externalInput`} control={control} trigger={trigger} t={t} type="number" notFullWidth sx={{ '& .MuiInputBase-root': { bgcolor: 'white', minWidth: 40 } }} />
+                                                    <TextField name={`transactionFunctions.${index}.externalInput`} control={control} trigger={trigger} t={t} type="number" notFullWidth sx={{ '& .MuiInputBase-root': { bgcolor: 'white', width: 80 } }} />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <TextField name={`transactionFunctions.${index}.externalOutput`} control={control} trigger={trigger} t={t} type="number" notFullWidth sx={{ '& .MuiInputBase-root': { bgcolor: 'white', minWidth: 40 } }} />
+                                                    <TextField name={`transactionFunctions.${index}.externalOutput`} control={control} trigger={trigger} t={t} type="number" notFullWidth sx={{ '& .MuiInputBase-root': { bgcolor: 'white', width: 80 } }} />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <TextField name={`transactionFunctions.${index}.externalInquiry`} control={control} trigger={trigger} t={t} type="number" notFullWidth sx={{ '& .MuiInputBase-root': { bgcolor: 'white', minWidth: 40 } }} />
+                                                    <TextField name={`transactionFunctions.${index}.externalInquiry`} control={control} trigger={trigger} t={t} type="number" notFullWidth sx={{ '& .MuiInputBase-root': { bgcolor: 'white', width: 80 } }} />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <TextField name={`transactionFunctions.${index}.fpValue`} control={control} trigger={trigger} t={t} type="number" notFullWidth sx={{ '& .MuiInputBase-root': { bgcolor: '#f5f5f5', minWidth: 80 } }} />
+                                                    <TextField name={`transactionFunctions.${index}.fpValue`} control={control} trigger={trigger} t={t} type="number" notFullWidth disabled sx={{ '& .MuiInputBase-root': { bgcolor: '#f5f5f5', width: 80 } }} />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <TextField name={`transactionFunctions.${index}.remarks`} control={control} trigger={trigger} t={t} notFullWidth sx={{ '& .MuiInputBase-root': { bgcolor: 'white', minWidth: 180 } }} />
+                                                    <TextField name={`transactionFunctions.${index}.remarks`} control={control} trigger={trigger} t={t} sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} />
+                                                </TableCell>
+                                                <TableCell align="center" padding="checkbox">
+                                                    <Checkbox checked={watch(`transactionFunctions.${index}.selected`) || false} onChange={(e) => setValue(`transactionFunctions.${index}.selected`, e.target.checked)} />
                                                 </TableCell>
                                             </TableRow>
                                         ))
@@ -437,6 +475,59 @@ function CalcForm(props: Props) {
                                 </TableBody>
                             </Table>
                         </Paper>
+
+                        {/* 工程別工数・工期テーブル */}
+                        <Box sx={{ mt: 3 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, cursor: 'pointer', bgcolor: '#f5f5f5', p: 1, borderRadius: 1 }} onClick={() => setProcessBreakdownOpen(!processBreakdownOpen)}>
+                                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>工程別内訳</Typography>
+                                <IconButton size="small">
+                                    {processBreakdownOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                </IconButton>
+                            </Box>
+                            
+                            <Collapse in={processBreakdownOpen} timeout={300} unmountOnExit>
+                                <Paper elevation={1} sx={{ border: 1, borderColor: 'divider', overflow: 'auto' }}>
+                                    <Table size="small">
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 100 }}></TableCell>
+                                                <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider' }}>基本設計</TableCell>
+                                                <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider' }}>詳細設計</TableCell>
+                                                <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider' }}>実装</TableCell>
+                                                <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider' }}>結合テスト</TableCell>
+                                                <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold' }}>総合テスト</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            <TableRow>
+                                                <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>比率</TableCell>
+                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{processRatios.basicDesign}</TableCell>
+                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{processRatios.detailedDesign}</TableCell>
+                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{processRatios.implementation}</TableCell>
+                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{processRatios.integrationTest}</TableCell>
+                                                <TableCell align="center">{processRatios.systemTest}</TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>工数</TableCell>
+                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessManMonths(processRatios.basicDesign)}</TableCell>
+                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessManMonths(processRatios.detailedDesign)}</TableCell>
+                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessManMonths(processRatios.implementation)}</TableCell>
+                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessManMonths(processRatios.integrationTest)}</TableCell>
+                                                <TableCell align="center">{calculateProcessManMonths(processRatios.systemTest)}</TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>工期</TableCell>
+                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessDuration(processRatios.basicDesign)}</TableCell>
+                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessDuration(processRatios.detailedDesign)}</TableCell>
+                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessDuration(processRatios.implementation)}</TableCell>
+                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessDuration(processRatios.integrationTest)}</TableCell>
+                                                <TableCell align="center">{calculateProcessDuration(processRatios.systemTest)}</TableCell>
+                                            </TableRow>
+                                        </TableBody>
+                                    </Table>
+                                </Paper>
+                            </Collapse>
+                        </Box>
                     </Box>
                 </Box>
             </FormProvider>

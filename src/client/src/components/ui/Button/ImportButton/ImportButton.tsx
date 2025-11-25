@@ -27,7 +27,7 @@ function ImportButton({ onFileSelect, ...props }: Props) {
             <label htmlFor="import-input">
                 <ProgressButton {...props} startIcon={<FileuploadIcon />}>
                     {/* ★要修正 */}
-                    {'インポートボタン'}
+                    {'インポート'}
                 </ProgressButton>
             </label>
         </>

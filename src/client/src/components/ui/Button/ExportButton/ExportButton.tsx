@@ -16,7 +16,7 @@ function ExportButton(props: Props) {
     return (
         <ProgressButton {...props} startIcon={<FileDownloadIcon />}>
             {/* ★要修正 */}
-            {'エクスポートボタン'}
+            {'エクスポート'}
         </ProgressButton>
     )
 }
