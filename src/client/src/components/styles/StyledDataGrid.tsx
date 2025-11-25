@@ -1,7 +1,7 @@
 import { DataGrid as MuiDataGrid, gridClasses, GridValidRowModel, DataGridProps } from '@mui/x-data-grid';
-import { inputBaseClasses } from '@mui/material/InputBase';
+// import { inputBaseClasses } from '@mui/material/InputBase';
 import { checkboxClasses } from '@mui/material/Checkbox';
-import { tablePaginationClasses } from '@mui/material/TablePagination';
+// import { tablePaginationClasses } from '@mui/material/TablePagination';
 import { styled } from '@mui/material/styles';
 
 const StyledDataGrid = styled(MuiDataGrid)<{ browserhorizontalscroll?: boolean }>(({ theme, browserhorizontalscroll: browserHorizontalScroll }) => ({
@@ -20,11 +20,11 @@ const StyledDataGrid = styled(MuiDataGrid)<{ browserhorizontalscroll?: boolean }
     [`& .${gridClasses.columnHeaderTitle}`]: {
         textOverflow: 'initial',
     },
-    [`& .${inputBaseClasses.root}.${tablePaginationClasses.input}`]: { display: 'none' },
-    [`& .${tablePaginationClasses.root}`]: { display: 'flex', flexGrow: 0 },
-    [`& .${tablePaginationClasses.toolbar}`]: { padding: 0},
-    [`& .${tablePaginationClasses.actions}`]: { order: 1, margin: 0 },
-    [`& .${tablePaginationClasses.displayedRows}`]: { order: 2 },
+    // [`& .${inputBaseClasses.root}.${tablePaginationClasses.input}`]: { display: 'none' },
+    // [`& .${tablePaginationClasses.root}`]: { display: 'flex', flexGrow: 0 },
+    // [`& .${tablePaginationClasses.toolbar}`]: { padding: 0},
+    // [`& .${tablePaginationClasses.actions}`]: { order: 1, margin: 0 },
+    // [`& .${tablePaginationClasses.displayedRows}`]: { order: 2 },
     [`& .${gridClasses.columnHeaderTitleContainerContent} .${checkboxClasses.root}`]: {
         color: (theme.vars || theme).palette.common.white,
     },

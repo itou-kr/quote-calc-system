@@ -88,13 +88,14 @@ const DataGrid = forwardRef(<R extends GridValidRowModel = object>(props: Props<
             autosizeOptions={autoSizeOptions}
             autosizeOnMount
             columnHeaderHeight={columnHeaderHeight}
-            paginationMode='server'
+            // paginationMode='server'
             localeText={{ footerRowSelected: () => null }}  
             browserhorizontalscroll={browserHorizontalScroll}
             disableRowSelectionOnClick={!!checkboxSelection}
             checkboxSelection={checkboxSelection}
             isRowSelectable={isRowSelectable}
             columnVisibilityModel={columnVisibilityModel}
+            hideFooter
         />
     );
 }) as <R extends GridValidRowModel = object>(props: Props<R>, ref?: React.Ref<RefType<R>>) => JSX.Element;
