@@ -77,11 +77,11 @@ function CalcForm(props: Props) {
   /** ▼ FP合計を計算 */
   const calculateTotalFP = () => {
     const total = 
-      Number(externalInputFP) + 
-      Number(externalOutputFP) + 
-      Number(externalInquiryFP) + 
-      Number(internalLogicalFileFP) + 
-      Number(externalInterfaceFileFP);
+      (parseFloat(String(externalInputFP)) || 0) + 
+      (parseFloat(String(externalOutputFP)) || 0) + 
+      (parseFloat(String(externalInquiryFP)) || 0) + 
+      (parseFloat(String(internalLogicalFileFP)) || 0) + 
+      (parseFloat(String(externalInterfaceFileFP)) || 0);
     setValue('totalFP', total);
     return total;
   };
@@ -93,13 +93,18 @@ function CalcForm(props: Props) {
       setValue('developmentMonths', Number(months.toFixed(2)));
       return months;
     }
+    setValue('developmentMonths', 0);
     return 0;
   };
 
   /** ▼ 総費用を計算 */
   const calculateTotalCost = (developmentMonths: number) => {
-    const cost = developmentMonths * unitPrice;
-    setValue('totalCost', Number(cost.toFixed(0)));
+    if (unitPrice > 0 && developmentMonths > 0) {
+      const cost = developmentMonths * unitPrice;
+      setValue('totalCost', Number(cost.toFixed(0)));
+    } else {
+      setValue('totalCost', 0);
+    }
   };
 
   /** ▼ 全体の計算実行 */
