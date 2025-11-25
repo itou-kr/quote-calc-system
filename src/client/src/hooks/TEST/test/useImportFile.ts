@@ -22,7 +22,7 @@ const importFile = async (file: File): Promise<{ name: string; content: string }
     });
 };
 
-export function useImportFile(viewId: ViewIdType | 'TEST') {
+export function useImportFile(viewId: ViewIdType | 'TEST' | 'CALC') {
     return useCallback(
         async (file: File) => {
             console.log('useImportFile:', viewId);

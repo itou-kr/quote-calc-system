@@ -7,7 +7,7 @@ const exportFile = (file: { name: string; content: string }) => {
     console.log('exportFile called:', file);
 };
 
-export function useExportFile(viewId: ViewIdType | 'TEST') {
+export function useExportFile(viewId: ViewIdType | 'TEST' | 'CALC') {
 
     // 仮仕様
     return useCallback(
