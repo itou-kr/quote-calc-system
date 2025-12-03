@@ -18,7 +18,7 @@ import TextField from '@front/components/ui/TextField';
 import { t } from 'i18next';
 
 // 初期データファンクションデータ
-const DEFAULT_DATA_FUNCTIONS = Array.from({ length: 20 }, () => ({
+const DEFAULT_DATA_FUNCTIONS = Array.from({ length: 50 }, () => ({
     selected: false,
     name: '',
     updateType: '',
@@ -27,7 +27,7 @@ const DEFAULT_DATA_FUNCTIONS = Array.from({ length: 20 }, () => ({
 }));
 
 // 初期トランザクションファンクションデータ
-const DEFAULT_TRANSACTION_FUNCTIONS = Array.from({ length: 20 }, () => ({
+const DEFAULT_TRANSACTION_FUNCTIONS = Array.from({ length: 50 }, () => ({
     selected: false,
     name: '',
     externalInput: 0,
@@ -43,6 +43,8 @@ const setupYupScheme = () => {
         projectName: yup.string().required('案件名を入力してください'),
         productivityFPPerMonth: yup.number().positive('正の数を入力してください').required('生産性を入力してください'),
         projectType: yup.string().required('案件種別を選択してください'),
+        // 使用する工程別比率
+        processRatioType: yup.string().required('使用する工程別比率を選択してください'),
         
         // データファンクション情報
         dataFunctions: yup.array().of(
@@ -67,6 +69,15 @@ const setupYupScheme = () => {
                 remarks: yup.string(),
             })
         ),
+
+        // 工程別比率
+        processRatios: yup.object({
+            basicDesign: yup.number().min(0, '0以上の値を入力してください').max(1, '1以下の値を入力してください'),
+            detailedDesign: yup.number().min(0, '0以上の値を入力してください').max(1, '1以下の値を入力してください'),
+            implementation: yup.number().min(0, '0以上の値を入力してください').max(1, '1以下の値を入力してください'),
+            integrationTest: yup.number().min(0, '0以上の値を入力してください').max(1, '1以下の値を入力してください'),
+            systemTest: yup.number().min(0, '0以上の値を入力してください').max(1, '1以下の値を入力してください'),
+        }),
     });
 };
 
@@ -292,8 +303,34 @@ function CalcForm(props: Props) {
                             </Select>
                         </Box>
 
-                        {/* インポート/エクスポート */}
-                        <Stack direction="row" spacing={1} sx={{ mb: 3, mt: 2 }}>
+                        {/* インポートファイル名表示/参照ボタン */}
+                        <Box sx={{ mb: 2 }}>
+                            <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+                                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>インポートファイル</Typography>
+                                <Button variant="outlined" size="small" onClick={() => {}} sx={{ minWidth: 80 }}>参照</Button>
+                            </Stack>
+                            <Box 
+                                component="input" 
+                                type="text" 
+                                placeholder="ファイルが選択されていません" 
+                                disabled 
+                                sx={{ 
+                                    width: '100%',
+                                    padding: '8.5px 14px',
+                                    fontSize: '0.875rem',
+                                    border: '1px solid rgba(0, 0, 0, 0.23)',
+                                    borderRadius: '4px',
+                                    bgcolor: 'white',
+                                    '&:disabled': {
+                                        bgcolor: '#f5f5f5',
+                                        cursor: 'not-allowed'
+                                    }
+                                }} 
+                            />
+                        </Box>
+
+                        {/* インポートボタン/エクスポートボタン */}
+                        <Stack direction="row" spacing={1} sx={{ mb: 3 }}>
                             <ImportButton onFileSelect={onImportButtonClick} onClick={() => {}} size="small">インポート</ImportButton>
                             <ExportButton onClick={onExportButtonClick} size="small" />
                         </Stack>
@@ -330,7 +367,7 @@ function CalcForm(props: Props) {
                     <Box sx={{ flex: 1, p: 2, overflow: 'hidden', bgcolor: '#fafafa' }}>
                         {/* テーブルタブと操作ボタン */}
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-                            <Tabs value={tableTabValue} onChange={(_, newValue) => setTableTabValue(newValue)}>
+                            <Tabs value={tableTabValue} onChange={(_, newValue) => setTableTabValue(newValue)} sx={{ '& .MuiTab-root': { minWidth: 200 } }}>
                                 <Tab label="データファンクション" />
                                 <Tab label="トランザクションファンクション" />
                             </Tabs>
@@ -342,8 +379,9 @@ function CalcForm(props: Props) {
 
                         {/* ファンクション情報入力テーブル */}
                         <Paper elevation={1} sx={{ maxHeight: processBreakdownOpen ? 'calc(100vh - 460px)' : 'calc(100vh - 300px)', overflow: 'auto', transition: 'max-height 300ms ease-in-out' }}>
-                            <Table stickyHeader size="small">
-                                {tableTabValue === 0 ? (
+                            {/* データファンクションテーブル */}
+                            <Box sx={{ display: tableTabValue === 0 ? 'block' : 'none' }}>
+                                <Table stickyHeader size="small">
                                     <TableHead>
                                         <TableRow>
                                             <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 60 }}>No</TableCell>
@@ -374,7 +412,38 @@ function CalcForm(props: Props) {
                                             <TableCell align="center" padding="checkbox" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 80 }}>行選択</TableCell>
                                         </TableRow>
                                     </TableHead>
-                                ) : (
+                                    <TableBody>
+                                        {dataFields.map((field, index) => (
+                                            <TableRow key={field.id} hover>
+                                                <TableCell>{index + 1}</TableCell>
+                                                <TableCell>
+                                                    <TextField name={`dataFunctions.${index}.name`} control={control} trigger={trigger} t={t} sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} />
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Select value={watch(`dataFunctions.${index}.updateType`) || ''} onChange={(e) => setValue(`dataFunctions.${index}.updateType`, e.target.value)} size="small" fullWidth displayEmpty sx={{ bgcolor: 'white' }}>
+                                                        <MenuItem value="">選択してください</MenuItem>
+                                                        <MenuItem value="更新あり">更新あり</MenuItem>
+                                                        <MenuItem value="参照のみ">参照のみ</MenuItem>
+                                                    </Select>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <TextField name={`dataFunctions.${index}.fpValue`} control={control} trigger={trigger} t={t} type="number" notFullWidth disabled sx={{ '& .MuiInputBase-root': { bgcolor: '#f5f5f5', width: 80 } }} />
+                                                </TableCell>
+                                                <TableCell>
+                                                    <TextField name={`dataFunctions.${index}.remarks`} control={control} trigger={trigger} t={t} sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} />
+                                                </TableCell>
+                                                <TableCell align="center" padding="checkbox">
+                                                    <Checkbox checked={watch(`dataFunctions.${index}.selected`) || false} onChange={(e) => setValue(`dataFunctions.${index}.selected`, e.target.checked)} />
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </Box>
+
+                            {/* トランザクションファンクションテーブル */}
+                            <Box sx={{ display: tableTabValue === 1 ? 'block' : 'none' }}>
+                                <Table stickyHeader size="small">
                                     <TableHead>
                                         <TableRow>
                                             <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 60 }}>No</TableCell>
@@ -417,35 +486,8 @@ function CalcForm(props: Props) {
                                             <TableCell align="center" padding="checkbox" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 80 }}>行選択</TableCell>
                                         </TableRow>
                                     </TableHead>
-                                )}
-                                <TableBody>
-                                    {tableTabValue === 0 ? (
-                                        dataFields.map((field, index) => (
-                                            <TableRow key={field.id} hover>
-                                                <TableCell>{index + 1}</TableCell>
-                                                <TableCell>
-                                                    <TextField name={`dataFunctions.${index}.name`} control={control} trigger={trigger} t={t} sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} />
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Select value={watch(`dataFunctions.${index}.updateType`) || ''} onChange={(e) => setValue(`dataFunctions.${index}.updateType`, e.target.value)} size="small" fullWidth displayEmpty sx={{ bgcolor: 'white' }}>
-                                                        <MenuItem value="">選択してください</MenuItem>
-                                                        <MenuItem value="更新あり">更新あり</MenuItem>
-                                                        <MenuItem value="参照のみ">参照のみ</MenuItem>
-                                                    </Select>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <TextField name={`dataFunctions.${index}.fpValue`} control={control} trigger={trigger} t={t} type="number" notFullWidth disabled sx={{ '& .MuiInputBase-root': { bgcolor: '#f5f5f5', width: 80 } }} />
-                                                </TableCell>
-                                                <TableCell>
-                                                    <TextField name={`dataFunctions.${index}.remarks`} control={control} trigger={trigger} t={t} sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} />
-                                                </TableCell>
-                                                <TableCell align="center" padding="checkbox">
-                                                    <Checkbox checked={watch(`dataFunctions.${index}.selected`) || false} onChange={(e) => setValue(`dataFunctions.${index}.selected`, e.target.checked)} />
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
-                                    ) : (
-                                        transactionFields.map((field, index) => (
+                                    <TableBody>
+                                        {transactionFields.map((field, index) => (
                                             <TableRow key={field.id} hover>
                                                 <TableCell>{index + 1}</TableCell>
                                                 <TableCell>
@@ -470,17 +512,17 @@ function CalcForm(props: Props) {
                                                     <Checkbox checked={watch(`transactionFunctions.${index}.selected`) || false} onChange={(e) => setValue(`transactionFunctions.${index}.selected`, e.target.checked)} />
                                                 </TableCell>
                                             </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
-                            </Table>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </Box>
                         </Paper>
 
                         {/* 工程別工数・工期テーブル */}
                         <Box sx={{ mt: 3 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, cursor: 'pointer', bgcolor: '#f5f5f5', p: 1, borderRadius: 1 }} onClick={() => setProcessBreakdownOpen(!processBreakdownOpen)}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, cursor: 'pointer', bgcolor: '#f5f5f5', p: 1, borderRadius: 1 }} onClick={() => setProcessBreakdownOpen(!processBreakdownOpen)}>
                                 <Typography variant="body1" sx={{ fontWeight: 'bold' }}>工程別内訳</Typography>
-                                <IconButton size="small">
+                                <IconButton size="small" sx={{ ml: 1 }}>
                                     {processBreakdownOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                                 </IconButton>
                             </Box>
