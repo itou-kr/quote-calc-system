@@ -20,6 +20,7 @@ type RenderProps<T extends FieldValues = FieldValues, N extends FieldPath<T> = F
     maxLength?: number;
     sx?: MuiTextFieldProps['sx'];
     className?: MuiTextFieldProps['className'];
+    hideHelperText?: boolean;
     onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void | Promise<void>;
     onBlur?: (e: React.FocusEvent<HTMLTextAreaElement | HTMLInputElement>, value: T[N]) => void | Promise<void>;
     trigger: UseFormTrigger<T>;
@@ -41,6 +42,7 @@ function RenderTextField<T extends FieldValues = FieldValues, N extends FieldPat
         maxLength,
         sx,
         className,
+        hideHelperText,
         onChange,
         onBlur,
         field: { name, ...field },
@@ -96,7 +98,7 @@ function RenderTextField<T extends FieldValues = FieldValues, N extends FieldPat
             sx={sx}
             className={className}
             error={!!error}
-            helperText={error?.message}
+            helperText={hideHelperText ? undefined : error?.message}
             onChange={handleChange}
             onBlur={handleBlur}
             inputRef={field.ref}

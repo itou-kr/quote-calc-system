@@ -10,6 +10,9 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import SummarizeIcon from '@mui/icons-material/Summarize';
+import EditIcon from '@mui/icons-material/Edit';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 
 import ImportButton from '@front/components/ui/Button/ImportButton';
 import ExportButton from '@front/components/ui/Button/ExportButton';
@@ -129,6 +132,8 @@ function CalcForm(props: Props) {
     
     const [tableTabValue, setTableTabValue] = useState(0);
     const [processBreakdownOpen, setProcessBreakdownOpen] = useState(false);
+    const [dataTableScrollTop, setDataTableScrollTop] = useState(0);
+    const [transactionTableScrollTop, setTransactionTableScrollTop] = useState(0);
 
     // 工程別の比率（デフォルト値）
     const processRatios = {
@@ -172,6 +177,8 @@ function CalcForm(props: Props) {
         // フォームのバリデーションを実行
         // 計算自体はリアクティブに自動実行される
         trigger();
+        // 工程別比率の表を自動で表示
+        setProcessBreakdownOpen(true);
     };
 
     /** ▼ 行追加 */
@@ -247,120 +254,119 @@ function CalcForm(props: Props) {
             <FormProvider {...methods}>
                 {/* ヘッダー */}
                 <Paper elevation={0} sx={{ bgcolor: '#1976d2', color: 'white', p: 2, borderRadius: 0 }}>
-                    <Typography variant="h5" sx={{ fontWeight: 'bold' }}>FP見積システム</Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <SummarizeIcon sx={{ fontSize: 32 }} />
+                        <Typography variant="h5" sx={{ fontWeight: 'bold' }}>見積作成支援ツール</Typography>
+                    </Box>
                 </Paper>
-
-                {/* ラベルエリア */}
-                <Box sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: '#f5f5f5', display: 'flex', alignItems: 'center', py: 1.5, px: 2 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
-                        <Box component="span" sx={{ mr: 1 }}>✎</Box>
-                        <Typography variant="body1">入力編（青枠）</Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
-                        <Box component="span" sx={{ mr: 1 }}>⚙</Box>
-                        <Typography variant="body1">自動計算編（グレー背景）</Typography>
-                    </Box>
-                    <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
-                        <Box component="span" sx={{ mr: 1 }}>ⓘ</Box>
-                        <Typography variant="body2">計算ボタンを押すと自動で値が更新されます</Typography>
-                    </Box>
-                </Box>
 
                 {/* メインコンテンツエリア */}
                 <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
                     {/* 左サイドバー - 案件情報 */}
-                    <Box sx={{ width: 320, borderRight: 1, borderColor: 'divider', p: 2, overflow: 'auto', bgcolor: 'white' }}>
-                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>案件情報</Typography>
+                    <Box sx={{ width: 360, borderRight: 1, borderColor: 'divider', display: 'flex', flexDirection: 'column', bgcolor: 'white' }}>
+                        {/* スクロール可能な上部エリア */}
+                        <Box sx={{ flex: 1, p: 3, overflowY: 'auto' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>案件情報</Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <EditIcon sx={{ fontSize: 16, mr: 0.3, color: 'text.secondary' }} />
+                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>入力欄</Typography>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <AutoAwesomeIcon sx={{ fontSize: 16, mr: 0.3, color: 'text.secondary' }} />
+                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>自動計算欄</Typography>
+                                    </Box>
+                                </Box>
+                            </Box>
 
-                        {/* 案件名 */}
-                        <Box sx={{ mb: 2 }}>
-                            <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 'bold' }}>案件名 <Typography component="span" color="error">*</Typography></Typography>
-                            <TextField name="projectName" control={control} trigger={trigger} t={t} sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} />
+                            {/* 案件名 */}
+                            <Box sx={{ mb: 2.5 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.8 }}>
+                                    <EditIcon sx={{ fontSize: 16, mr: 0.5 }} />
+                                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>案件名 <Typography component="span" color="error">*</Typography></Typography>
+                                </Box>
+                                <TextField name="projectName" control={control} trigger={trigger} t={t} hideHelperText sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} />
+                            </Box>
+
+                            {/* 生産性 */}
+                            <Box sx={{ mb: 2.5 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.8 }}>
+                                    <EditIcon sx={{ fontSize: 16, mr: 0.5 }} />
+                                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>生産性(FP/月) <Typography component="span" color="error">*</Typography></Typography>
+                                </Box>
+                                <TextField name="productivityFPPerMonth" control={control} trigger={trigger} t={t} type="number" hideHelperText />
+                            </Box>
+
+                            {/* 案件種別 */}
+                            <Box sx={{ mb: 2.5 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.8 }}>
+                                    <EditIcon sx={{ fontSize: 16, mr: 0.5 }} />
+                                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>案件種別 <Typography component="span" color="error">*</Typography></Typography>
+                                </Box>
+                                <Select value={watch('projectType') || '新規開発'} onChange={(e) => setValue('projectType', e.target.value)} fullWidth size="small" sx={{ bgcolor: 'white' }}>
+                                    <MenuItem value="新規開発">新規開発</MenuItem>
+                                    <MenuItem value="改良開発">改良開発</MenuItem>
+                                    <MenuItem value="再開発">再開発</MenuItem>
+                                </Select>
+                            </Box>
+
+                            {/* 使用する工程別比率 */}
+                            <Box sx={{ mb: 3 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.8 }}>
+                                    <EditIcon sx={{ fontSize: 16, mr: 0.5 }} />
+                                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>使用する工程別比率</Typography>
+                                </Box>
+                                <Select defaultValue="中央値" size="small" fullWidth sx={{ bgcolor: 'white' }}>
+                                    <MenuItem value="中央値">中央値</MenuItem>
+                                    <MenuItem value="平均値">平均値</MenuItem>
+                                </Select>
+                            </Box>
+
+                            <Divider sx={{ my: 3 }} />
+
+                            {/* インポート / エクスポート */}
+                            <Box sx={{ mb: 3 }}>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1.5 }}>インポート / エクスポート</Typography>
+                                <Stack direction="row" spacing={1}>
+                                    <ImportButton onFileSelect={onImportButtonClick} onClick={() => {}} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }}>インポート</ImportButton>
+                                    <ExportButton onClick={onExportButtonClick} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }} />
+                                </Stack>
+                            </Box>
+
+                            <Divider sx={{ my: 3 }} />
+
+                            {/* 計算結果サマリー */}
+                            <Box>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1.5 }}>計算結果サマリー</Typography>
+
+                                <Box sx={{ mb: 1, p: 1.5, bgcolor: '#f5f5f5', borderRadius: 1, border: 1, borderColor: '#e0e0e0' }}>
+                                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            <AutoAwesomeIcon sx={{ fontSize: 18, mr: 0.8, color: 'primary.main' }} />
+                                            <Typography variant="body2" sx={{ fontWeight: 'medium' }}>総FP</Typography>
+                                        </Box>
+                                        <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'primary.main' }}>{totalFP}</Typography>
+                                    </Stack>
+                                </Box>
+
+                                <Box sx={{ p: 1.5, bgcolor: '#f5f5f5', borderRadius: 1, border: 1, borderColor: '#e0e0e0' }}>
+                                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            <AutoAwesomeIcon sx={{ fontSize: 18, mr: 0.8, color: 'primary.main' }} />
+                                            <Typography variant="body2" sx={{ fontWeight: 'medium' }}>工数(人月)</Typography>
+                                        </Box>
+                                        <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'primary.main' }}>{manMonths}</Typography>
+                                    </Stack>
+                                </Box>
+                            </Box>
                         </Box>
 
-                        {/* 生産性 */}
-                        <Box sx={{ mb: 2 }}>
-                            <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 'bold' }}>生産性(FP/月) <Typography component="span" color="error">*</Typography></Typography>
-                            <TextField name="productivityFPPerMonth" control={control} trigger={trigger} t={t} type="number" />
+                        {/* 固定された下部ボタンエリア */}
+                        <Box sx={{ borderTop: 1, borderColor: 'divider', p: 3, bgcolor: 'white' }}>
+                            {/* 工数計算実行ボタン */}
+                            <Button variant="contained" onClick={onExecuteCalculation} sx={{ width: '100%', bgcolor: '#21bd40ff', '&:hover': { bgcolor: '#388e3c' } }}>工数計算を実行</Button>
                         </Box>
-
-                        {/* 案件種別 */}
-                        <Box sx={{ mb: 2 }}>
-                            <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 'bold' }}>案件種別 <Typography component="span" color="error">*</Typography></Typography>
-                            <Select value={watch('projectType') || '新規開発'} onChange={(e) => setValue('projectType', e.target.value)} fullWidth size="small" sx={{ bgcolor: 'white' }}>
-                                <MenuItem value="新規開発">新規開発</MenuItem>
-                                <MenuItem value="改良開発">改良開発</MenuItem>
-                                <MenuItem value="再開発">再開発</MenuItem>
-                            </Select>
-                        </Box>
-
-                        {/* 使用する工程別比率 */}
-                        <Box sx={{ mb: 2 }}>
-                            <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>使用する工程別比率</Typography>
-                            <Select defaultValue="中央値" size="small" fullWidth sx={{ bgcolor: 'white' }}>
-                                <MenuItem value="中央値">中央値</MenuItem>
-                                <MenuItem value="平均値">平均値</MenuItem>
-                            </Select>
-                        </Box>
-
-                        {/* インポートファイル名表示/参照ボタン */}
-                        <Box sx={{ mb: 2 }}>
-                            <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
-                                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>インポートファイル</Typography>
-                                <Button variant="outlined" size="small" onClick={() => {}} sx={{ minWidth: 80 }}>参照</Button>
-                            </Stack>
-                            <Box 
-                                component="input" 
-                                type="text" 
-                                placeholder="ファイルが選択されていません" 
-                                disabled 
-                                sx={{ 
-                                    width: '100%',
-                                    padding: '8.5px 14px',
-                                    fontSize: '0.875rem',
-                                    border: '1px solid rgba(0, 0, 0, 0.23)',
-                                    borderRadius: '4px',
-                                    bgcolor: 'white',
-                                    '&:disabled': {
-                                        bgcolor: '#f5f5f5',
-                                        cursor: 'not-allowed'
-                                    }
-                                }} 
-                            />
-                        </Box>
-
-                        {/* インポートボタン/エクスポートボタン */}
-                        <Stack direction="row" spacing={1} sx={{ mb: 3 }}>
-                            <ImportButton onFileSelect={onImportButtonClick} onClick={() => {}} size="small">インポート</ImportButton>
-                            <ExportButton onClick={onExportButtonClick} size="small" />
-                        </Stack>
-
-                        <Divider sx={{ my: 2 }} />
-
-                        {/* 計算結果サマリー */}
-                        <Typography variant="body2" sx={{ mb: 2, fontWeight: 'bold' }}>計算結果サマリー</Typography>
-
-                        <Box sx={{ mb: 2, p: 1.5, bgcolor: '#f5f5f5', borderRadius: 1 }}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center">
-                                <Typography variant="body2">総FP</Typography>
-                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{totalFP}</Typography>
-                            </Stack>
-                        </Box>
-
-                        <Box sx={{ mb: 2, p: 1.5, bgcolor: '#f5f5f5', borderRadius: 1 }}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center">
-                                <Typography variant="body2">工数(人月)</Typography>
-                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{manMonths}</Typography>
-                            </Stack>
-                        </Box>
-
-                        {/* 工数計算実行ボタン */}
-                        <Button variant="contained" color="primary" onClick={onExecuteCalculation} sx={{ mt: 2, width: '100%' }}>工数計算を実行</Button>
-                        
-                        {/* 工程別工数・工期表示ボタン */}
-                        <Button variant="contained" color="primary" onClick={() => setProcessBreakdownOpen(!processBreakdownOpen)} sx={{ mt: 2, width: '100%' }}>
-                            {processBreakdownOpen ? '工程別工数・工期を非表示' : '工程別工数・工期を表示'}
-                        </Button>
                     </Box>
 
                     {/* 右メインエリア - 画面情報入力 */}
@@ -372,40 +378,54 @@ function CalcForm(props: Props) {
                                 <Tab label="トランザクションファンクション" />
                             </Tabs>
                             <Stack direction="row" spacing={1} sx={{ mr: 2 }}>
-                                <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={onAddRow} size="small">行追加</Button>
-                                <Button variant="contained" color="error" startIcon={<DeleteIcon />} onClick={onDeleteSelected} size="small">行削除</Button>
+                                <Button variant="contained" startIcon={<AddIcon />} onClick={onAddRow} size="small" sx={{ bgcolor: '#1e88e5', '&:hover': { bgcolor: '#1565c0' } }}>行追加</Button>
+                                <Button variant="contained" sx={{ bgcolor: '#e53935', '&:hover': { bgcolor: '#c62828' } }} startIcon={<DeleteIcon />} onClick={onDeleteSelected} size="small">行削除</Button>
                             </Stack>
                         </Box>
 
                         {/* ファンクション情報入力テーブル */}
-                        <Paper elevation={1} sx={{ maxHeight: processBreakdownOpen ? 'calc(100vh - 460px)' : 'calc(100vh - 300px)', overflow: 'auto', transition: 'max-height 300ms ease-in-out' }}>
+                        <Paper elevation={1} sx={{ maxHeight: processBreakdownOpen ? 'calc(100vh - 400px)' : 'calc(100vh - 240px)', overflow: 'auto', transition: 'max-height 300ms ease-in-out' }}
+                            onScroll={(e) => {
+                                const target = e.target as HTMLElement;
+                                if (tableTabValue === 0) {
+                                    setDataTableScrollTop(target.scrollTop);
+                                } else {
+                                    setTransactionTableScrollTop(target.scrollTop);
+                                }
+                            }}
+                            ref={(el) => {
+                                if (el) {
+                                    el.scrollTop = tableTabValue === 0 ? dataTableScrollTop : transactionTableScrollTop;
+                                }
+                            }}
+                        >
                             {/* データファンクションテーブル */}
                             <Box sx={{ display: tableTabValue === 0 ? 'block' : 'none' }}>
                                 <Table stickyHeader size="small">
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 60 }}>No</TableCell>
-                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 300 }}>
+                                            <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 60 }}>No</TableCell>
+                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 500 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    <Box component="span" sx={{ mr: 0.5 }}>✎</Box>
+                                                    <EditIcon sx={{ fontSize: 16, mr: 0.5 }} />
                                                     名称
                                                 </Box>
                                             </TableCell>
                                             <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 150 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    <Box component="span" sx={{ mr: 0.5 }}>✎</Box>
+                                                    <EditIcon sx={{ fontSize: 16, mr: 0.5 }} />
                                                     更新種別
                                                 </Box>
                                             </TableCell>
                                             <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 100 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    <Box component="span" sx={{ mr: 0.5 }}>⚙</Box>
+                                                    <AutoAwesomeIcon sx={{ fontSize: 16, mr: 0.5 }} />
                                                     FP値
                                                 </Box>
                                             </TableCell>
                                             <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 300 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    <Box component="span" sx={{ mr: 0.5 }}>✎</Box>
+                                                    <EditIcon sx={{ fontSize: 16, mr: 0.5 }} />
                                                     備考
                                                 </Box>
                                             </TableCell>
@@ -415,7 +435,7 @@ function CalcForm(props: Props) {
                                     <TableBody>
                                         {dataFields.map((field, index) => (
                                             <TableRow key={field.id} hover>
-                                                <TableCell>{index + 1}</TableCell>
+                                                <TableCell align="center">{index + 1}</TableCell>
                                                 <TableCell>
                                                     <TextField name={`dataFunctions.${index}.name`} control={control} trigger={trigger} t={t} sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} />
                                                 </TableCell>
@@ -446,40 +466,40 @@ function CalcForm(props: Props) {
                                 <Table stickyHeader size="small">
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 60 }}>No</TableCell>
-                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 200 }}>
+                                            <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 60 }}>No</TableCell>
+                                            <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 500 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    <Box component="span" sx={{ mr: 0.5 }}>✎</Box>
+                                                    <EditIcon sx={{ fontSize: 16, mr: 0.5 }} />
                                                     名称
                                                 </Box>
                                             </TableCell>
                                             <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 100 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    <Box component="span" sx={{ mr: 0.5 }}>✎</Box>
+                                                    <EditIcon sx={{ fontSize: 16, mr: 0.5 }} />
                                                     外部入力
                                                 </Box>
                                             </TableCell>
                                             <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 100 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    <Box component="span" sx={{ mr: 0.5 }}>✎</Box>
+                                                    <EditIcon sx={{ fontSize: 16, mr: 0.5 }} />
                                                     外部出力
                                                 </Box>
                                             </TableCell>
                                             <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 100 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    <Box component="span" sx={{ mr: 0.5 }}>✎</Box>
+                                                    <EditIcon sx={{ fontSize: 16, mr: 0.5 }} />
                                                     外部照会
                                                 </Box>
                                             </TableCell>
                                             <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 100 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    <Box component="span" sx={{ mr: 0.5 }}>⚙</Box>
+                                                    <AutoAwesomeIcon sx={{ fontSize: 16, mr: 0.5 }} />
                                                     FP値
                                                 </Box>
                                             </TableCell>
                                             <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 300 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    <Box component="span" sx={{ mr: 0.5 }}>✎</Box>
+                                                    <EditIcon sx={{ fontSize: 16, mr: 0.5 }} />
                                                     備考
                                                 </Box>
                                             </TableCell>
@@ -489,7 +509,7 @@ function CalcForm(props: Props) {
                                     <TableBody>
                                         {transactionFields.map((field, index) => (
                                             <TableRow key={field.id} hover>
-                                                <TableCell>{index + 1}</TableCell>
+                                                <TableCell align="center">{index + 1}</TableCell>
                                                 <TableCell>
                                                     <TextField name={`transactionFunctions.${index}.name`} control={control} trigger={trigger} t={t} sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} />
                                                 </TableCell>
@@ -523,7 +543,7 @@ function CalcForm(props: Props) {
                             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, cursor: 'pointer', bgcolor: '#f5f5f5', p: 1, borderRadius: 1 }} onClick={() => setProcessBreakdownOpen(!processBreakdownOpen)}>
                                 <Typography variant="body1" sx={{ fontWeight: 'bold' }}>工程別内訳</Typography>
                                 <IconButton size="small" sx={{ ml: 1 }}>
-                                    {processBreakdownOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                    {processBreakdownOpen ? <ExpandMoreIcon /> : <ExpandLessIcon />}
                                 </IconButton>
                             </Box>
                             
