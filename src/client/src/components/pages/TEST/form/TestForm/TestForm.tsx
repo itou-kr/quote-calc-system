@@ -12,13 +12,13 @@ import FormPaperProvider from '@front/components/ui/Layout/Form/FormPaperProvide
 // import { useTypedSelector } from '@front/stores';
 import ImportButton from '@front/components/ui/Button/ImportButton';
 import ExportButton from '@front/components/ui/Button/ExportButton';
-import CalcButton from '@front/components/ui/Button/CalcButton'
 import FileUpload from '@front/components/ui/FileUpload';
 import FormContent, { Record, RecordTitle, Separator } from '@front/components/ui/Layout/Form/Content';
 import TextField from '@front/components/ui/TextField';
 import { t } from 'i18next';
 import TestTable, { Props as TestTableProps } from '@front/components/pages/TEST/table/TestTable';
 import { Columns } from '@front/stores/TEST/test/testStore';
+import TestCalc from '@front/components/pages/TEST/form/TestForm/TestCalc'
 
 const setupYupScheme = () => {
   return yup.object({
@@ -49,26 +49,26 @@ const dummyData: Columns[] = [
   {
     isSelected: '1',
     rowNo: 1,
-    itemName: 'プロジェクトA',
-    updateType: 'ii',
-    fpValue: 'TypeA',
-    note: 'aa'
+    itemName: 'テストマスタ１',
+    updateType: '更新あり',
+    fpValue: '0',
+    note: '備考１'
   },
   {
     isSelected: '1',
-    rowNo: 1,
-    itemName: 'プロジェクトA',
-    updateType: 'ii',
-    fpValue: 'TypeA',
-    note: 'aa'
+    rowNo: 2,
+    itemName: 'テストマスタ２',
+    updateType: '参照のみ',
+    fpValue: '0',
+    note: '備考２'
   },
   {
     isSelected: '1',
-    rowNo: 1,
-    itemName: 'プロジェクトA',
-    updateType: 'ii',
-    fpValue: 'TypeA',
-    note: 'aa'
+    rowNo: 3,
+    itemName: 'テストマスタ３',
+    updateType: '更新あり',
+    fpValue: '0',
+    note: '備考３'
   },
 ];
 
@@ -131,7 +131,7 @@ function TestForm(props: Props) {
       sx={{ height: '100%' }}
     >
       <Grid size="auto">
-        <Box sx={{ width: 600, marginLeft: 0 }}>
+        <Box sx={{ width: 400, marginLeft: 0 }}>
           <FormPaperProvider {...methods}>
             {/* --- 案件情報フォーム ----------------------------------- */}
             <FormContent>
@@ -139,14 +139,16 @@ function TestForm(props: Props) {
                 <Typography sx={{ fontWeight: 'bold' }}>案件情報</Typography>
               </RecordTitle>
               <Separator />
-              <Record label="案件名">
-                <TextField
-                  name="projectName"
-                  control={control}
-                  trigger={trigger}
-                  t={t}
-                />
-              </Record>
+              <Stack direction="column" spacing={1}>
+                <Record label="案件名">
+                  <TextField
+                    name="projectName"
+                    control={control}
+                    trigger={trigger}
+                    t={t}
+                  />
+                </Record>
+              </Stack>
               <Record label="生産性（FP/月）">
                 <TextField
                   name="productivityFPPerMonth"
@@ -213,7 +215,8 @@ function TestForm(props: Props) {
             {/* --- ボタン行 ------------------------------------------ */}
             <Stack>
               <Box>
-                <CalcButton onClick={onExportButtonClick} fullWidth/>
+                {/* <CalcButton onClick={onExportButtonClick} fullWidth/> */}
+                <TestCalc methods={methods}/>
               </Box>
             </Stack>
           </FormPaperProvider>

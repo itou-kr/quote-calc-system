@@ -17,7 +17,7 @@ files:
   api.mustache:
     templateType: API
     folder: src/apis
-    destinationFilename: /type.ts
+    destinationFilename: /types.ts
   api_impl.mustache:
     templateType: API
     folder: src/apis

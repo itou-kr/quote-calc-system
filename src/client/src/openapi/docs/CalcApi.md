@@ -1,31 +1,32 @@
-# TestApi
+# CalcApi
 
 All URIs are relative to *http://localhost*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
-|[**apiTESTTestPost**](#apitesttestpost) | **POST** /api/TEST/test | テスト|
+|[**calcTestApplication**](#calctestapplication) | **POST** /api/TEST/calc | 工数計算|
 
-# **apiTESTTestPost**
-> User apiTESTTestPost(user)
+# **calcTestApplication**
+> CalcTestApplication200Response calcTestApplication(calcTestApplicationRequest)
 
+...
 
 ### Example
 
 ```typescript
 import {
-    TestApi,
+    CalcApi,
     Configuration,
-    User
+    CalcTestApplicationRequest
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new TestApi(configuration);
+const apiInstance = new CalcApi(configuration);
 
-let user: User; //
+let calcTestApplicationRequest: CalcTestApplicationRequest; //...
 
-const { status, data } = await apiInstance.apiTESTTestPost(
-    user
+const { status, data } = await apiInstance.calcTestApplication(
+    calcTestApplicationRequest
 );
 ```
 
@@ -33,12 +34,12 @@ const { status, data } = await apiInstance.apiTESTTestPost(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **user** | **User**|  | |
+| **calcTestApplicationRequest** | **CalcTestApplicationRequest**| ... | |
 
 
 ### Return type
 
-**User**
+**CalcTestApplication200Response**
 
 ### Authorization
 
@@ -53,7 +54,7 @@ No authorization required
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**201** | テスト |  -  |
+|**200** | ... |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

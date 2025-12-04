@@ -11,26 +11,29 @@
  */
 
 
-export class ApiTESTTestGet200ResponseInner {
-    'id'?: number;
-    'name'?: string;
+/**
+* 工数計算リクエスト
+*/
+export class CalcTestApplicationRequest {
+    'totalFP'?: number;
+    'manMonth'?: number;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
-            "name": "id",
-            "baseName": "id",
+            "name": "totalFP",
+            "baseName": "totalFP",
             "type": "number"
         },
         {
-            "name": "name",
-            "baseName": "name",
-            "type": "string"
+            "name": "manMonth",
+            "baseName": "manMonth",
+            "type": "number"
         }    ];
 
     static getAttributeTypeMap() {
-        return ApiTESTTestGet200ResponseInner.attributeTypeMap;
+        return CalcTestApplicationRequest.attributeTypeMap;
     }
 }
 

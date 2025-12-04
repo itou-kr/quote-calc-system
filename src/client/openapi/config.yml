@@ -1,7 +1,7 @@
 generatorName: typescript-axios
 inputSpec: ../../docs/openapi/index.yml
 outputDir: ./src/openapi
-globalproperties:
+globalProperties:
   apis: ""
   models: ""
   supportingFiles: "index.ts,configuration.ts,base.ts,common.ts,api.ts,openapi-generator-ignore"

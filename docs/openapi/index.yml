@@ -4,5 +4,7 @@ info:
   description: ...
   version: 1.0.0
 paths:
- /api/TEST/test:
-  $ref: ./TEST.yml#/paths/~1TEST~1test
+  # /TEST/test:
+  #   $ref: ./TEST.yml#/paths/~1TEST~1test
+  /api/TEST/calc:
+    $ref: ./TEST.yml#/paths/~1TEST~1calc
