@@ -44,10 +44,11 @@ const setupYupScheme = () => {
     return yup.object({
         // 案件情報
         projectName: yup.string().required('案件名を入力してください'),
+        autoProductivity: yup.boolean(),
         productivityFPPerMonth: yup.number().positive('正の数を入力してください').required('生産性を入力してください'),
         projectType: yup.string().required('案件種別を選択してください'),
-        // 使用する工程別比率
-        processRatioType: yup.string().required('使用する工程別比率を選択してください'),
+        // 使用するIPA代表値
+        ipaValueType: yup.string().required('使用するIPA代表値を選択してください'),
         
         // データファンクション情報
         dataFunctions: yup.array().of(
@@ -106,8 +107,10 @@ function CalcForm(props: Props) {
         resolver: yupResolver(schema),
         defaultValues: {
             projectName: '',
-            productivityFPPerMonth: undefined,
+            autoProductivity: true,
+            productivityFPPerMonth: 10.5,
             projectType: '新規開発',
+            ipaValueType: '中央値',
             dataFunctions: [...DEFAULT_DATA_FUNCTIONS],
             transactionFunctions: [...DEFAULT_TRANSACTION_FUNCTIONS],
             ...props.data,
@@ -128,6 +131,7 @@ function CalcForm(props: Props) {
 
     const dataFunctions = watch('dataFunctions') || [];
     const transactionFunctions = watch('transactionFunctions') || [];
+    const autoProductivity = watch('autoProductivity') ?? false;
     const productivityFPPerMonth = watch('productivityFPPerMonth') || 0;
     
     const [tableTabValue, setTableTabValue] = useState(0);
@@ -291,18 +295,38 @@ function CalcForm(props: Props) {
 
                             {/* 生産性 */}
                             <Box sx={{ mb: 2.5 }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.8 }}>
-                                    <EditIcon sx={{ fontSize: 16, mr: 0.5 }} />
-                                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>生産性(FP/月) <Typography component="span" color="error">*</Typography></Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.8 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <EditIcon sx={{ fontSize: 16, mr: 0.5 }} />
+                                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>生産性(FP/月) <Typography component="span" color="error">*</Typography></Typography>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <Checkbox 
+                                            checked={autoProductivity} 
+                                            onChange={(e) => setValue('autoProductivity', e.target.checked)}
+                                            size="small"
+                                            sx={{ p: 0, mr: 0.5 }}
+                                        />
+                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>自動入力</Typography>
+                                    </Box>
                                 </Box>
-                                <TextField name="productivityFPPerMonth" control={control} trigger={trigger} t={t} type="number" hideHelperText />
+                                <TextField 
+                                    name="productivityFPPerMonth" 
+                                    control={control} 
+                                    trigger={trigger} 
+                                    t={t} 
+                                    type="number" 
+                                    hideHelperText 
+                                    disabled={autoProductivity}
+                                    sx={{ '& .MuiInputBase-root': { bgcolor: autoProductivity ? '#f5f5f5' : 'white' } }}
+                                />
                             </Box>
 
                             {/* 案件種別 */}
                             <Box sx={{ mb: 2.5 }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.8 }}>
                                     <EditIcon sx={{ fontSize: 16, mr: 0.5 }} />
-                                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>案件種別 <Typography component="span" color="error">*</Typography></Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>案件種別</Typography>
                                 </Box>
                                 <Select value={watch('projectType') || '新規開発'} onChange={(e) => setValue('projectType', e.target.value)} fullWidth size="small" sx={{ bgcolor: 'white' }}>
                                     <MenuItem value="新規開発">新規開発</MenuItem>
@@ -311,13 +335,13 @@ function CalcForm(props: Props) {
                                 </Select>
                             </Box>
 
-                            {/* 使用する工程別比率 */}
+                            {/* 使用するIPA代表値 */}
                             <Box sx={{ mb: 3 }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.8 }}>
                                     <EditIcon sx={{ fontSize: 16, mr: 0.5 }} />
-                                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>使用する工程別比率</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>使用するIPA代表値</Typography>
                                 </Box>
-                                <Select defaultValue="中央値" size="small" fullWidth sx={{ bgcolor: 'white' }}>
+                                <Select value={watch('ipaValueType') || '中央値'} onChange={(e) => setValue('ipaValueType', e.target.value)} size="small" fullWidth sx={{ bgcolor: 'white' }}>
                                     <MenuItem value="中央値">中央値</MenuItem>
                                     <MenuItem value="平均値">平均値</MenuItem>
                                 </Select>
