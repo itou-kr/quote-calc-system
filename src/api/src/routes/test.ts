@@ -1,6 +1,7 @@
 import { Router } from 'express';
-import { calcTestApplication } from '../apis/calcApi/calcTestApplication';
+import { calcTestApplicationExpress } from '../apis/calcApi/calcTestApplicationExpress';
 import { apiTESTTestGet } from '../apis/testApi/apiTESTTestGet';
+
 
 const router = Router();
 
@@ -8,6 +9,6 @@ const router = Router();
 router.get('/ping', apiTESTTestGet);
 
 // POST /TEST/calc
-router.post('/ping', calcTestApplication);
+router.post('/calc', calcTestApplicationExpress);
 
 export default router;

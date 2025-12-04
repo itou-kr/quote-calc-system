@@ -11,8 +11,6 @@ paths:
         - calc
       operationId: calcTestApplication
       description: ...
-      x-eov-operation-id: calcTestApplication
-      x-eov-operation-handler: calcApi
       requestBody:
         description: ...
         required: true

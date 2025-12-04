@@ -16,6 +16,7 @@ export function useCalcTest(viewId: ViewIdType) {
         async (data: CalcTestApplicationRequest, _: UseFormSetError<FormType>): Promise<CalcTestApplication200Response | undefined> => {
             clearAlertMessage();
             const response = await calcApi.calcTestApplication(data);
+            console.log('response', response);
             const createTest = response.data;
             setAlertMessage({ severity: 'error', message:'aaaaa' });
             return createTest;

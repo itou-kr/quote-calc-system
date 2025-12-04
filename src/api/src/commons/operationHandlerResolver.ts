@@ -24,7 +24,7 @@ export default function operationHandlerResolver(logger: RootLogger) {
 
         const apiDef = paths[apiPath]?.[apiMethod];
         if (!apiDef) {
-        throw new Error(`API Definition NotFound. (${apiMethod.toUpperCase()} ${apiPath})`);
+        throw new Error(`API Definition NotFound！ (${apiMethod.toUpperCase()} ${apiPath})`);
         }
 
         const tag = apiDef.tags?.[0];
