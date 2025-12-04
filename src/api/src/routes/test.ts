@@ -1,13 +1,13 @@
-// import { Router } from 'express';
-// import { calcTestApplication } from '../apis/calcApi/calcTestApplication';
-// import { apiTESTTestGet } from '../apis/testApi/apiTESTTestGet';
+import { Router } from 'express';
+import { calcTestApplication } from '../apis/calcApi/calcTestApplication';
+import { apiTESTTestGet } from '../apis/testApi/apiTESTTestGet';
 
-// const router = Router();
+const router = Router();
 
-// // GET /TEST/ping
-// router.get('/ping', apiTESTTestGet);
+// GET /TEST/ping
+router.get('/ping', apiTESTTestGet);
 
-// // POST /TEST/calc
-// router.post('/ping', calcTestApplication);
+// POST /TEST/calc
+router.post('/ping', calcTestApplication);
 
-// export default router;
+export default router;

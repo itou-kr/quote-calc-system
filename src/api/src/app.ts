@@ -6,7 +6,7 @@ import * as DevLogin from '@quote-calc-system/middlewares/devLogin';
 import * as ErrorHandler from '@quote-calc-system/middlewares/openApiValidator';
 import * as OpenApiValidator from 'express-openapi-validator';
 import operationHandlerResolver from './commons/operationHandlerResolver';
-// import testRouter from './routes/test';
+import testRouter from './routes/test';
 import path from 'path';
 inspect.defaultOptions = {
   ...inspect.defaultOptions,
@@ -28,7 +28,7 @@ export function init(logger: RootLogger) {
   // ----------------------------------------------------------------------
   // OpenAPI で定義された API
   // ----------------------------------------------------------------------
-  // app.use('/TEST', testRouter);
+  app.use('/TEST', testRouter);
   app.use(
     OpenApiValidator.middleware({
       apiSpec: path.join(__dirname, '..', 'openapi', 'openapi.yml'),

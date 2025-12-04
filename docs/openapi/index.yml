@@ -6,5 +6,5 @@ info:
 paths:
   # /TEST/test:
   #   $ref: ./TEST.yml#/paths/~1TEST~1test
-  /api/TEST/calc:
+  /TEST/calc:
     $ref: ./TEST.yml#/paths/~1TEST~1calc

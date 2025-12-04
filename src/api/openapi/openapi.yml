@@ -4,7 +4,7 @@ info:
   description: ...
   version: 1.0.0
 paths:
-  /api/TEST/calc:
+  /TEST/calc:
     post:
       summary: 工数計算
       tags:
