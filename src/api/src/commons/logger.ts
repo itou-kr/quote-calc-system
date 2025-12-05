@@ -1,58 +1,63 @@
-// ...existing code...
-export type LogLevel = "debug" | "info" | "warn" | "error" | "silent";
+import { format } from 'util';
 
-export class LoggerImpl {
-  private priority: Record<LogLevel, number> = {
-    debug: 0,
-    info: 1,
-    warn: 2,
-    error: 3,
-    silent: 4,
-  };
-  private level: LogLevel;
+export interface Logger {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  error(message: string, ...args: any[]): void;
 
-  constructor(level: LogLevel = "info") {
-    this.level = level;
-  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  warn(message: string, ...args: any[]): void;
 
-  setLevel(level: LogLevel) {
-    this.level = level;
-  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  info(message: string, ...args: any[]): void;
 
-  private shouldLog(level: LogLevel) {
-    return this.priority[level] >= this.priority[this.level];
-  }
-
-  private format(level: LogLevel, msg: unknown, ...args: unknown[]): string {
-    const body =
-      typeof msg === "string" ? msg : JSON.stringify(msg, null, 2);
-    const rest = args.length ? " " + args.map(a => (typeof a === "string" ? a : JSON.stringify(a))).join(" ") : "";
-    return `[${new Date().toISOString()}] [${level.toUpperCase()}] ${body}${rest}`;
-  }
-
-  private write(stream: NodeJS.WriteStream, level: LogLevel, msg: unknown, ...args: unknown[]): void {
-    if (!this.shouldLog(level)) return;
-    stream.write(this.format(level, msg, ...args) + "\n");
-  }
-
-  debug(msg: unknown, ...args: unknown[]): void {
-    this.write(process.stdout, "debug", msg, ...args);
-  }
-
-  info(msg: unknown, ...args: unknown[]): void {
-    this.write(process.stdout, "info", msg, ...args);
-  }
-
-  warn(msg: unknown, ...args: unknown[]): void {
-    this.write(process.stderr, "warn", msg, ...args);
-  }
-
-  error(msg: unknown, ...args: unknown[]): void {
-    this.write(process.stderr, "error", msg, ...args);
-  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  debug(message: string, ...args: any[]): void;
 }
 
-export const Logger = new LoggerImpl();         // デフォルトインスタンス（level: info）
-export const NoopLogger = new LoggerImpl("silent"); // ログを抑制したい場合に使用
-// 型として使いたい場合にエクスポート
-export type Logger = LoggerImpl;
+export interface RootLogger extends Logger {
+  createChild(name: string): Logger;
+}
+
+export class LoggerImpl implements RootLogger {
+  private readonly name: string;
+
+  constructor(name: string = 'ROOT') {
+    this.name = name;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  error(message: string, ...args: any[]): void {
+    this.log('error', message, ...args);
+  }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  warn(message: string, ...args: any[]): void {
+    this.log('warn', message, ...args);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  info(message: string, ...args: any[]): void {
+    this.log('info', message, ...args);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any  
+  debug(message: string, ...args: any[]): void {
+    this.log('debug', message, ...args);
+  }
+
+  createChild(name: string): Logger {
+    return new LoggerImpl(name);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private log(level: 'error' | 'warn' | 'info' | 'debug', message: string, ...args: any[]): void {
+    //eslint-disable-next-line no-console
+    console[level](
+      new Date().toISOString(),
+      `[${level.toUpperCase().padEnd(5)}]`,
+      `${this.name}`,
+      '-',
+      format(MessageChannel, ...args)
+    );
+  }
+}

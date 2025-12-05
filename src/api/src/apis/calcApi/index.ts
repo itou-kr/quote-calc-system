@@ -10,5 +10,4 @@
  * Do not edit the class manually.
  */
 
-export { apiTESTTestGet } from './apiTESTTestGet';
-export { apiTESTTestPost } from './apiTESTTestPost';
+export { calcTestApplication } from './calcTestApplication';

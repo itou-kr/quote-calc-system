@@ -28,7 +28,7 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 {{>apiInner}}
 {{/apis}}{{/apiInfo}}
 {{/withSeparateModelsAndApi}}{{#withSeparateModelsAndApi}}
-import axios from 'axios';
+import axios from './axios';
 
 {{#apiInfo}}{{#apis}}{{#operations}}import { {{classname}}Factory } from './{{tsApiPackage}}/{{classFilename}}';
 {{/operations}}{{/apis}}{{/apiInfo}}

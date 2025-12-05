@@ -1,0 +1,1 @@
+export type LoadingStatus = 'loading' | 'completed' | 'error' | undefined;

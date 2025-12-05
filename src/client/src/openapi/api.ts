@@ -13,9 +13,11 @@
  */
 
 
-import axios from 'axios';
+import axios from './axios';
 
+import { CalcApiFactory } from './apis/calc-api';
 import { TestApiFactory } from './apis/test-api';
 
+export const calcApi = CalcApiFactory(undefined, undefined, axios);
 export const testApi = TestApiFactory(undefined, undefined, axios);
 

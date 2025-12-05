@@ -5,38 +5,67 @@ info:
 tags:
   - name: test
     description: ...
+  - name: calc
+    description: 工数計算関連
 paths:
-  /TEST/test:
-    get:
-      tags:
-        - test
-      summary: テスト
-      responses:
-        '200':
-          description: テスト
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'
+  /TEST/calc:
     post:
+      summary: 工数計算
       tags:
-        - test
-      summary: テスト
+        - calc
+      operationId: calcTestApplication
+      description: ...
       requestBody:
+        description: ...
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: "#/components/schemas/CalcTestApplicationRequest"
       responses:
-        '201':
-          description: テスト
+        "200":
+          description: ...
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: "#/components/schemas/CalcTestApplication200Response"
+
+  # /TEST/test:
+  #   post:
+  #     tags:
+  #       - test
+  #     summary: テスト
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/User'
+  #     responses:
+  #       '201':
+  #         description: テスト
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/User'
+
+  /TEST/ping:
+    get:
+      tags:
+        - test
+      summary: 接続確認用
+      operationId: ping
+      responses:
+        '200':
+          description: 正常
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: pong
 
 components:
   schemas:
@@ -47,3 +76,19 @@ components:
           type: integer
         name:
           type: string
+    CalcTestApplicationRequest:
+      description: 工数計算リクエスト
+      type: object
+      properties:
+        totalFP:
+          type: number
+        manMonth:
+          type: number
+    CalcTestApplication200Response:
+      description: 工数計算レスポンス
+      type: object
+      properties:
+        totalFP:
+          type: number
+        manMonth:
+          type: number

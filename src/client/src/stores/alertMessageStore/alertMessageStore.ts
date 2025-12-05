@@ -23,13 +23,35 @@ const alertMessageStore = createSlice({
                 draftState.messages[action.payload] = undefined;
             }
         },
-        // setMessage: (draftState: AlertMessageState, action: PayloadAction<{ viewId: ViewId; message: MessageType }>) => {
-            // const {
-            //     viewId,
-            //     message: { severity, message, icon, title },
-            // } = action.payload;
-        // }
-    }
+        setMessage: (draftState: AlertMessageState, action: PayloadAction<{ viewId: ViewId; message: MessageType }>) => {
+            const {
+                viewId,
+                message: { severity, message, icon, title },
+            } = action.payload;
+
+            if (draftState.messages[viewId]) {
+                if (draftState.messages[viewId][severity]) {
+                    draftState.messages[viewId][severity].message.push(message);
+                } else {
+                    draftState.messages[viewId][severity] = { message: [message], icon, title };
+                }
+            } else {
+                draftState.messages[viewId] = { [severity]: { message: [message], icon, title }};
+            }
+        },
+        overrideMessage: (draftState: AlertMessageState, action: PayloadAction<{ viewId: ViewId; message: MessageType }>) => {
+            const {
+                viewId,
+                message: { severity, message, icon, title },
+            } = action.payload;
+
+            if (draftState.messages[viewId]) {
+                draftState.messages[viewId][severity] = { message: [message], icon, title };
+            } else {
+                draftState.messages[viewId] = { [severity]: { message: [message], icon, title } };
+            }
+        },
+    },
 });
 
 export default alertMessageStore;

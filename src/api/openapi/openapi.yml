@@ -4,41 +4,36 @@ info:
   description: ...
   version: 1.0.0
 paths:
-  /api/TEST/test:
-    get:
-      tags:
-        - test
-      summary: テスト
-      responses:
-        '200':
-          description: テスト
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties: &ref_0
-                    id:
-                      type: integer
-                    name:
-                      type: string
+  /TEST/calc:
     post:
+      summary: 工数計算
       tags:
-        - test
-      summary: テスト
+        - calc
+      operationId: calcTestApplication
+      description: ...
       requestBody:
+        description: ...
         required: true
         content:
           application/json:
             schema:
+              description: 工数計算リクエスト
               type: object
-              properties: *ref_0
+              properties:
+                totalFP:
+                  type: number
+                manMonth:
+                  type: number
       responses:
-        '201':
-          description: テスト
+        '200':
+          description: ...
           content:
             application/json:
               schema:
+                description: 工数計算レスポンス
                 type: object
-                properties: *ref_0
+                properties:
+                  totalFP:
+                    type: number
+                  manMonth:
+                    type: number

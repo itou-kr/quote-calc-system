@@ -1,5 +1,6 @@
-src/apis/testApi/index.ts
-src/apis/testApi/type.ts
-src/models/apiTESTTestGet200ResponseInner.ts
+src/apis/calcApi/index.ts
+src/apis/calcApi/types.ts
 src/models/byteBuffer.ts
+src/models/calcTestApplication200Response.ts
+src/models/calcTestApplicationRequest.ts
 src/models/index.ts
