@@ -4,7 +4,7 @@ All URIs are relative to *http://localhost*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
-|[**calcTestApplication**](#calctestapplication) | **POST** /api/TEST/calc | 工数計算|
+|[**calcTestApplication**](#calctestapplication) | **POST** /TEST/calc | 工数計算|
 
 # **calcTestApplication**
 > CalcTestApplication200Response calcTestApplication(calcTestApplicationRequest)

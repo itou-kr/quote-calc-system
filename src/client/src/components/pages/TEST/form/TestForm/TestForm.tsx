@@ -19,7 +19,7 @@ import { t } from 'i18next';
 import TestTable, { Props as TestTableProps } from '@front/components/pages/TEST/table/TestTable';
 import { Columns } from '@front/stores/TEST/test/testStore';
 import TestCalc from '@front/components/pages/TEST/form/TestForm/TestCalc'
-import { useTypedSelector } from '@front/stores';
+// import { useTypedSelector } from '@front/stores';
 
 const setupYupScheme = () => {
   return yup.object({
@@ -87,7 +87,7 @@ function TestForm(props: Props) {
   const yupSchema = useMemo(() => {
     return setupYupScheme();
   }, []);
-  const { data: calcData } = useTypedSelector((state) => state.test)
+  // const { data: calcData } = useTypedSelector((state) => state.test)
   // const { loading, rowCount, data } = useTypedSelector((state) => state.test);
 
   const importFile = useImportFile(viewId);

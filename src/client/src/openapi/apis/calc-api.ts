@@ -40,7 +40,7 @@ export const CalcApiAxiosParamCreator = function (configuration?: Configuration)
         calcTestApplication: async (calcTestApplicationRequest: CalcTestApplicationRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'calcTestApplicationRequest' is not null or undefined
             assertParamExists('calcTestApplication', 'calcTestApplicationRequest', calcTestApplicationRequest)
-            const localVarPath = `/api/TEST/calc`;
+            const localVarPath = `/TEST/calc`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
