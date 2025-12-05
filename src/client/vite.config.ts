@@ -58,6 +58,7 @@ export default defineConfig(() => {
       proxy: {
         '/api': {
           target: 'http://localhost:3010',
+          rewrite: (path) => path.replace(/^\/api/,''),
         },
       },
     },
