@@ -29,6 +29,19 @@ export function useCalcTest(viewId: ViewIdType) {
                 calcStore.actions.setCalc({
                     ...response,
                     manMonth: response.data.manMonth || undefined,
+                    /* t-miwa ビルドできないため、意図的にコメントアウト
+                    totalFP: response.data.totalFP || undefined,
+                    manMonthsBasicDesign: response.data.manMonthsBasicDesign || undefined,
+                    manMonthsDetailedDesign: response.data.manMonthsDetailedDesign || undefined,
+                    manMonthsImplementation: response.data.manMonthsImplementation || undefined,
+                    manMonthsIntegrationTest: response.data.manMonthsIntegrationTest || undefined,
+                    manMonthsSystemTest: response.data.manMonthsSystemTest || undefined,
+                    durationBasicDesign: response.data.durationBasicDesign || undefined,
+                    durationDetailedDesign: response.data.durationDetailedDesign || undefined,
+                    durationImplementation: response.data.durationImplementation || undefined,
+                    durationIntegrationTest: response.data.durationIntegrationTest || undefined,
+                    durationSystemTest: response.data.durationSystemTest || undefined,
+                    */
                 })
             );
         },
