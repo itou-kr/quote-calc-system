@@ -26,47 +26,49 @@ import TestCalc from '@front/components/pages/TEST/form/TestForm/TestCalc'
 const setupYupScheme = () => {
   return yup.object({
     // 案件情報
-    projectName: yup.string().required('案件名を入力してください'),
+    projectName: yup.string(),
     autoProductivity: yup.boolean(),
-    productivityFPPerMonth: yup.number().positive('正の数を入力してください').required('生産性を入力してください'),
-    projectType: yup.string().required('案件種別を選択してください'),
+    productivityFPPerMonth: yup.number().positive('正の数を入力してください'),
+    projectType: yup.string(),
     fileUpload: yup.string(),
     totalFP: yup.number(),
     manMonth: yup.number(),
-    ipaValueType: yup.string().required('使用するIPA代表値を選択してください'),
+    ipaValueType: yup.string(),
     
     // データファンクション情報
     dataFunctions: yup.array().of(
-        yup.object({
-            selected: yup.boolean(),
-            name: yup.string(),
-            updateType: yup.string(),
-            fpValue: yup.number().min(0, '0以上の値を入力してください'),
-            remarks: yup.string(),
-        })
+      yup.object({
+        selected: yup.boolean(),
+        name: yup.string(),
+        updateType: yup.string(),
+        fpValue: yup.number().min(0, '0以上の値を入力してください'),
+        remarks: yup.string(),
+      })
     ),
         
     // トランザクションファンクション情報
     transactionFunctions: yup.array().of(
-        yup.object({
-            selected: yup.boolean(),
-            name: yup.string(),
-            externalInput: yup.number().min(0, '0以上の値を入力してください'),
-            externalOutput: yup.number().min(0, '0以上の値を入力してください'),
-            externalInquiry: yup.number().min(0, '0以上の値を入力してください'),
-            fpValue: yup.number().min(0, '0以上の値を入力してください'),
-            remarks: yup.string(),
-        })
+      yup.object({
+        selected: yup.boolean(),
+        name: yup.string(),
+        externalInput: yup.number().min(0, '0以上の値を入力してください'),
+        externalOutput: yup.number().min(0, '0以上の値を入力してください'),
+        externalInquiry: yup.number().min(0, '0以上の値を入力してください'),
+        fpValue: yup.number().min(0, '0以上の値を入力してください'),
+        remarks: yup.string(),
+      })
     ),
 
     // 工程別比率
-    processRatios: yup.object({
+    processRatios: yup.array().of(
+      yup.object({
         basicDesign: yup.number().min(0, '0以上の値を入力してください').max(1, '1以下の値を入力してください'),
         detailedDesign: yup.number().min(0, '0以上の値を入力してください').max(1, '1以下の値を入力してください'),
         implementation: yup.number().min(0, '0以上の値を入力してください').max(1, '1以下の値を入力してください'),
         integrationTest: yup.number().min(0, '0以上の値を入力してください').max(1, '1以下の値を入力してください'),
         systemTest: yup.number().min(0, '0以上の値を入力してください').max(1, '1以下の値を入力してください'),
-    }),
+      }),
+    )
   });
 };
 
@@ -107,6 +109,7 @@ type Props = Pick<TestTableProps, 'onSelected'> & {
 
 function TestForm(props: Props) {
   const { viewId, onSelected, data } = props;
+  console.log(data);
 
   const yupSchema = useMemo(() => {
     return setupYupScheme();
