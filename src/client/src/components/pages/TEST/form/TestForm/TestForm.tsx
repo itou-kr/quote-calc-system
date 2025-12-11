@@ -262,7 +262,7 @@ function TestForm(props: Props) {
                   <Typography sx={{ fontWeight: 'bold' }}>計算結果サマリー</Typography>
                 </RecordTitle>
                 {/* 計算結果の項目はここに追加していく */}
-                {/* <Record label="総FP">
+                <Record label="総FP">
                   <TextField
                     name="totalFP"
                     control={control}
@@ -277,8 +277,8 @@ function TestForm(props: Props) {
                     trigger={trigger}
                     t={t}
                   />
-                </Record> */}
-                <Box sx={{ mb: 1, p: 1.5, bgcolor: '#f5f5f5', borderRadius: 1, border: 1, borderColor: '#e0e0e0' }}>
+                </Record>
+                {/* <Box sx={{ mb: 1, p: 1.5, bgcolor: '#f5f5f5', borderRadius: 1, border: 1, borderColor: '#e0e0e0' }}>
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <AutoAwesomeIcon sx={{ fontSize: 18, mr: 0.8, color: 'primary.main' }} />
@@ -296,7 +296,7 @@ function TestForm(props: Props) {
                         </Box>
                         <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'primary.main' }}>manMonth</Typography>
                     </Stack>
-                </Box>
+                </Box> */}
               </FormContent>
 
             </FormPaperProvider>
