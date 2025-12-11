@@ -21,6 +21,8 @@ type RenderProps<T extends FieldValues = FieldValues, N extends FieldPath<T> = F
     sx?: MuiTextFieldProps['sx'];
     className?: MuiTextFieldProps['className'];
     hideHelperText?: boolean;
+    slotProps?: MuiTextFieldProps['slotProps'];
+    InputProps?: MuiTextFieldProps['InputProps'];
     onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void | Promise<void>;
     onBlur?: (e: React.FocusEvent<HTMLTextAreaElement | HTMLInputElement>, value: T[N]) => void | Promise<void>;
     trigger: UseFormTrigger<T>;
@@ -43,6 +45,8 @@ function RenderTextField<T extends FieldValues = FieldValues, N extends FieldPat
         sx,
         className,
         hideHelperText,
+        slotProps: userSlotProps,
+        InputProps: userInputProps,
         onChange,
         onBlur,
         field: { name, ...field },
@@ -72,6 +76,18 @@ function RenderTextField<T extends FieldValues = FieldValues, N extends FieldPat
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [t]);
 
+    // slotPropsをマージ（ユーザー指定を優先）
+    const mergedSlotProps = {
+        input: {
+            readOnly,
+            ...userSlotProps?.input,
+        },
+        htmlInput: {
+            maxLength,
+            ...userSlotProps?.htmlInput,
+        },
+    };
+
     return (
         <StyledTextField
             name={name}
@@ -81,14 +97,8 @@ function RenderTextField<T extends FieldValues = FieldValues, N extends FieldPat
             variant={variant}
             disabled={disabled}
             required={required}
-            slotProps={{
-                input: {
-                    readOnly,
-                },
-                htmlInput: {
-                    maxLength,
-                },
-            }}
+            slotProps={mergedSlotProps}
+            InputProps={userInputProps}
             value={field.value || ''}
             multiline={multiline}
             rows={multiline ? multilineRows : undefined}

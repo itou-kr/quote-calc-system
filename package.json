@@ -12,5 +12,8 @@
     "@mui/styled-engine": "^7.3.5",
     "@mui/system": "^7.3.5",
     "react-router-dom": "^7.9.5"
+  },
+  "scripts": {
+    "dev": "vite --host"
   }
 }

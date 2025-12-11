@@ -2,8 +2,8 @@ import * as yup from 'yup';
 import { useImportFile } from '@front/hooks/TEST/test';
 import { useExportFile } from '@front/hooks/TEST/test';
 import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
-import { useMemo, useState } from 'react';
-import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
+import { useMemo, useState, useCallback } from 'react';
+import { FormProvider, useForm, useFieldArray, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Stack, Paper, Typography, Divider, Table, TableHead, TableBody, TableRow, TableCell, Checkbox, Select, MenuItem, Tabs, Tab, Collapse, IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -129,15 +129,31 @@ function CalcForm(props: Props) {
         name: 'transactionFunctions',
     });
 
-    const dataFunctions = watch('dataFunctions') || [];
-    const transactionFunctions = watch('transactionFunctions') || [];
+    // パフォーマンス改善: watch呼び出しを最小限に
     const autoProductivity = watch('autoProductivity') ?? false;
-    const productivityFPPerMonth = watch('productivityFPPerMonth') || 0;
     
     const [tableTabValue, setTableTabValue] = useState(0);
     const [processBreakdownOpen, setProcessBreakdownOpen] = useState(false);
     const [dataTableScrollTop, setDataTableScrollTop] = useState(0);
     const [transactionTableScrollTop, setTransactionTableScrollTop] = useState(0);
+    const [totalFP, setTotalFP] = useState(0);
+    const [manMonths, setManMonths] = useState(0);
+    const [standardDuration, setStandardDuration] = useState(0);
+
+    // 選択数をカウント
+    const selectedDataCount = watch('dataFunctions')?.filter(item => item.selected).length || 0;
+    const selectedTransactionCount = watch('transactionFunctions')?.filter(item => item.selected).length || 0;
+    const selectedCount = tableTabValue === 0 ? selectedDataCount : selectedTransactionCount;
+
+    // パフォーマンス改善: スクロールイベントハンドラーをメモ化
+    const handleScroll = useCallback((e: React.UIEvent<HTMLElement>) => {
+        const target = e.target as HTMLElement;
+        if (tableTabValue === 0) {
+            setDataTableScrollTop(target.scrollTop);
+        } else {
+            setTransactionTableScrollTop(target.scrollTop);
+        }
+    }, [tableTabValue]);
 
     // 工程別の比率（デフォルト値）
     const processRatios = {
@@ -149,37 +165,113 @@ function CalcForm(props: Props) {
     };
 
     /** ▼ FP合計を計算 */
-    const calculateTotalFP = () => {
+    const calculateTotalFP = useCallback(() => {
+        const dataFunctions = getValues('dataFunctions') || [];
+        const transactionFunctions = getValues('transactionFunctions') || [];
         const dataTotal = dataFunctions.reduce((sum, item) => sum + (Number(item.fpValue) || 0), 0);
         const transactionTotal = transactionFunctions.reduce((sum, item) => sum + (Number(item.fpValue) || 0), 0);
         return dataTotal + transactionTotal;
-    };
+    }, [getValues]);
 
-    /** ▼ 工数を計算 */
-    const calculateManMonths = () => {
+    /** ▼ 総工数を計算 */
+    const calculateManMonths = useCallback(() => {
         const totalFP = calculateTotalFP();
+        const productivityFPPerMonth = getValues('productivityFPPerMonth') || 0;
         if (productivityFPPerMonth > 0) {
-            return Math.round((totalFP / productivityFPPerMonth) * 100) / 100;
+            // 小数点第三位を切り上げ(第二位まで表示)
+            return Math.ceil((totalFP / productivityFPPerMonth) * 100) / 100;
         }
         return 0;
-    };
+    }, [calculateTotalFP, getValues]);
+
+    /** ▼ 標準工期を計算 */
+    const calculateStandardDuration = useCallback(() => {
+        const totalManMonths = calculateManMonths();
+        // 標準工期 = 2.64 × 総工数^(1/3)
+        return Math.round(2.64 * Math.pow(totalManMonths, 1/3) * 100) / 100;
+    }, [calculateManMonths]);
 
     /** ▼ 工程別の工数を計算 */
-    const calculateProcessManMonths = (ratio: number) => {
+    const calculateProcessManMonths = useCallback((ratio: number, isLast: boolean = false) => {
         const totalManMonths = calculateManMonths();
-        return Math.round(totalManMonths * ratio * 100) / 100;
-    };
+        
+        if (isLast) {
+            // 実装（比率が最大の工程）は、総工数から他の工程の合計を引いた値にする
+            const basicDesign = Math.round(processRatios.basicDesign * totalManMonths * 100) / 100;
+            const detailedDesign = Math.round(processRatios.detailedDesign * totalManMonths * 100) / 100;
+            const integrationTest = Math.round(processRatios.integrationTest * totalManMonths * 100) / 100;
+            const systemTest = Math.round(processRatios.systemTest * totalManMonths * 100) / 100;
+            const sumOthers = basicDesign + detailedDesign + integrationTest + systemTest;
+            return Math.round((totalManMonths - sumOthers) * 100) / 100;
+        }
+        
+        // 通常の工程は四捨五入
+        return Math.round(ratio * totalManMonths * 100) / 100;
+    }, [calculateManMonths]);
 
-    /** ▼ 工程別の工期を計算（仮：工数と同じ値を表示） */
-    const calculateProcessDuration = (ratio: number) => {
-        const totalManMonths = calculateManMonths();
-        return Math.round(totalManMonths * ratio * 100) / 100;
-    };
+    /** ▼ 工程別の工期を計算 */
+    const calculateProcessDuration = useCallback((ratio: number, isLast: boolean = false) => {
+        const standardDuration = calculateStandardDuration();
+        
+        if (isLast) {
+            // 実装（比率が最大の工程）は、標準工期から他の工程の合計を引いた値にする
+            const basicDesign = Math.round(processRatios.basicDesign * standardDuration * 100) / 100;
+            const detailedDesign = Math.round(processRatios.detailedDesign * standardDuration * 100) / 100;
+            const integrationTest = Math.round(processRatios.integrationTest * standardDuration * 100) / 100;
+            const systemTest = Math.round(processRatios.systemTest * standardDuration * 100) / 100;
+            const sumOthers = basicDesign + detailedDesign + integrationTest + systemTest;
+            return Math.round((standardDuration - sumOthers) * 100) / 100;
+        }
+        
+        // 通常の工程は四捨五入
+        return Math.round(ratio * standardDuration * 100) / 100;
+    }, [calculateStandardDuration]);
 
     /** ▼ 工数計算実行（バリデーショントリガー） */
     const onExecuteCalculation = () => {
+        // データファンクションのFP値を計算
+        const currentDataFunctions = getValues('dataFunctions');
+        if (currentDataFunctions) {
+            currentDataFunctions.forEach((item, index) => {
+                // 名称に文字列が入っている場合のみ計算
+                if (item.name && item.name.trim() !== '') {
+                    if (item.updateType === '更新あり') {
+                        setValue(`dataFunctions.${index}.fpValue`, 7);
+                    } else if (item.updateType === '参照のみ') {
+                        setValue(`dataFunctions.${index}.fpValue`, 5);
+                    }
+                }
+            });
+        }
+
+        // トランザクションファンクションのFP値を計算
+        const currentTransactionFunctions = getValues('transactionFunctions');
+        if (currentTransactionFunctions) {
+            currentTransactionFunctions.forEach((item, index) => {
+                // 名称に文字列が入っている場合のみ計算
+                if (item.name && item.name.trim() !== '') {
+                    const externalInput = Number(item.externalInput) || 0;
+                    const externalOutput = Number(item.externalOutput) || 0;
+                    const externalInquiry = Number(item.externalInquiry) || 0;
+                    
+                    // FP値 = 外部入力*4 + 外部出力*5 + 外部照会*4
+                    const fpValue = externalInput * 4 + externalOutput * 5 + externalInquiry * 4;
+                    setValue(`transactionFunctions.${index}.fpValue`, fpValue);
+                }
+            });
+        }
+
+        // 計算結果を更新
+        const newTotalFP = calculateTotalFP();
+        setTotalFP(newTotalFP);
+        
+        const newManMonths = calculateManMonths();
+        setManMonths(newManMonths);
+        
+        const newStandardDuration = calculateStandardDuration();
+        setStandardDuration(newStandardDuration);
+
         // フォームのバリデーションを実行
-        // 計算自体はリアクティブに自動実行される
         trigger();
         // 工程別比率の表を自動で表示
         setProcessBreakdownOpen(true);
@@ -250,9 +342,6 @@ function CalcForm(props: Props) {
         });
     };
 
-    const totalFP = calculateTotalFP();
-    const manMonths = calculateManMonths();
-
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
             <FormProvider {...methods}>
@@ -318,6 +407,17 @@ function CalcForm(props: Props) {
                                     type="number" 
                                     hideHelperText 
                                     disabled={autoProductivity}
+                                    slotProps={{ 
+                                        htmlInput: { 
+                                            min: 1,
+                                            step: 0.1,
+                                            onKeyDown: (e: React.KeyboardEvent) => { 
+                                                if (e.key === '-' || e.key === 'e' || e.key === '+') {
+                                                    e.preventDefault();
+                                                }
+                                            }
+                                        } 
+                                    }}
                                     sx={{ '& .MuiInputBase-root': { bgcolor: autoProductivity ? '#f5f5f5' : 'white' } }}
                                 />
                             </Box>
@@ -374,13 +474,23 @@ function CalcForm(props: Props) {
                                     </Stack>
                                 </Box>
 
-                                <Box sx={{ p: 1.5, bgcolor: '#f5f5f5', borderRadius: 1, border: 1, borderColor: '#e0e0e0' }}>
+                                <Box sx={{ mb: 1, p: 1.5, bgcolor: '#f5f5f5', borderRadius: 1, border: 1, borderColor: '#e0e0e0' }}>
                                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                             <AutoAwesomeIcon sx={{ fontSize: 18, mr: 0.8, color: 'primary.main' }} />
                                             <Typography variant="body2" sx={{ fontWeight: 'medium' }}>工数(人月)</Typography>
                                         </Box>
                                         <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'primary.main' }}>{manMonths}</Typography>
+                                    </Stack>
+                                </Box>
+
+                                <Box sx={{ p: 1.5, bgcolor: '#f5f5f5', borderRadius: 1, border: 1, borderColor: '#e0e0e0' }}>
+                                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            <AutoAwesomeIcon sx={{ fontSize: 18, mr: 0.8, color: 'primary.main' }} />
+                                            <Typography variant="body2" sx={{ fontWeight: 'medium' }}>標準工期(月)</Typography>
+                                        </Box>
+                                        <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'primary.main' }}>{standardDuration}</Typography>
                                     </Stack>
                                 </Box>
                             </Box>
@@ -401,22 +511,50 @@ function CalcForm(props: Props) {
                                 <Tab label="データファンクション" />
                                 <Tab label="トランザクションファンクション" />
                             </Tabs>
-                            <Stack direction="row" spacing={1} sx={{ mr: 2 }}>
-                                <Button variant="contained" startIcon={<AddIcon />} onClick={onAddRow} size="small" sx={{ bgcolor: '#1e88e5', '&:hover': { bgcolor: '#1565c0' } }}>行追加</Button>
-                                <Button variant="contained" sx={{ bgcolor: '#e53935', '&:hover': { bgcolor: '#c62828' } }} startIcon={<DeleteIcon />} onClick={onDeleteSelected} size="small">行削除</Button>
+                            <Stack direction="row" spacing={1} alignItems="center" sx={{ mr: 2 }}>
+                                <Button 
+                                    variant="outlined" 
+                                    startIcon={<AddIcon />} 
+                                    onClick={onAddRow} 
+                                    size="small"
+                                    sx={{ 
+                                        borderColor: '#1e88e5', 
+                                        color: '#1e88e5',
+                                        '&:hover': { 
+                                            borderColor: '#1565c0',
+                                            bgcolor: '#e3f2fd'
+                                        }
+                                    }}
+                                >
+                                    行追加
+                                </Button>
+                                <Button 
+                                    variant="outlined" 
+                                    startIcon={<DeleteIcon />} 
+                                    onClick={onDeleteSelected} 
+                                    size="small"
+                                    disabled={selectedCount === 0}
+                                    sx={{ 
+                                        borderColor: '#e53935', 
+                                        color: '#e53935',
+                                        '&:hover': { 
+                                            borderColor: '#c62828',
+                                            bgcolor: '#ffebee'
+                                        },
+                                        '&.Mui-disabled': {
+                                            borderColor: 'rgba(0, 0, 0, 0.12)',
+                                            color: 'rgba(0, 0, 0, 0.26)'
+                                        }
+                                    }}
+                                >
+                                    選択した行を削除{selectedCount > 0 ? ` (${selectedCount})` : ''}
+                                </Button>
                             </Stack>
                         </Box>
 
                         {/* ファンクション情報入力テーブル */}
                         <Paper elevation={1} sx={{ maxHeight: processBreakdownOpen ? 'calc(100vh - 400px)' : 'calc(100vh - 240px)', overflow: 'auto', transition: 'max-height 300ms ease-in-out' }}
-                            onScroll={(e) => {
-                                const target = e.target as HTMLElement;
-                                if (tableTabValue === 0) {
-                                    setDataTableScrollTop(target.scrollTop);
-                                } else {
-                                    setTransactionTableScrollTop(target.scrollTop);
-                                }
-                            }}
+                            onScroll={handleScroll}
                             ref={(el) => {
                                 if (el) {
                                     el.scrollTop = tableTabValue === 0 ? dataTableScrollTop : transactionTableScrollTop;
@@ -453,7 +591,12 @@ function CalcForm(props: Props) {
                                                     備考
                                                 </Box>
                                             </TableCell>
-                                            <TableCell align="center" padding="checkbox" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 80 }}>行選択</TableCell>
+                                            <TableCell align="center" padding="checkbox" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 80 }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <DeleteIcon sx={{ fontSize: 16, mr: 0.5, color: '#e53935' }} />
+                                                    削除
+                                                </Box>
+                                            </TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -464,11 +607,17 @@ function CalcForm(props: Props) {
                                                     <TextField name={`dataFunctions.${index}.name`} control={control} trigger={trigger} t={t} sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <Select value={watch(`dataFunctions.${index}.updateType`) || ''} onChange={(e) => setValue(`dataFunctions.${index}.updateType`, e.target.value)} size="small" fullWidth displayEmpty sx={{ bgcolor: 'white' }}>
-                                                        <MenuItem value="">選択してください</MenuItem>
-                                                        <MenuItem value="更新あり">更新あり</MenuItem>
-                                                        <MenuItem value="参照のみ">参照のみ</MenuItem>
-                                                    </Select>
+                                                    <Controller
+                                                        name={`dataFunctions.${index}.updateType`}
+                                                        control={control}
+                                                        render={({ field }) => (
+                                                            <Select {...field} size="small" fullWidth displayEmpty sx={{ bgcolor: 'white' }}>
+                                                                <MenuItem value="">選択してください</MenuItem>
+                                                                <MenuItem value="更新あり">更新あり</MenuItem>
+                                                                <MenuItem value="参照のみ">参照のみ</MenuItem>
+                                                            </Select>
+                                                        )}
+                                                    />
                                                 </TableCell>
                                                 <TableCell>
                                                     <TextField name={`dataFunctions.${index}.fpValue`} control={control} trigger={trigger} t={t} type="number" notFullWidth disabled sx={{ '& .MuiInputBase-root': { bgcolor: '#f5f5f5', width: 80 } }} />
@@ -477,10 +626,37 @@ function CalcForm(props: Props) {
                                                     <TextField name={`dataFunctions.${index}.remarks`} control={control} trigger={trigger} t={t} sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} />
                                                 </TableCell>
                                                 <TableCell align="center" padding="checkbox">
-                                                    <Checkbox checked={watch(`dataFunctions.${index}.selected`) || false} onChange={(e) => setValue(`dataFunctions.${index}.selected`, e.target.checked)} />
+                                                    <Controller
+                                                        name={`dataFunctions.${index}.selected`}
+                                                        control={control}
+                                                        render={({ field }) => (
+                                                            <Checkbox {...field} checked={field.value || false} />
+                                                        )}
+                                                    />
                                                 </TableCell>
                                             </TableRow>
                                         ))}
+                                        {/* 行追加ボタン行 */}
+                                        <TableRow>
+                                            <TableCell colSpan={6} align="center" sx={{ py: 2, bgcolor: '#fafafa', borderTop: 2, borderColor: '#e0e0e0' }}>
+                                                <Button 
+                                                    variant="outlined" 
+                                                    startIcon={<AddIcon />} 
+                                                    onClick={onAddRow} 
+                                                    size="small"
+                                                    sx={{ 
+                                                        borderColor: '#1e88e5', 
+                                                        color: '#1e88e5',
+                                                        '&:hover': { 
+                                                            borderColor: '#1565c0',
+                                                            bgcolor: '#e3f2fd'
+                                                        }
+                                                    }}
+                                                >
+                                                    行を追加
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
                                     </TableBody>
                                 </Table>
                             </Box>
@@ -527,7 +703,12 @@ function CalcForm(props: Props) {
                                                     備考
                                                 </Box>
                                             </TableCell>
-                                            <TableCell align="center" padding="checkbox" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 80 }}>行選択</TableCell>
+                                            <TableCell align="center" padding="checkbox" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 80 }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <DeleteIcon sx={{ fontSize: 16, mr: 0.5, color: '#e53935' }} />
+                                                    削除
+                                                </Box>
+                                            </TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -538,13 +719,13 @@ function CalcForm(props: Props) {
                                                     <TextField name={`transactionFunctions.${index}.name`} control={control} trigger={trigger} t={t} sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <TextField name={`transactionFunctions.${index}.externalInput`} control={control} trigger={trigger} t={t} type="number" notFullWidth sx={{ '& .MuiInputBase-root': { bgcolor: 'white', width: 80 } }} />
+                                                    <TextField name={`transactionFunctions.${index}.externalInput`} control={control} trigger={trigger} t={t} type="number" notFullWidth slotProps={{ htmlInput: { min: 0, onKeyDown: (e: React.KeyboardEvent) => { if (e.key === '-' || e.key === 'e' || e.key === '+') e.preventDefault(); } } }} sx={{ '& .MuiInputBase-root': { bgcolor: 'white', width: 80 } }} />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <TextField name={`transactionFunctions.${index}.externalOutput`} control={control} trigger={trigger} t={t} type="number" notFullWidth sx={{ '& .MuiInputBase-root': { bgcolor: 'white', width: 80 } }} />
+                                                    <TextField name={`transactionFunctions.${index}.externalOutput`} control={control} trigger={trigger} t={t} type="number" notFullWidth slotProps={{ htmlInput: { min: 0, onKeyDown: (e: React.KeyboardEvent) => { if (e.key === '-' || e.key === 'e' || e.key === '+') e.preventDefault(); } } }} sx={{ '& .MuiInputBase-root': { bgcolor: 'white', width: 80 } }} />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <TextField name={`transactionFunctions.${index}.externalInquiry`} control={control} trigger={trigger} t={t} type="number" notFullWidth sx={{ '& .MuiInputBase-root': { bgcolor: 'white', width: 80 } }} />
+                                                    <TextField name={`transactionFunctions.${index}.externalInquiry`} control={control} trigger={trigger} t={t} type="number" notFullWidth slotProps={{ htmlInput: { min: 0, onKeyDown: (e: React.KeyboardEvent) => { if (e.key === '-' || e.key === 'e' || e.key === '+') e.preventDefault(); } } }} sx={{ '& .MuiInputBase-root': { bgcolor: 'white', width: 80 } }} />
                                                 </TableCell>
                                                 <TableCell>
                                                     <TextField name={`transactionFunctions.${index}.fpValue`} control={control} trigger={trigger} t={t} type="number" notFullWidth disabled sx={{ '& .MuiInputBase-root': { bgcolor: '#f5f5f5', width: 80 } }} />
@@ -553,10 +734,37 @@ function CalcForm(props: Props) {
                                                     <TextField name={`transactionFunctions.${index}.remarks`} control={control} trigger={trigger} t={t} sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} />
                                                 </TableCell>
                                                 <TableCell align="center" padding="checkbox">
-                                                    <Checkbox checked={watch(`transactionFunctions.${index}.selected`) || false} onChange={(e) => setValue(`transactionFunctions.${index}.selected`, e.target.checked)} />
+                                                    <Controller
+                                                        name={`transactionFunctions.${index}.selected`}
+                                                        control={control}
+                                                        render={({ field }) => (
+                                                            <Checkbox {...field} checked={field.value || false} />
+                                                        )}
+                                                    />
                                                 </TableCell>
                                             </TableRow>
                                         ))}
+                                        {/* 行追加ボタン行 */}
+                                        <TableRow>
+                                            <TableCell colSpan={8} align="center" sx={{ py: 2, bgcolor: '#fafafa', borderTop: 2, borderColor: '#e0e0e0' }}>
+                                                <Button 
+                                                    variant="outlined" 
+                                                    startIcon={<AddIcon />} 
+                                                    onClick={onAddRow} 
+                                                    size="small"
+                                                    sx={{ 
+                                                        borderColor: '#1e88e5', 
+                                                        color: '#1e88e5',
+                                                        '&:hover': { 
+                                                            borderColor: '#1565c0',
+                                                            bgcolor: '#e3f2fd'
+                                                        }
+                                                    }}
+                                                >
+                                                    行を追加
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
                                     </TableBody>
                                 </Table>
                             </Box>
@@ -594,20 +802,20 @@ function CalcForm(props: Props) {
                                                 <TableCell align="center">{processRatios.systemTest}</TableCell>
                                             </TableRow>
                                             <TableRow>
-                                                <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>工数</TableCell>
-                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessManMonths(processRatios.basicDesign)}</TableCell>
-                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessManMonths(processRatios.detailedDesign)}</TableCell>
-                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessManMonths(processRatios.implementation)}</TableCell>
-                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessManMonths(processRatios.integrationTest)}</TableCell>
-                                                <TableCell align="center">{calculateProcessManMonths(processRatios.systemTest)}</TableCell>
+                                                <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>工数(人月)</TableCell>
+                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessManMonths(processRatios.basicDesign, false)}</TableCell>
+                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessManMonths(processRatios.detailedDesign, false)}</TableCell>
+                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessManMonths(processRatios.implementation, true)}</TableCell>
+                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessManMonths(processRatios.integrationTest, false)}</TableCell>
+                                                <TableCell align="center">{calculateProcessManMonths(processRatios.systemTest, false)}</TableCell>
                                             </TableRow>
                                             <TableRow>
-                                                <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>工期</TableCell>
-                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessDuration(processRatios.basicDesign)}</TableCell>
-                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessDuration(processRatios.detailedDesign)}</TableCell>
-                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessDuration(processRatios.implementation)}</TableCell>
-                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessDuration(processRatios.integrationTest)}</TableCell>
-                                                <TableCell align="center">{calculateProcessDuration(processRatios.systemTest)}</TableCell>
+                                                <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>工期(月)</TableCell>
+                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessDuration(processRatios.basicDesign, false)}</TableCell>
+                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessDuration(processRatios.detailedDesign, false)}</TableCell>
+                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessDuration(processRatios.implementation, true)}</TableCell>
+                                                <TableCell align="center" sx={{ borderRight: 1, borderColor: 'divider' }}>{calculateProcessDuration(processRatios.integrationTest, false)}</TableCell>
+                                                <TableCell align="center">{calculateProcessDuration(processRatios.systemTest, false)}</TableCell>
                                             </TableRow>
                                         </TableBody>
                                     </Table>
