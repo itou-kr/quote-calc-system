@@ -10,8 +10,8 @@ import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
 import FormPaperProvider from '@front/components/ui/Layout/Form/FormPaperProvider';
 import EditIcon from '@mui/icons-material/Edit';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import { useTypedSelector } from '@front/stores';
 
-// import { useTypedSelector } from '@front/stores';
 import ImportButton from '@front/components/ui/Button/ImportButton';
 import ExportButton from '@front/components/ui/Button/ExportButton';
 // import FileUpload from '@front/components/ui/FileUpload';
@@ -21,45 +21,46 @@ import { t } from 'i18next';
 import TestTable, { Props as TestTableProps } from '@front/components/pages/TEST/table/TestTable';
 import { Columns } from '@front/stores/TEST/test/testStore';
 import TestCalc from '@front/components/pages/TEST/form/TestForm/TestCalc'
-// import { useTypedSelector } from '@front/stores';
 
 const setupYupScheme = () => {
   return yup.object({
     // 案件情報
     projectName: yup.string(),
-    autoProductivity: yup.boolean(),
     productivityFPPerMonth: yup.number().positive('正の数を入力してください'),
     projectType: yup.string(),
-    fileUpload: yup.string(),
+    ipaValueType: yup.string(),
+    // fileUpload: yup.string(),
     totalFP: yup.number(),
     manMonth: yup.number(),
-    ipaValueType: yup.string(),
     
     // データファンクション情報
-    dataFunctions: yup.array().of(
-      yup.object({
-        selected: yup.boolean(),
-        name: yup.string(),
-        updateType: yup.string(),
-        fpValue: yup.number().min(0, '0以上の値を入力してください'),
-        remarks: yup.string(),
-      })
-    ),
+    dataFunctions: yup
+      .array()
+      .of(
+        yup
+          .object({
+            name: yup.string(),
+            updateType: yup.string(),
+            fpValue: yup.number().min(0, '0以上の値を入力してください'),
+            remarks: yup.string(),
+            selected: yup.boolean(),
+          })
+      ),
         
     // トランザクションファンクション情報
     transactionFunctions: yup.array().of(
       yup.object({
-        selected: yup.boolean(),
         name: yup.string(),
         externalInput: yup.number().min(0, '0以上の値を入力してください'),
         externalOutput: yup.number().min(0, '0以上の値を入力してください'),
         externalInquiry: yup.number().min(0, '0以上の値を入力してください'),
         fpValue: yup.number().min(0, '0以上の値を入力してください'),
         remarks: yup.string(),
+        selected: yup.boolean(),
       })
     ),
 
-    // 工程別比率
+    // 工程別内訳 比率
     processRatios: yup.array().of(
       yup.object({
         basicDesign: yup.number().min(0, '0以上の値を入力してください').max(1, '1以下の値を入力してください'),
@@ -115,7 +116,7 @@ function TestForm(props: Props) {
     return setupYupScheme();
   }, []);
 
-  // const { data: calcData } = useTypedSelector((state) => state.test)
+  const { data: calcData } = useTypedSelector((state) => state.calc)
   // const { loading, rowCount, data } = useTypedSelector((state) => state.test);
 
   const importFile = useImportFile(viewId);
@@ -125,6 +126,9 @@ function TestForm(props: Props) {
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
     resolver: yupResolver(yupSchema),
+    values: calcData ?? {
+
+    },
     defaultValues: props.data,
   });
 
@@ -222,7 +226,7 @@ function TestForm(props: Props) {
                         t={t}
                       />
                     </Record>
-                    <Record label="使用するAPI代表値" required={false}>
+                    <Record label="使用するIPA代表値" required={false}>
                       <TextField
                         name="ipaValueType"
                         control={control}

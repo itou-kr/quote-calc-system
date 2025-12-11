@@ -26,10 +26,8 @@ export function useCalcTest(viewId: ViewIdType) {
             // const createTest = response.data;
             setAlertMessage({ severity: 'error', message:'aaaaa' });
             dispatch(
-                calcStore.actions.setCalc({
-                    ...response,
-                    manMonth: response.data.manMonth || undefined,
-                })
+                calcStore.actions.setCalc(
+                    response.data)
             );
         },
         [clearAlertMessage, setAlertMessage]

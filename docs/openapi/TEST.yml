@@ -80,15 +80,61 @@ components:
       description: 工数計算リクエスト
       type: object
       properties:
+        projectName:
+          type: string
+        productivityFPPerMonth:
+          type: number
+        projectType:
+          type: string
+        ipaValueType:
+          type: string
         totalFP:
           type: number
         manMonth:
           type: number
+        dataFunctions:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              updateType:
+                type: string
+              fpValue:
+                type: number
+              remarks:
+                type: string
+              selected:
+                type: boolean
     CalcTestApplication200Response:
       description: 工数計算レスポンス
       type: object
       properties:
+        projectName:
+          type: string
+        productivityFPPerMonth:
+          type: number
+        projectType:
+          type: string
+        ipaValueType:
+          type: string
         totalFP:
           type: number
         manMonth:
           type: number
+        dataFunctions:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              updateType:
+                type: string
+              fpValue:
+                type: number
+              remarks:
+                type: string
+              selected:
+                type: boolean

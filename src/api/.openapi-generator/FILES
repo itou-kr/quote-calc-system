@@ -3,4 +3,5 @@ src/apis/calcApi/types.ts
 src/models/byteBuffer.ts
 src/models/calcTestApplication200Response.ts
 src/models/calcTestApplicationRequest.ts
+src/models/calcTestApplicationRequestDataFunctionsInner.ts
 src/models/index.ts

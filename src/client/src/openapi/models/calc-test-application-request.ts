@@ -12,6 +12,9 @@
  * Do not edit the class manually.
  */
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { CalcTestApplication200ResponseDataFunctionsInner } from './calc-test-application200-response-data-functions-inner';
 
 /**
  * 工数計算リクエスト
@@ -19,6 +22,30 @@
  * @interface CalcTestApplicationRequest
  */
 export interface CalcTestApplicationRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof CalcTestApplicationRequest
+     */
+    'projectName'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CalcTestApplicationRequest
+     */
+    'productivityFPPerMonth'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof CalcTestApplicationRequest
+     */
+    'projectType'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CalcTestApplicationRequest
+     */
+    'ipaValueType'?: string;
     /**
      * 
      * @type {number}
@@ -31,4 +58,10 @@ export interface CalcTestApplicationRequest {
      * @memberof CalcTestApplicationRequest
      */
     'manMonth'?: number;
+    /**
+     * 
+     * @type {Array<CalcTestApplication200ResponseDataFunctionsInner>}
+     * @memberof CalcTestApplicationRequest
+     */
+    'dataFunctions'?: Array<CalcTestApplication200ResponseDataFunctionsInner>;
 }
