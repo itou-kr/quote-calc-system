@@ -1,4 +1,4 @@
-import { Box, Stack, Tabs, Tab } from '@mui/material';
+import { Box, Stack, Tabs, Tab, SxProps, Theme } from '@mui/material';
 import Button from '@front/components/ui/Button';
 
 export type TabDefinition = {
@@ -11,7 +11,7 @@ export type ActionButton = {
     onClick: () => void;
     disabled?: boolean;
     variant?: 'outlined' | 'contained' | 'text';
-    sx?: Record<string, any>;
+    sx?: SxProps<Theme>;
 };
 
 export type Props = {

@@ -31,7 +31,7 @@ function ProcessBreakdownTable(props: Props) {
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, cursor: 'pointer', bgcolor: '#f5f5f5', p: 1, borderRadius: 1 }} onClick={onToggle}>
                 <Typography variant="body1" sx={{ fontWeight: 'bold' }}>工程別内訳</Typography>
                 <IconButton size="small" sx={{ ml: 1 }}>
-                    {isOpen ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+                    {isOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                 </IconButton>
             </Box>
             

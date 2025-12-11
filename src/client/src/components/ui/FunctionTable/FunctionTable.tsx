@@ -68,8 +68,12 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                                     controllerField.onChange(e); 
                                     if (onSelectedCountChange) {
                                         setTimeout(() => {
-                                            const values = control._formValues[baseName] as any[];
-                                            const count = values?.filter((item: any) => item.selected).length || 0;
+                                            // Count selected items from the fields array
+                                            let count = 0;
+                                            fields.forEach((_, idx) => {
+                                                const val = control._getWatch(`${baseName}.${idx}.selected` as any);
+                                                if (val) count++;
+                                            });
                                             onSelectedCountChange(count);
                                         }, 0);
                                     }
