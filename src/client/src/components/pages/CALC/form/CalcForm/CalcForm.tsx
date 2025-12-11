@@ -45,7 +45,15 @@ const setupYupScheme = () => {
         // 案件情報
         projectName: yup.string().required('案件名を入力してください'),
         autoProductivity: yup.boolean(),
-        productivityFPPerMonth: yup.number().positive('正の数を入力してください').required('生産性を入力してください'),
+        productivityFPPerMonth: yup
+            .number()
+            .min(1, '1以上の値を入力してください')
+            .test('decimal-places', '小数点第二位までの値を入力してください', (value) => {
+                if (value === undefined || value === null) return true;
+                const decimalPart = value.toString().split('.')[1];
+                return !decimalPart || decimalPart.length <= 2;
+            })
+            .required('生産性を入力してください'),
         projectType: yup.string().required('案件種別を選択してください'),
         // 使用するIPA代表値
         ipaValueType: yup.string().required('使用するIPA代表値を選択してください'),
@@ -139,11 +147,7 @@ function CalcForm(props: Props) {
     const [totalFP, setTotalFP] = useState(0);
     const [manMonths, setManMonths] = useState(0);
     const [standardDuration, setStandardDuration] = useState(0);
-
-    // 選択数をカウント
-    const selectedDataCount = watch('dataFunctions')?.filter(item => item.selected).length || 0;
-    const selectedTransactionCount = watch('transactionFunctions')?.filter(item => item.selected).length || 0;
-    const selectedCount = tableTabValue === 0 ? selectedDataCount : selectedTransactionCount;
+    const [selectedCount, setSelectedCount] = useState(0);
 
     // パフォーマンス改善: スクロールイベントハンドラーをメモ化
     const handleScroll = useCallback((e: React.UIEvent<HTMLElement>) => {
@@ -154,6 +158,19 @@ function CalcForm(props: Props) {
             setTransactionTableScrollTop(target.scrollTop);
         }
     }, [tableTabValue]);
+
+    /** ▼ 選択数を更新 */
+    const updateSelectedCount = useCallback(() => {
+        if (tableTabValue === 0) {
+            const values = getValues('dataFunctions');
+            const count = values?.filter(item => item.selected).length || 0;
+            setSelectedCount(count);
+        } else {
+            const values = getValues('transactionFunctions');
+            const count = values?.filter(item => item.selected).length || 0;
+            setSelectedCount(count);
+        }
+    }, [tableTabValue, getValues]);
 
     // 工程別の比率（デフォルト値）
     const processRatios = {
@@ -172,6 +189,19 @@ function CalcForm(props: Props) {
         const transactionTotal = transactionFunctions.reduce((sum, item) => sum + (Number(item.fpValue) || 0), 0);
         return dataTotal + transactionTotal;
     }, [getValues]);
+
+    /** ▼ 総FPに基づいて生産性を計算 */
+    const calculateProductivity = useCallback((totalFP: number) => {
+        if (totalFP < 400) {
+            return 10.5;
+        } else if (totalFP < 1000) {
+            return 13.1;
+        } else if (totalFP < 3000) {
+            return 9.0;
+        } else {
+            return 8.4;
+        }
+    }, []);
 
     /** ▼ 総工数を計算 */
     const calculateManMonths = useCallback(() => {
@@ -265,6 +295,19 @@ function CalcForm(props: Props) {
         const newTotalFP = calculateTotalFP();
         setTotalFP(newTotalFP);
         
+        // 自動入力ONの場合は生産性を自動計算
+        if (autoProductivity) {
+            const newProductivity = calculateProductivity(newTotalFP);
+            setValue('productivityFPPerMonth', newProductivity);
+            // input要素に直接値を設定して小数点第一位まで表示
+            setTimeout(() => {
+                const input = document.querySelector('input[name="productivityFPPerMonth"]') as HTMLInputElement;
+                if (input) {
+                    input.value = newProductivity.toFixed(1);
+                }
+            }, 0);
+        }
+        
         const newManMonths = calculateManMonths();
         setManMonths(newManMonths);
         
@@ -319,6 +362,8 @@ function CalcForm(props: Props) {
                 .reverse();
             indicesToRemove.forEach(index => removeTransaction(index));
         }
+        // 削除後は選択数を0にリセット
+        setSelectedCount(0);
     };
 
     /** ▼ インポート処理 */
@@ -409,11 +454,21 @@ function CalcForm(props: Props) {
                                     disabled={autoProductivity}
                                     slotProps={{ 
                                         htmlInput: { 
-                                            min: 1,
+                                            min: 1.0,
                                             step: 0.1,
                                             onKeyDown: (e: React.KeyboardEvent) => { 
                                                 if (e.key === '-' || e.key === 'e' || e.key === '+') {
                                                     e.preventDefault();
+                                                }
+                                            },
+                                            onBlur: (e: React.FocusEvent<HTMLInputElement>) => {
+                                                const value = parseFloat(e.target.value);
+                                                if (!isNaN(value)) {
+                                                    // 小数点第一位まで丸めて表示（0でも省略しない）
+                                                    const formatted = Math.round(value * 10) / 10;
+                                                    setValue('productivityFPPerMonth', parseFloat(formatted.toFixed(1)));
+                                                    // 表示を更新するためにinput要素の値も設定
+                                                    e.target.value = formatted.toFixed(1);
                                                 }
                                             }
                                         } 
@@ -426,7 +481,7 @@ function CalcForm(props: Props) {
                             <Box sx={{ mb: 2.5 }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.8 }}>
                                     <EditIcon sx={{ fontSize: 16, mr: 0.5 }} />
-                                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>案件種別</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>案件種別(未対応)</Typography>
                                 </Box>
                                 <Select value={watch('projectType') || '新規開発'} onChange={(e) => setValue('projectType', e.target.value)} fullWidth size="small" sx={{ bgcolor: 'white' }}>
                                     <MenuItem value="新規開発">新規開発</MenuItem>
@@ -439,7 +494,7 @@ function CalcForm(props: Props) {
                             <Box sx={{ mb: 3 }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.8 }}>
                                     <EditIcon sx={{ fontSize: 16, mr: 0.5 }} />
-                                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>使用するIPA代表値</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>使用するIPA代表値(未対応)</Typography>
                                 </Box>
                                 <Select value={watch('ipaValueType') || '中央値'} onChange={(e) => setValue('ipaValueType', e.target.value)} size="small" fullWidth sx={{ bgcolor: 'white' }}>
                                     <MenuItem value="中央値">中央値</MenuItem>
@@ -451,7 +506,7 @@ function CalcForm(props: Props) {
 
                             {/* インポート / エクスポート */}
                             <Box sx={{ mb: 3 }}>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1.5 }}>インポート / エクスポート</Typography>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1.5 }}>インポート / エクスポート(未対応)</Typography>
                                 <Stack direction="row" spacing={1}>
                                     <ImportButton onFileSelect={onImportButtonClick} onClick={() => {}} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }}>インポート</ImportButton>
                                     <ExportButton onClick={onExportButtonClick} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }} />
@@ -507,7 +562,7 @@ function CalcForm(props: Props) {
                     <Box sx={{ flex: 1, p: 2, overflow: 'hidden', bgcolor: '#fafafa' }}>
                         {/* テーブルタブと操作ボタン */}
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-                            <Tabs value={tableTabValue} onChange={(_, newValue) => setTableTabValue(newValue)} sx={{ '& .MuiTab-root': { minWidth: 200 } }}>
+                            <Tabs value={tableTabValue} onChange={(_, newValue) => { setTableTabValue(newValue); setTimeout(() => updateSelectedCount(), 0); }} sx={{ '& .MuiTab-root': { minWidth: 200 } }}>
                                 <Tab label="データファンクション" />
                                 <Tab label="トランザクションファンクション" />
                             </Tabs>
@@ -582,7 +637,7 @@ function CalcForm(props: Props) {
                                             <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 100 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                     <AutoAwesomeIcon sx={{ fontSize: 16, mr: 0.5 }} />
-                                                    FP値
+                                                    FP
                                                 </Box>
                                             </TableCell>
                                             <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 300 }}>
@@ -630,7 +685,7 @@ function CalcForm(props: Props) {
                                                         name={`dataFunctions.${index}.selected`}
                                                         control={control}
                                                         render={({ field }) => (
-                                                            <Checkbox {...field} checked={field.value || false} />
+                                                            <Checkbox {...field} checked={field.value || false} onChange={(e) => { field.onChange(e); setTimeout(() => updateSelectedCount(), 0); }} />
                                                         )}
                                                     />
                                                 </TableCell>
@@ -694,7 +749,7 @@ function CalcForm(props: Props) {
                                             <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 100 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                     <AutoAwesomeIcon sx={{ fontSize: 16, mr: 0.5 }} />
-                                                    FP値
+                                                    FP
                                                 </Box>
                                             </TableCell>
                                             <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', minWidth: 300 }}>
@@ -738,7 +793,7 @@ function CalcForm(props: Props) {
                                                         name={`transactionFunctions.${index}.selected`}
                                                         control={control}
                                                         render={({ field }) => (
-                                                            <Checkbox {...field} checked={field.value || false} />
+                                                            <Checkbox {...field} checked={field.value || false} onChange={(e) => { field.onChange(e); setTimeout(() => updateSelectedCount(), 0); }} />
                                                         )}
                                                     />
                                                 </TableCell>
