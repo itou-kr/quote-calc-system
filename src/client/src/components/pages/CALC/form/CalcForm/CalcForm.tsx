@@ -481,16 +481,16 @@ function CalcForm(props: Props) {
                             {/* 計算結果サマリー */}
                             <Box>
                                 <Text variant="subsectionTitle">計算結果サマリー</Text>
-                                <SummaryCard label="総FP" value={totalFP} icon={<AutoAwesomeIcon />} />
-                                <SummaryCard label="工数(人月)" value={manMonths} icon={<AutoAwesomeIcon />} />
-                                <SummaryCard label="標準工期(月)" value={standardDuration} icon={<AutoAwesomeIcon />} />
+                                <SummaryCard label="総FP" value={totalFP} />
+                                <SummaryCard label="工数(人月)" value={manMonths} />
+                                <SummaryCard label="標準工期(月)" value={standardDuration} />
                             </Box>
                         </Box>
 
                         {/* 固定された下部ボタンエリア */}
                         <Box sx={{ borderTop: 1, borderColor: 'divider', p: 3, bgcolor: 'white' }}>
                             {/* 工数計算実行ボタン */}
-                            <Button variant="contained" onClick={onExecuteCalculation} sx={{ width: '100%', bgcolor: '#12a830ff', '&:hover': { bgcolor: '#137f19ff' } }}>工数計算を実行</Button>
+                            <Button variant="contained" onClick={onExecuteCalculation} sx={{ width: '100%', bgcolor: '#00d02aff', '&:hover': { bgcolor: '#00a708ff' } }}>工数計算を実行</Button>
                         </Box>
                     </Box>
 
