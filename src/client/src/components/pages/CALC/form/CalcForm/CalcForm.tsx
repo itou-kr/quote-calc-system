@@ -5,9 +5,7 @@ import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
 import { useMemo, useState, useCallback } from 'react';
 import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Stack, Paper, Typography, Divider, Checkbox, Select, MenuItem } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { Box, Stack, Paper, Divider, Checkbox, Select, MenuItem } from '@mui/material';
 import SummarizeIcon from '@mui/icons-material/Summarize';
 import EditIcon from '@mui/icons-material/Edit';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
@@ -21,27 +19,12 @@ import FormSection from '@front/components/ui/FormSection';
 import TableToolbar from '@front/components/ui/TableToolbar';
 import ProcessBreakdownTable from '@front/components/ui/ProcessBreakdownTable';
 import FunctionTable, { ColumnDefinition } from '@front/components/ui/FunctionTable';
+import FlexBox from '@front/components/ui/FlexBox';
+import TabPanel from '@front/components/ui/TabPanel';
+import Text from '@front/components/ui/Text';
+import { createEmptyDataFunction, createEmptyTransactionFunction, createDataFunctions, createTransactionFunctions } from '@front/types/functionTypes';
+import { createAddRowAction, createDeleteSelectedAction } from '@front/components/ui/TableToolbar/actions/tableActions';
 import { t } from 'i18next';
-
-// 初期データファンクションデータ
-const DEFAULT_DATA_FUNCTIONS = Array.from({ length: 50 }, () => ({
-    selected: false,
-    name: '',
-    updateType: '',
-    fpValue: 0,
-    remarks: '',
-}));
-
-// 初期トランザクションファンクションデータ
-const DEFAULT_TRANSACTION_FUNCTIONS = Array.from({ length: 50 }, () => ({
-    selected: false,
-    name: '',
-    externalInput: 0,
-    externalOutput: 0,
-    externalInquiry: 0,
-    fpValue: 0,
-    remarks: '',
-}));
 
 const setupYupScheme = () => {
     return yup.object({
@@ -122,8 +105,8 @@ function CalcForm(props: Props) {
             productivityFPPerMonth: 10.5,
             projectType: '新規開発',
             ipaValueType: '中央値',
-            dataFunctions: [...DEFAULT_DATA_FUNCTIONS],
-            transactionFunctions: [...DEFAULT_TRANSACTION_FUNCTIONS],
+            dataFunctions: createDataFunctions(50),
+            transactionFunctions: createTransactionFunctions(50),
             ...props.data,
         },
     });
@@ -147,10 +130,11 @@ function CalcForm(props: Props) {
     const [processBreakdownOpen, setProcessBreakdownOpen] = useState(false);
     const [dataTableScrollTop, setDataTableScrollTop] = useState(0);
     const [transactionTableScrollTop, setTransactionTableScrollTop] = useState(0);
+    const [dataSelectedCount, setDataSelectedCount] = useState(0);
+    const [transactionSelectedCount, setTransactionSelectedCount] = useState(0);
     const [totalFP, setTotalFP] = useState(0);
     const [manMonths, setManMonths] = useState(0);
     const [standardDuration, setStandardDuration] = useState(0);
-    const [selectedCount, setSelectedCount] = useState(0);
 
     // データファンクションテーブルのカラム定義
     const dataColumns: ColumnDefinition[] = useMemo(() => [
@@ -184,19 +168,6 @@ function CalcForm(props: Props) {
             setTransactionTableScrollTop(target.scrollTop);
         }
     }, [tableTabValue]);
-
-    /** ▼ 選択数を更新 */
-    const updateSelectedCount = useCallback(() => {
-        if (tableTabValue === 0) {
-            const values = getValues('dataFunctions');
-            const count = values?.filter(item => item.selected).length || 0;
-            setSelectedCount(count);
-        } else {
-            const values = getValues('transactionFunctions');
-            const count = values?.filter(item => item.selected).length || 0;
-            setSelectedCount(count);
-        }
-    }, [tableTabValue, getValues]);
 
     // 工程別の比率（デフォルト値）
     const processRatios = {
@@ -346,51 +317,39 @@ function CalcForm(props: Props) {
         setProcessBreakdownOpen(true);
     };
 
-    /** ▼ 行追加 */
-    const onAddRow = () => {
-        if (tableTabValue === 0) {
-            appendData({ 
-                selected: false, 
-                name: '', 
-                updateType: '',
-                fpValue: 0, 
-                remarks: '' 
-            });
-        } else {
-            appendTransaction({
-                selected: false,
-                name: '',
-                externalInput: 0,
-                externalOutput: 0,
-                externalInquiry: 0,
-                fpValue: 0,
-                remarks: ''
-            });
-        }
-    };
+    /** ▼ データファンクション行追加 */
+    const onAddDataRow = useCallback(() => {
+        appendData(createEmptyDataFunction());
+    }, [appendData]);
 
-    /** ▼ 選択削除 */
-    const onDeleteSelected = () => {
-        if (tableTabValue === 0) {
-            const values = getValues('dataFunctions');
-            if (!values) return;
-            const indicesToRemove = values
-                .map((item, index) => (item.selected ? index : -1))
-                .filter(index => index !== -1)
-                .reverse();
-            indicesToRemove.forEach(index => removeData(index));
-        } else {
-            const values = getValues('transactionFunctions');
-            if (!values) return;
-            const indicesToRemove = values
-                .map((item, index) => (item.selected ? index : -1))
-                .filter(index => index !== -1)
-                .reverse();
-            indicesToRemove.forEach(index => removeTransaction(index));
-        }
-        // 削除後は選択数を0にリセット
-        setSelectedCount(0);
-    };
+    /** ▼ トランザクションファンクション行追加 */
+    const onAddTransactionRow = useCallback(() => {
+        appendTransaction(createEmptyTransactionFunction());
+    }, [appendTransaction]);
+
+    /** ▼ データファンクション選択削除 */
+    const onDeleteDataSelected = useCallback(() => {
+        const values = getValues('dataFunctions');
+        if (!values) return;
+        const indicesToRemove = values
+            .map((item, index) => (item.selected ? index : -1))
+            .filter(index => index !== -1)
+            .reverse();
+        indicesToRemove.forEach(index => removeData(index));
+        setDataSelectedCount(0);
+    }, [getValues, removeData]);
+
+    /** ▼ トランザクションファンクション選択削除 */
+    const onDeleteTransactionSelected = useCallback(() => {
+        const values = getValues('transactionFunctions');
+        if (!values) return;
+        const indicesToRemove = values
+            .map((item, index) => (item.selected ? index : -1))
+            .filter(index => index !== -1)
+            .reverse();
+        indicesToRemove.forEach(index => removeTransaction(index));
+        setTransactionSelectedCount(0);
+    }, [getValues, removeTransaction]);
 
     /** ▼ インポート処理 */
     const onImportButtonClick = async (file: File) => {
@@ -418,10 +377,10 @@ function CalcForm(props: Props) {
             <FormProvider {...methods}>
                 {/* ヘッダー */}
                 <Paper elevation={0} sx={{ bgcolor: '#1976d2', color: 'white', p: 2, borderRadius: 0 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <FlexBox gap={1}>
                         <SummarizeIcon sx={{ fontSize: 32 }} />
-                        <Typography variant="h5" sx={{ fontWeight: 'bold' }}>見積作成支援ツール</Typography>
-                    </Box>
+                        <Text variant="pageTitle">見積作成支援ツール</Text>
+                    </FlexBox>
                 </Paper>
 
                 {/* メインコンテンツエリア */}
@@ -430,50 +389,40 @@ function CalcForm(props: Props) {
                     <Box sx={{ width: 360, borderRight: 1, borderColor: 'divider', display: 'flex', flexDirection: 'column', bgcolor: 'white' }}>
                         {/* スクロール可能な上部エリア */}
                         <Box sx={{ flex: 1, p: 3, overflowY: 'auto' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>案件情報</Typography>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <FlexBox justify="space-between" sx={{ mb: 3 }}>
+                                <Text variant="sectionTitle">案件情報</Text>
+                                <FlexBox gap={1.5}>
+                                    <FlexBox>
                                         <EditIcon sx={{ fontSize: 16, mr: 0.3, color: 'text.secondary' }} />
-                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>入力欄</Typography>
-                                    </Box>
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <Text variant="label">入力欄</Text>
+                                    </FlexBox>
+                                    <FlexBox>
                                         <AutoAwesomeIcon sx={{ fontSize: 16, mr: 0.3, color: 'text.secondary' }} />
-                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>自動計算欄</Typography>
-                                    </Box>
-                                </Box>
-                            </Box>
+                                        <Text variant="label">自動計算欄</Text>
+                                    </FlexBox>
+                                </FlexBox>
+                            </FlexBox>
 
                             {/* 案件名 */}
-                            <FormSection label="案件名" icon={<EditIcon />} required>
+                            <FormSection label="案件名" required>
                                 <TextField name="projectName" control={control} trigger={trigger} t={t} hideHelperText sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} />
                             </FormSection>
 
                             {/* 生産性 */}
-                            <Box sx={{ mb: 2.5 }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.8 }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <EditIcon sx={{ fontSize: 16, mr: 0.5 }} />
-                                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>生産性(FP/月) <Typography component="span" color="error">*</Typography></Typography>
-                                    </Box>
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <FormSection label="生産性(FP/月)" required
+                                rightElement={
+                                    <FlexBox>
                                         <Checkbox 
                                             checked={autoProductivity} 
                                             onChange={(e) => setValue('autoProductivity', e.target.checked)}
                                             size="small"
                                             sx={{ p: 0, mr: 0.5 }}
                                         />
-                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>自動入力</Typography>
-                                    </Box>
-                                </Box>
-                                <TextField 
-                                    name="productivityFPPerMonth" 
-                                    control={control} 
-                                    trigger={trigger} 
-                                    t={t} 
-                                    type="number" 
-                                    hideHelperText 
-                                    disabled={autoProductivity}
+                                        <Text variant="label">自動入力</Text>
+                                    </FlexBox>
+                                }
+                            >
+                                <TextField name="productivityFPPerMonth" control={control} trigger={trigger} t={t} type="number" hideHelperText disabled={autoProductivity}
                                     slotProps={{ 
                                         htmlInput: { 
                                             min: 1.0,
@@ -497,10 +446,10 @@ function CalcForm(props: Props) {
                                     }}
                                     sx={{ '& .MuiInputBase-root': { bgcolor: autoProductivity ? '#f5f5f5' : 'white' } }}
                                 />
-                            </Box>
+                            </FormSection>
 
                             {/* 案件種別 */}
-                            <FormSection label="案件種別(未対応)" icon={<EditIcon />}>
+                            <FormSection label="案件種別(未対応)">
                                 <Select value={watch('projectType') || '新規開発'} onChange={(e) => setValue('projectType', e.target.value)} fullWidth size="small" sx={{ bgcolor: 'white' }}>
                                     <MenuItem value="新規開発">新規開発</MenuItem>
                                     <MenuItem value="改良開発">改良開発</MenuItem>
@@ -509,7 +458,7 @@ function CalcForm(props: Props) {
                             </FormSection>
 
                             {/* 使用するIPA代表値 */}
-                            <FormSection label="使用するIPA代表値(未対応)" icon={<EditIcon />} mb={3}>
+                            <FormSection label="使用するIPA代表値(未対応)" mb={3}>
                                 <Select value={watch('ipaValueType') || '中央値'} onChange={(e) => setValue('ipaValueType', e.target.value)} size="small" fullWidth sx={{ bgcolor: 'white' }}>
                                     <MenuItem value="中央値">中央値</MenuItem>
                                     <MenuItem value="平均値">平均値</MenuItem>
@@ -520,7 +469,7 @@ function CalcForm(props: Props) {
 
                             {/* インポート / エクスポート */}
                             <Box sx={{ mb: 3 }}>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1.5 }}>インポート / エクスポート(未対応)</Typography>
+                                <Text variant="subsectionTitle">インポート / エクスポート(未対応)</Text>
                                 <Stack direction="row" spacing={1}>
                                     <ImportButton onFileSelect={onImportButtonClick} onClick={() => {}} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }}>インポート</ImportButton>
                                     <ExportButton onClick={onExportButtonClick} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }} />
@@ -531,7 +480,7 @@ function CalcForm(props: Props) {
 
                             {/* 計算結果サマリー */}
                             <Box>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1.5 }}>計算結果サマリー</Typography>
+                                <Text variant="subsectionTitle">計算結果サマリー</Text>
                                 <SummaryCard label="総FP" value={totalFP} icon={<AutoAwesomeIcon />} />
                                 <SummaryCard label="工数(人月)" value={manMonths} icon={<AutoAwesomeIcon />} />
                                 <SummaryCard label="標準工期(月)" value={standardDuration} icon={<AutoAwesomeIcon />} />
@@ -554,49 +503,22 @@ function CalcForm(props: Props) {
                                 { label: 'トランザクションファンクション' }
                             ]}
                             activeTab={tableTabValue}
-                            onTabChange={(newValue) => { 
-                                setTableTabValue(newValue); 
-                                setTimeout(() => updateSelectedCount(), 0); 
-                            }}
-                            actions={[
-                                {
-                                    label: '行追加',
-                                    icon: <AddIcon />,
-                                    onClick: onAddRow,
-                                    variant: 'outlined',
-                                    sx: { 
-                                        borderColor: '#1e88e5', 
-                                        color: '#1e88e5',
-                                        '&:hover': { 
-                                            borderColor: '#1565c0',
-                                            bgcolor: '#e3f2fd'
-                                        }
-                                    }
-                                },
-                                {
-                                    label: `選択した行を削除${selectedCount > 0 ? ` (${selectedCount})` : ''}`,
-                                    icon: <DeleteIcon />,
-                                    onClick: onDeleteSelected,
-                                    disabled: selectedCount === 0,
-                                    variant: 'outlined',
-                                    sx: { 
-                                        borderColor: '#e53935', 
-                                        color: '#e53935',
-                                        '&:hover': { 
-                                            borderColor: '#c62828',
-                                            bgcolor: '#ffebee'
-                                        },
-                                        '&.Mui-disabled': {
-                                            borderColor: 'rgba(0, 0, 0, 0.12)',
-                                            color: 'rgba(0, 0, 0, 0.26)'
-                                        }
-                                    }
-                                }
-                            ]}
+                            onTabChange={setTableTabValue}
+                            actions={
+                                tableTabValue === 0
+                                    ? [
+                                        createAddRowAction(onAddDataRow),
+                                        createDeleteSelectedAction(onDeleteDataSelected, dataSelectedCount)
+                                    ]
+                                    : [
+                                        createAddRowAction(onAddTransactionRow),
+                                        createDeleteSelectedAction(onDeleteTransactionSelected, transactionSelectedCount)
+                                    ]
+                            }
                         />
 
                         {/* ファンクション情報入力テーブル */}
-                        <Box sx={{ display: tableTabValue === 0 ? 'block' : 'none' }}>
+                        <TabPanel value={tableTabValue} index={0}>
                             <FunctionTable
                                 fields={dataFields}
                                 columns={dataColumns}
@@ -604,14 +526,16 @@ function CalcForm(props: Props) {
                                 control={control}
                                 trigger={trigger}
                                 t={t}
-                                onRowAdd={onAddRow}
-                                onSelectedCountChange={setSelectedCount}
+                                onRowAdd={onAddDataRow}
+                                onDeleteSelected={onDeleteDataSelected}
+                                selectedCount={dataSelectedCount}
+                                onSelectedCountChange={setDataSelectedCount}
                                 maxHeight={processBreakdownOpen ? 'calc(100vh - 400px)' : 'calc(100vh - 240px)'}
                                 onScroll={handleScroll}
                                 scrollTop={dataTableScrollTop}
                             />
-                        </Box>
-                        <Box sx={{ display: tableTabValue === 1 ? 'block' : 'none' }}>
+                        </TabPanel>
+                        <TabPanel value={tableTabValue} index={1}>
                             <FunctionTable
                                 fields={transactionFields}
                                 columns={transactionColumns}
@@ -619,13 +543,15 @@ function CalcForm(props: Props) {
                                 control={control}
                                 trigger={trigger}
                                 t={t}
-                                onRowAdd={onAddRow}
-                                onSelectedCountChange={setSelectedCount}
+                                onRowAdd={onAddTransactionRow}
+                                onDeleteSelected={onDeleteTransactionSelected}
+                                selectedCount={transactionSelectedCount}
+                                onSelectedCountChange={setTransactionSelectedCount}
                                 maxHeight={processBreakdownOpen ? 'calc(100vh - 400px)' : 'calc(100vh - 240px)'}
                                 onScroll={handleScroll}
                                 scrollTop={transactionTableScrollTop}
                             />
-                        </Box>
+                        </TabPanel>
 
                         {/* 工程別工数・工期テーブル */}
                         <ProcessBreakdownTable

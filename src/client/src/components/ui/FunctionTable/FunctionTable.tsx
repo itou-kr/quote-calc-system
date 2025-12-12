@@ -28,7 +28,9 @@ export type Props<T extends FieldValues = FieldValues> = {
     trigger: UseFormTrigger<T>;
     t: TFunction<'translation', undefined>;
     onRowAdd: () => void;
-    onSelectedCountChange?: (count: number) => void;
+    onDeleteSelected: () => void;
+    selectedCount: number;
+    onSelectedCountChange: (count: number) => void;
     maxHeight?: string;
     onScroll?: (e: React.UIEvent<HTMLElement>) => void;
     scrollTop?: number;
@@ -40,7 +42,7 @@ export type Props<T extends FieldValues = FieldValues> = {
  * @returns ファンクションテーブルコンポーネント
  */
 function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
-    const { fields, columns, baseName, control, trigger, t, onRowAdd, onSelectedCountChange, maxHeight, onScroll, scrollTop } = props;
+    const { fields, columns, baseName, control, trigger, t, onRowAdd, onDeleteSelected, selectedCount, onSelectedCountChange, maxHeight, onScroll, scrollTop } = props;
 
     const renderIcon = (iconType?: 'edit' | 'auto') => {
         if (iconType === 'edit') {
@@ -64,20 +66,17 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                             <Checkbox 
                                 {...controllerField} 
                                 checked={controllerField.value || false} 
-                                onChange={(e) => { 
-                                    controllerField.onChange(e); 
-                                    if (onSelectedCountChange) {
-                                        setTimeout(() => {
-                                            // Count selected items from the fields array
-                                            let count = 0;
-                                            fields.forEach((_, idx) => {
-                                                const val = control._getWatch(`${baseName}.${idx}.selected` as any);
-                                                if (val) count++;
-                                            });
-                                            onSelectedCountChange(count);
-                                        }, 0);
-                                    }
-                                }} 
+                                onChange={(e) => {
+                                    controllerField.onChange(e);
+                                    setTimeout(() => {
+                                        let count = 0;
+                                        fields.forEach((_, idx) => {
+                                            const val = control._getWatch(`${baseName}.${idx}.selected` as any);
+                                            if (val) count++;
+                                        });
+                                        onSelectedCountChange(count);
+                                    }, 0);
+                                }}
                             />
                         )}
                     />
@@ -191,22 +190,45 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                     {/* 行追加ボタン行 */}
                     <TableRow>
                         <TableCell colSpan={columns.length + 1} align="center" sx={{ py: 2, bgcolor: '#fafafa', borderTop: 2, borderColor: '#e0e0e0' }}>
-                            <Button 
-                                variant="outlined" 
-                                startIcon={<AddIcon />} 
-                                onClick={onRowAdd}
-                                size="small"
-                                sx={{ 
-                                    borderColor: '#1e88e5', 
-                                    color: '#1e88e5',
-                                    '&:hover': { 
-                                        borderColor: '#1565c0',
-                                        bgcolor: '#e3f2fd'
-                                    }
-                                }}
-                            >
-                                行を追加
-                            </Button>
+                            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+                                <Button 
+                                    variant="outlined" 
+                                    startIcon={<AddIcon />} 
+                                    onClick={onRowAdd}
+                                    size="small"
+                                    sx={{ 
+                                        borderColor: '#1e88e5', 
+                                        color: '#1e88e5',
+                                        '&:hover': { 
+                                            borderColor: '#1565c0',
+                                            bgcolor: '#e3f2fd'
+                                        }
+                                    }}
+                                >
+                                    行を追加
+                                </Button>
+                                <Button 
+                                    variant="outlined" 
+                                    startIcon={<DeleteIcon />} 
+                                    onClick={onDeleteSelected}
+                                    size="small"
+                                    disabled={selectedCount === 0}
+                                    sx={{ 
+                                        borderColor: '#e53935', 
+                                        color: '#e53935',
+                                        '&:hover': { 
+                                            borderColor: '#c62828',
+                                            bgcolor: '#ffebee'
+                                        },
+                                        '&.Mui-disabled': {
+                                            borderColor: 'rgba(0, 0, 0, 0.12)',
+                                            color: 'rgba(0, 0, 0, 0.26)'
+                                        }
+                                    }}
+                                >
+                                    選択した行を削除{selectedCount > 0 ? ` (${selectedCount})` : ''}
+                                </Button>
+                            </Box>
                         </TableCell>
                     </TableRow>
                 </TableBody>

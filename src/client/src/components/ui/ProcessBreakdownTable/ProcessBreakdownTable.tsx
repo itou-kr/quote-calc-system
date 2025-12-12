@@ -28,14 +28,25 @@ function ProcessBreakdownTable(props: Props) {
 
     return (
         <Box sx={{ mt: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, cursor: 'pointer', bgcolor: '#f5f5f5', p: 1, borderRadius: 1 }} onClick={onToggle}>
+            <Box 
+                sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    mb: isOpen ? 2 : 0, 
+                    cursor: 'pointer', 
+                    bgcolor: '#f5f5f5', 
+                    p: 1, 
+                    borderRadius: 1 
+                }} 
+                onClick={onToggle}
+            >
                 <Typography variant="body1" sx={{ fontWeight: 'bold' }}>工程別内訳</Typography>
                 <IconButton size="small" sx={{ ml: 1 }}>
-                    {isOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                    {isOpen ? <ExpandMoreIcon /> : <ExpandLessIcon />}
                 </IconButton>
             </Box>
             
-            <Collapse in={isOpen} timeout={300} unmountOnExit>
+            <Collapse in={isOpen} timeout={300}>
                 <Paper elevation={1} sx={{ border: 1, borderColor: 'divider', overflow: 'auto' }}>
                     <Table size="small">
                         <TableHead>
