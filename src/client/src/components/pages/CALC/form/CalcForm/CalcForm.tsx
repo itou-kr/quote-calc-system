@@ -139,9 +139,9 @@ function CalcForm(props: Props) {
     // データファンクションテーブルのカラム定義
     const dataColumns: ColumnDefinition[] = useMemo(() => [
         { key: 'name', label: '名称', width: 500, icon: 'edit', type: 'text' },
-        { key: 'updateType', label: '更新種別', width: 150, icon: 'edit', type: 'select', options: [
-            { value: '更新あり', label: '更新あり' },
-            { value: '参照のみ', label: '参照のみ' }
+        { key: 'updateType', label: 'データファンクションの種類', width: 336, icon: 'edit', type: 'select', options: [
+            { value: '内部論理ファイル', label: '内部論理ファイル' },
+            { value: '外部インタフェースファイル', label: '外部インタフェースファイル' }
         ]},
         { key: 'fpValue', label: 'FP', width: 100, icon: 'auto', type: 'number', disabled: true },
         { key: 'remarks', label: '備考', minWidth: 300, icon: 'edit', type: 'text' },
@@ -262,9 +262,9 @@ function CalcForm(props: Props) {
             currentDataFunctions.forEach((item, index) => {
                 // 名称に文字列が入っている場合のみ計算
                 if (item.name && item.name.trim() !== '') {
-                    if (item.updateType === '更新あり') {
+                    if (item.updateType === '内部論理ファイル') {
                         setValue(`dataFunctions.${index}.fpValue`, 7);
-                    } else if (item.updateType === '参照のみ') {
+                    } else if (item.updateType === '外部インタフェースファイル') {
                         setValue(`dataFunctions.${index}.fpValue`, 5);
                     }
                 }
