@@ -37,7 +37,7 @@ function TestCalc(props: Props) {
     
 
     return (
-        <Box>
+        <Box sx={{ borderTop: 1, borderColor: 'divider', p: 3, bgcolor: 'white' }}>
             <CalcButton onClick={handleSubmit(handleCalcClick)} fullWidth/>
         </Box>
     )

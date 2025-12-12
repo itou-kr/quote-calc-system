@@ -10,17 +10,43 @@
  * Do not edit the class manually.
  */
 
+import { CalcTestApplicationRequestDataFunctionsInner } from './calcTestApplicationRequestDataFunctionsInner';
 
 /**
 * 工数計算リクエスト
 */
 export class CalcTestApplicationRequest {
+    'projectName'?: string;
+    'productivityFPPerMonth'?: number;
+    'projectType'?: string;
+    'ipaValueType'?: string;
     'totalFP'?: number;
     'manMonth'?: number;
+    'dataFunctions'?: Array<CalcTestApplicationRequestDataFunctionsInner>;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
+        {
+            "name": "projectName",
+            "baseName": "projectName",
+            "type": "string"
+        },
+        {
+            "name": "productivityFPPerMonth",
+            "baseName": "productivityFPPerMonth",
+            "type": "number"
+        },
+        {
+            "name": "projectType",
+            "baseName": "projectType",
+            "type": "string"
+        },
+        {
+            "name": "ipaValueType",
+            "baseName": "ipaValueType",
+            "type": "string"
+        },
         {
             "name": "totalFP",
             "baseName": "totalFP",
@@ -30,6 +56,11 @@ export class CalcTestApplicationRequest {
             "name": "manMonth",
             "baseName": "manMonth",
             "type": "number"
+        },
+        {
+            "name": "dataFunctions",
+            "baseName": "dataFunctions",
+            "type": "Array<CalcTestApplicationRequestDataFunctionsInner>"
         }    ];
 
     static getAttributeTypeMap() {

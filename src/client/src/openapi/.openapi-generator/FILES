@@ -5,8 +5,10 @@ common.ts
 configuration.ts
 docs/CalcApi.md
 docs/CalcTestApplication200Response.md
+docs/CalcTestApplication200ResponseDataFunctionsInner.md
 docs/CalcTestApplicationRequest.md
 index.ts
 models/calc-test-application-request.ts
+models/calc-test-application200-response-data-functions-inner.ts
 models/calc-test-application200-response.ts
 models/index.ts
