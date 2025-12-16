@@ -5,17 +5,17 @@ import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
 import { useMemo, useState, useCallback } from 'react';
 import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Stack, Paper, Divider, Checkbox, Select, MenuItem } from '@mui/material';
+import { Box, Stack, Paper, Divider, Select, MenuItem } from '@mui/material';
 import SummarizeIcon from '@mui/icons-material/Summarize';
 import EditIcon from '@mui/icons-material/Edit';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
-
 import ImportButton from '@front/components/ui/Button/ImportButton';
 import ExportButton from '@front/components/ui/Button/ExportButton';
 import Button from '@front/components/ui/Button';
 import TextField from '@front/components/ui/TextField';
 import SummaryCard from '@front/components/ui/SummaryCard';
 import FormSection from '@front/components/ui/FormSection';
+import ProductivityField from '@front/components/ui/ProductivityField';
 import TableToolbar from '@front/components/ui/TableToolbar';
 import ProcessBreakdownTable from '@front/components/ui/ProcessBreakdownTable';
 import FunctionTable, { ColumnDefinition } from '@front/components/ui/FunctionTable';
@@ -123,9 +123,6 @@ function CalcForm(props: Props) {
         name: 'transactionFunctions',
     });
 
-    // パフォーマンス改善: watch呼び出しを最小限に
-    const autoProductivity = watch('autoProductivity') ?? false;
-    
     const [tableTabValue, setTableTabValue] = useState(0);
     const [processBreakdownOpen, setProcessBreakdownOpen] = useState(false);
     const [dataTableScrollTop, setDataTableScrollTop] = useState(0);
@@ -169,14 +166,14 @@ function CalcForm(props: Props) {
         }
     }, [tableTabValue]);
 
-    // 工程別の比率（デフォルト値）
-    const processRatios = {
+    // 工程別の比率（デフォルト値）- メモ化
+    const processRatios = useMemo(() => ({
         basicDesign: 0.157,
         detailedDesign: 0.189,
         implementation: 0.354,
         integrationTest: 0.164,
         systemTest: 0.136,
-    };
+    }), []);
 
     /** ▼ FP合計を計算 */
     const calculateTotalFP = useCallback(() => {
@@ -234,7 +231,7 @@ function CalcForm(props: Props) {
         
         // 通常の工程は四捨五入
         return Math.round(ratio * totalManMonths * 100) / 100;
-    }, [calculateManMonths]);
+    }, [calculateManMonths, processRatios]);
 
     /** ▼ 工程別の工期を計算 */
     const calculateProcessDuration = useCallback((ratio: number, isLast: boolean = false) => {
@@ -252,7 +249,7 @@ function CalcForm(props: Props) {
         
         // 通常の工程は四捨五入
         return Math.round(ratio * standardDuration * 100) / 100;
-    }, [calculateStandardDuration]);
+    }, [calculateStandardDuration, processRatios]);
 
     /** ▼ 工数計算実行（バリデーショントリガー） */
     const onExecuteCalculation = () => {
@@ -293,6 +290,7 @@ function CalcForm(props: Props) {
         setTotalFP(newTotalFP);
         
         // 自動入力ONの場合は生産性を自動計算
+        const autoProductivity = getValues('autoProductivity');
         if (autoProductivity) {
             const newProductivity = calculateProductivity(newTotalFP);
             setValue('productivityFPPerMonth', newProductivity);
@@ -409,44 +407,7 @@ function CalcForm(props: Props) {
                             </FormSection>
 
                             {/* 生産性 */}
-                            <FormSection label="生産性(FP/月)" required
-                                rightElement={
-                                    <FlexBox>
-                                        <Checkbox 
-                                            checked={autoProductivity} 
-                                            onChange={(e) => setValue('autoProductivity', e.target.checked)}
-                                            size="small"
-                                            sx={{ p: 0, mr: 0.5 }}
-                                        />
-                                        <Text variant="label">自動入力</Text>
-                                    </FlexBox>
-                                }
-                            >
-                                <TextField name="productivityFPPerMonth" control={control} trigger={trigger} t={t} type="number" hideHelperText disabled={autoProductivity}
-                                    slotProps={{ 
-                                        htmlInput: { 
-                                            min: 1.0,
-                                            step: 0.1,
-                                            onKeyDown: (e: React.KeyboardEvent) => { 
-                                                if (e.key === '-' || e.key === 'e' || e.key === '+') {
-                                                    e.preventDefault();
-                                                }
-                                            },
-                                            onBlur: (e: React.FocusEvent<HTMLInputElement>) => {
-                                                const value = parseFloat(e.target.value);
-                                                if (!isNaN(value)) {
-                                                    // 小数点第一位まで丸めて表示（0でも省略しない）
-                                                    const formatted = Math.round(value * 10) / 10;
-                                                    setValue('productivityFPPerMonth', parseFloat(formatted.toFixed(1)));
-                                                    // 表示を更新するためにinput要素の値も設定
-                                                    e.target.value = formatted.toFixed(1);
-                                                }
-                                            }
-                                        } 
-                                    }}
-                                    sx={{ '& .MuiInputBase-root': { bgcolor: autoProductivity ? '#f5f5f5' : 'white' } }}
-                                />
-                            </FormSection>
+                            <ProductivityField control={control} trigger={trigger} setValue={setValue} t={t} />
 
                             {/* 案件種別 */}
                             <FormSection label="案件種別(未対応)">
@@ -559,7 +520,7 @@ function CalcForm(props: Props) {
                             calculateProcessManMonths={calculateProcessManMonths}
                             calculateProcessDuration={calculateProcessDuration}
                             isOpen={processBreakdownOpen}
-                            onToggle={() => setProcessBreakdownOpen(!processBreakdownOpen)}
+                            onToggle={useCallback(() => setProcessBreakdownOpen(prev => !prev), [])}
                         />
                     </Box>
                 </Box>

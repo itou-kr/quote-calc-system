@@ -21,7 +21,7 @@ function SummaryCard(props: Props) {
                     <Box sx={{ fontSize: 18, mr: 0.8, color: 'primary.main', display: 'flex', alignItems: 'center' }}>
                         <AutoAwesomeIcon sx={{ fontSize: 18 }} />
                     </Box>
-                    <Typography variant="body2" sx={{ fontWeight: 'medium' }}>{label}</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>{label}</Typography>
                 </Box>
                 <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'primary.main' }}>{value}</Typography>
             </Stack>

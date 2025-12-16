@@ -124,7 +124,15 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                                 } 
                             } 
                         }}
-                        sx={{ '& .MuiInputBase-root': { bgcolor: column.disabled ? '#f5f5f5' : 'white', width: 80 } }}
+                        sx={{ 
+                            '& .MuiInputBase-root': { 
+                                bgcolor: column.disabled ? '#f5f5f5' : 'white', 
+                                width: 80 
+                            },
+                            '& input[type="number"]': {
+                                paddingRight: '4px',
+                            }
+                        }}
                     />
                 </TableCell>
             );
