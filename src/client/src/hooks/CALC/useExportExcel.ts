@@ -4,6 +4,17 @@ import { saveAs } from 'file-saver';
 import { FormType } from '@front/components/pages/CALC/form/CalcForm/CalcForm';
 
 /**
+ * 工程別内訳データの型定義
+ */
+export type ProcessBreakdown = {
+    basicDesign: { manMonths: number; duration: number };
+    detailedDesign: { manMonths: number; duration: number };
+    implementation: { manMonths: number; duration: number };
+    integrationTest: { manMonths: number; duration: number };
+    systemTest: { manMonths: number; duration: number };
+};
+
+/**
  * Excel出力用フック
  */
 export const useExportExcel = () => {
@@ -35,13 +46,7 @@ export const useExportExcel = () => {
         totalFP: number,
         manMonths: number,
         standardDuration: number,
-        processBreakdown?: {
-            basicDesign: { manMonths: number; duration: number };
-            detailedDesign: { manMonths: number; duration: number };
-            implementation: { manMonths: number; duration: number };
-            integrationTest: { manMonths: number; duration: number };
-            systemTest: { manMonths: number; duration: number };
-        }
+        processBreakdown?: ProcessBreakdown
     ) => {
         try {
             // 案件名が未入力の場合はエラー
@@ -261,5 +266,3 @@ export const useExportExcel = () => {
 
     return { exportToExcel };
 };
-
-export default useExportExcel;

@@ -356,6 +356,7 @@ function CalcForm(props: Props) {
             
             // 案件名のバリデーション
             if (!data.projectName || data.projectName.trim() === '') {
+                console.error('案件名を入力してください');
                 alert('案件名を入力してください');
                 return;
             }
@@ -389,12 +390,9 @@ function CalcForm(props: Props) {
 
             await exportToExcel(data, totalFP, manMonths, standardDuration, processBreakdown);
         } catch (error) {
-            if (error instanceof Error) {
-                alert(error.message);
-            } else {
-                alert('Excelファイルの生成中にエラーが発生しました');
-            }
+            const errorMessage = error instanceof Error ? error.message : 'Excelファイルの生成中にエラーが発生しました';
             console.error('Export error:', error);
+            alert(errorMessage);
         }
     };
 
