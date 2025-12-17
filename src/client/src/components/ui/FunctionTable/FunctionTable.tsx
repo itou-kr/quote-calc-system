@@ -206,7 +206,7 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                     alignItems: 'center',
                     justifyContent: 'flex-start',
                     gap: 1,
-                    pl: '77px', // No列(60px) + 削除列(80px) + 名称列パディング(16px) = 156px
+                    pl: '77px',
                     pr: 2
                 }}>
                     <Button 
@@ -306,7 +306,7 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
             {/* 仮想化リスト */}
             <Box ref={listContainerRef} sx={{ flex: 1, overflow: 'hidden' }}>
                 <FixedSizeList
-                    height={listHeight}
+                    height={listHeight || 700}
                     itemCount={fields.length + 1}
                     itemSize={ROW_HEIGHT}
                     width="100%"

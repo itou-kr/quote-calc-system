@@ -105,8 +105,8 @@ function CalcForm(props: Props) {
             productivityFPPerMonth: 10.5,
             projectType: '新規開発',
             ipaValueType: '中央値',
-            dataFunctions: createDataFunctions(200),
-            transactionFunctions: createTransactionFunctions(200),
+            dataFunctions: createDataFunctions(50),
+            transactionFunctions: createTransactionFunctions(50),
             ...props.data,
         },
     });
