@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 import { useImportFile } from '@front/hooks/TEST/test';
-import { useExportFile } from '@front/hooks/TEST/test';
+import { useExportExcel } from '@front/hooks/CALC';
 import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
 import { useMemo, useState, useCallback } from 'react';
 import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
@@ -93,7 +93,7 @@ function CalcForm(props: Props) {
     const schema = useMemo(() => setupYupScheme(), []);
 
     const importFile = useImportFile(viewId as ViewIdType | 'TEST' | 'CALC');
-    const exportFile = useExportFile(viewId as ViewIdType | 'TEST' | 'CALC');
+    const { exportToExcel } = useExportExcel();
 
     const methods = useForm<FormType>({
         mode: 'onSubmit',
@@ -351,11 +351,51 @@ function CalcForm(props: Props) {
 
     /** ▼ エクスポート処理 */
     const onExportButtonClick = async () => {
-        const data = methods.getValues();
-        await exportFile({
-            name: 'export.json',
-            content: JSON.stringify(data, null, 2),
-        });
+        try {
+            const data = methods.getValues();
+            
+            // 案件名のバリデーション
+            if (!data.projectName || data.projectName.trim() === '') {
+                alert('案件名を入力してください');
+                return;
+            }
+
+            // 工程別内訳データの準備（工数計算実行後のみ）
+            let processBreakdown = undefined;
+            if (processBreakdownOpen && manMonths > 0) {
+                processBreakdown = {
+                    basicDesign: {
+                        manMonths: calculateProcessManMonths(processRatios.basicDesign),
+                        duration: calculateProcessDuration(processRatios.basicDesign)
+                    },
+                    detailedDesign: {
+                        manMonths: calculateProcessManMonths(processRatios.detailedDesign),
+                        duration: calculateProcessDuration(processRatios.detailedDesign)
+                    },
+                    implementation: {
+                        manMonths: calculateProcessManMonths(processRatios.implementation, true),
+                        duration: calculateProcessDuration(processRatios.implementation, true)
+                    },
+                    integrationTest: {
+                        manMonths: calculateProcessManMonths(processRatios.integrationTest),
+                        duration: calculateProcessDuration(processRatios.integrationTest)
+                    },
+                    systemTest: {
+                        manMonths: calculateProcessManMonths(processRatios.systemTest),
+                        duration: calculateProcessDuration(processRatios.systemTest)
+                    }
+                };
+            }
+
+            await exportToExcel(data, totalFP, manMonths, standardDuration, processBreakdown);
+        } catch (error) {
+            if (error instanceof Error) {
+                alert(error.message);
+            } else {
+                alert('Excelファイルの生成中にエラーが発生しました');
+            }
+            console.error('Export error:', error);
+        }
     };
 
     return (
