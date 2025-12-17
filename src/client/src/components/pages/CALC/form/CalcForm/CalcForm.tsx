@@ -134,7 +134,7 @@ function CalcForm(props: Props) {
     // データファンクションテーブルのカラム定義
     const dataColumns: ColumnDefinition[] = useMemo(() => [
         { key: 'name', label: '名称', width: 500, icon: 'edit', type: 'text' },
-        { key: 'updateType', label: 'データファンクションの種類', width: 336, icon: 'edit', type: 'select', options: [
+        { key: 'updateType', label: 'データファンクションの種類', width: 300, icon: 'edit', type: 'select', options: [
             { value: '内部論理ファイル', label: '内部論理ファイル' },
             { value: '外部インタフェースファイル', label: '外部インタフェースファイル' }
         ]},

@@ -46,7 +46,7 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
     
     // リストコンテナのrefと高さstate
     const listContainerRef = useRef<HTMLDivElement>(null);
-    const [listHeight, setListHeight] = useState(700);
+    const [listHeight, setListHeight] = useState(0);
 
     // リストコンテナの高さを監視（debounceでカクつき軽減）
     useEffect(() => {
