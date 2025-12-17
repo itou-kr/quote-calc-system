@@ -48,8 +48,20 @@ function ProcessBreakdownTable(props: Props) {
                 </IconButton>
             </Box>
             
-            <Collapse in={isOpen} timeout={300}>
-                <Paper elevation={1} sx={{ border: 1, borderColor: 'divider', overflow: 'auto', mb: 2 }}>
+            <Collapse in={isOpen} timeout={500} unmountOnExit>
+                <Paper 
+                    elevation={1} 
+                    sx={{ 
+                        border: 1, 
+                        borderColor: 'divider', 
+                        overflow: 'auto', 
+                        mb: 2,
+                        transition: 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out',
+                        opacity: isOpen ? 1 : 0,
+                        transform: isOpen ? 'scaleY(1)' : 'scaleY(0.95)',
+                        transformOrigin: 'top'
+                    }}
+                >
                     <Table size="small" sx={{ tableLayout: 'fixed' }}>
                         <TableHead>
                             <TableRow>

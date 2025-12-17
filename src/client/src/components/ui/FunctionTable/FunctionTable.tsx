@@ -46,17 +46,30 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
     
     // リストコンテナのrefと高さstate
     const listContainerRef = useRef<HTMLDivElement>(null);
-    const [listHeight, setListHeight] = useState(400);
+    const [listHeight, setListHeight] = useState(700);
 
-    // リストコンテナの高さを監視
+    // リストコンテナの高さを監視（debounceでカクつき軽減）
     useEffect(() => {
+        let timeoutId: number;
+        
         const updateHeight = () => {
-            if (listContainerRef.current) {
-                setListHeight(listContainerRef.current.clientHeight);
+            if (timeoutId) {
+                clearTimeout(timeoutId);
             }
+            
+            // 20ms遅延でカクつきを軽減
+            timeoutId = window.setTimeout(() => {
+                if (listContainerRef.current) {
+                    setListHeight(listContainerRef.current.clientHeight);
+                }
+            }, 20);
         };
 
-        updateHeight();
+        // 初回は即座に実行
+        if (listContainerRef.current) {
+            setListHeight(listContainerRef.current.clientHeight);
+        }
+
         window.addEventListener('resize', updateHeight);
         
         // ResizeObserverでコンテナサイズ変更を監視
@@ -66,6 +79,9 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
         }
 
         return () => {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
             window.removeEventListener('resize', updateHeight);
             observer.disconnect();
         };
