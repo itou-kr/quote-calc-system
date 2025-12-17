@@ -105,8 +105,8 @@ function CalcForm(props: Props) {
             productivityFPPerMonth: 10.5,
             projectType: '新規開発',
             ipaValueType: '中央値',
-            dataFunctions: createDataFunctions(50),
-            transactionFunctions: createTransactionFunctions(50),
+            dataFunctions: createDataFunctions(200),
+            transactionFunctions: createTransactionFunctions(200),
             ...props.data,
         },
     });
@@ -125,8 +125,6 @@ function CalcForm(props: Props) {
 
     const [tableTabValue, setTableTabValue] = useState(0);
     const [processBreakdownOpen, setProcessBreakdownOpen] = useState(false);
-    const [dataTableScrollTop, setDataTableScrollTop] = useState(0);
-    const [transactionTableScrollTop, setTransactionTableScrollTop] = useState(0);
     const [dataSelectedCount, setDataSelectedCount] = useState(0);
     const [transactionSelectedCount, setTransactionSelectedCount] = useState(0);
     const [totalFP, setTotalFP] = useState(0);
@@ -155,16 +153,6 @@ function CalcForm(props: Props) {
         { key: 'remarks', label: '備考', minWidth: 300, icon: 'edit', type: 'text' },
         { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
     ], []);
-
-    // パフォーマンス改善: スクロールイベントハンドラーをメモ化
-    const handleScroll = useCallback((e: React.UIEvent<HTMLElement>) => {
-        const target = e.target as HTMLElement;
-        if (tableTabValue === 0) {
-            setDataTableScrollTop(target.scrollTop);
-        } else {
-            setTransactionTableScrollTop(target.scrollTop);
-        }
-    }, [tableTabValue]);
 
     // 工程別の比率（デフォルト値）- メモ化
     const processRatios = useMemo(() => ({
@@ -456,7 +444,7 @@ function CalcForm(props: Props) {
                     </Box>
 
                     {/* 右メインエリア - 画面情報入力 */}
-                    <Box sx={{ flex: 1, p: 2, overflow: 'hidden', bgcolor: '#fafafa' }}>
+                    <Box sx={{ flex: 1, pt: 2, px: 2, pb: 0, overflow: 'hidden', bgcolor: '#fafafa', display: 'flex', flexDirection: 'column' }}>
                         {/* テーブルタブと操作ボタン */}
                         <TableToolbar
                             tabs={[
@@ -479,40 +467,38 @@ function CalcForm(props: Props) {
                         />
 
                         {/* ファンクション情報入力テーブル */}
-                        <TabPanel value={tableTabValue} index={0}>
-                            <FunctionTable
-                                fields={dataFields}
-                                columns={dataColumns}
-                                baseName="dataFunctions"
-                                control={control}
-                                trigger={trigger}
-                                t={t}
-                                onRowAdd={onAddDataRow}
-                                onDeleteSelected={onDeleteDataSelected}
-                                selectedCount={dataSelectedCount}
-                                onSelectedCountChange={setDataSelectedCount}
-                                maxHeight={processBreakdownOpen ? 'calc(100vh - 400px)' : 'calc(100vh - 240px)'}
-                                onScroll={handleScroll}
-                                scrollTop={dataTableScrollTop}
-                            />
-                        </TabPanel>
-                        <TabPanel value={tableTabValue} index={1}>
-                            <FunctionTable
-                                fields={transactionFields}
-                                columns={transactionColumns}
-                                baseName="transactionFunctions"
-                                control={control}
-                                trigger={trigger}
-                                t={t}
-                                onRowAdd={onAddTransactionRow}
-                                onDeleteSelected={onDeleteTransactionSelected}
-                                selectedCount={transactionSelectedCount}
-                                onSelectedCountChange={setTransactionSelectedCount}
-                                maxHeight={processBreakdownOpen ? 'calc(100vh - 400px)' : 'calc(100vh - 240px)'}
-                                onScroll={handleScroll}
-                                scrollTop={transactionTableScrollTop}
-                            />
-                        </TabPanel>
+                        <Box sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                            <TabPanel value={tableTabValue} index={0}>
+                                <FunctionTable
+                                    fields={dataFields}
+                                    columns={dataColumns}
+                                    baseName="dataFunctions"
+                                    control={control}
+                                    trigger={trigger}
+                                    t={t}
+                                    onRowAdd={onAddDataRow}
+                                    onDeleteSelected={onDeleteDataSelected}
+                                    selectedCount={dataSelectedCount}
+                                    onSelectedCountChange={setDataSelectedCount}
+                                    maxHeight="100%"
+                                />
+                            </TabPanel>
+                            <TabPanel value={tableTabValue} index={1}>
+                                <FunctionTable
+                                    fields={transactionFields}
+                                    columns={transactionColumns}
+                                    baseName="transactionFunctions"
+                                    control={control}
+                                    trigger={trigger}
+                                    t={t}
+                                    onRowAdd={onAddTransactionRow}
+                                    onDeleteSelected={onDeleteTransactionSelected}
+                                    selectedCount={transactionSelectedCount}
+                                    onSelectedCountChange={setTransactionSelectedCount}
+                                    maxHeight="100%"
+                                />
+                            </TabPanel>
+                        </Box>
 
                         {/* 工程別工数・工期テーブル */}
                         <ProcessBreakdownTable

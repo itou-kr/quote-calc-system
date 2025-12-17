@@ -16,16 +16,17 @@ export type TabPanelProps = {
 function TabPanel(props: TabPanelProps) {
     const { value, index, children, sx } = props;
 
+    // 非アクティブなタブはレンダリングしない（パフォーマンス最適化）
+    if (value !== index) {
+        return null;
+    }
+
     return (
         <Box
             role="tabpanel"
-            hidden={value !== index}
             id={`tabpanel-${index}`}
             aria-labelledby={`tab-${index}`}
-            sx={{
-                display: value === index ? 'block' : 'none',
-                ...sx,
-            }}
+            sx={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', ...sx }}
         >
             {children}
         </Box>

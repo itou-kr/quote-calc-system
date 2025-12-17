@@ -33,7 +33,7 @@ function ProcessBreakdownTable(props: Props) {
                 sx={{ 
                     display: 'flex', 
                     alignItems: 'center', 
-                    mb: isOpen ? 2 : 0, 
+                    mb: 2, 
                     cursor: 'pointer', 
                     bgcolor: '#f5f5f5', 
                     p: 1, 
@@ -49,7 +49,7 @@ function ProcessBreakdownTable(props: Props) {
             </Box>
             
             <Collapse in={isOpen} timeout={300}>
-                <Paper elevation={1} sx={{ border: 1, borderColor: 'divider', overflow: 'auto' }}>
+                <Paper elevation={1} sx={{ border: 1, borderColor: 'divider', overflow: 'auto', mb: 2 }}>
                     <Table size="small" sx={{ tableLayout: 'fixed' }}>
                         <TableHead>
                             <TableRow>
