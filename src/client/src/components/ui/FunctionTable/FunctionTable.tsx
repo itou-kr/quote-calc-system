@@ -47,6 +47,8 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
     
     // リストコンテナのrefと高さstate
     const listContainerRef = useRef<HTMLDivElement>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const headerContainerRef = useRef<HTMLDivElement>(null);
     const [listHeight, setListHeight] = useState(0);
 
     // リストコンテナの高さを監視（debounceでカクつき軽減）
@@ -85,6 +87,26 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
             }
             window.removeEventListener('resize', updateHeight);
             observer.disconnect();
+        };
+    }, []);
+
+    // 横スクロールの同期
+    useEffect(() => {
+        const scrollContainer = scrollContainerRef.current;
+        const headerContainer = headerContainerRef.current;
+        
+        if (!scrollContainer || !headerContainer) return;
+
+        const handleScroll = (e: Event) => {
+            // リストの横スクロール位置をヘッダーに同期
+            const target = e.target as HTMLDivElement;
+            headerContainer.scrollLeft = target.scrollLeft;
+        };
+
+        scrollContainer.addEventListener('scroll', handleScroll);
+        
+        return () => {
+            scrollContainer.removeEventListener('scroll', handleScroll);
         };
     }, []);
 
@@ -297,45 +319,57 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
 
     return (
         <Paper elevation={1} sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            {/* ヘッダー */}
-            <Table stickyHeader size="small">
-                <TableHead>
-                    <TableRow sx={{ display: 'flex', width: '100%' }}>
-                        <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 60, flexShrink: 0, padding: '6px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }}>No</TableCell>
-                        {columns.map((column) => (
-                            <TableCell 
-                                key={column.key}
-                                sx={{ 
-                                    bgcolor: '#e3f2fd', 
-                                    fontWeight: 'bold', 
-                                    width: column.width, 
-                                    minWidth: column.minWidth,
-                                    flexShrink: column.key === 'selected' || column.type === 'number' || column.type === 'select' ? 0 : undefined,
-                                    flex: column.key !== 'selected' && column.type !== 'number' && column.type !== 'select' && !column.width ? 1 : undefined,
-                                    padding: '6px 16px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'flex-start',
-                                    whiteSpace: 'nowrap',
-                                    ...(column.key === 'selected' && { paddingLeft: '0px' })
-                                }}
-                            >
-                                {column.key === 'selected' ? (
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <DeleteIcon sx={{ fontSize: 16, mr: 0.5, color: '#e53935' }} />
-                                        削除
-                                    </Box>
-                                ) : (
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        {renderIcon(column.icon)}
-                                        {column.label}
-                                    </Box>
-                                )}
-                            </TableCell>
-                        ))}
-                    </TableRow>
-                </TableHead>
-            </Table>
+            {/* ヘッダー（横スクロール同期用のコンテナでラップ） */}
+            <Box 
+                ref={headerContainerRef}
+                sx={{ 
+                    overflowX: 'auto', 
+                    overflowY: 'hidden',
+                    '&::-webkit-scrollbar': {
+                        height: 0, // スクロールバーを非表示
+                    },
+                    scrollbarWidth: 'none', // Firefox用
+                }}
+            >
+                <Table stickyHeader size="small">
+                    <TableHead>
+                        <TableRow sx={{ display: 'flex', width: '100%' }}>
+                            <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 60, flexShrink: 0, padding: '6px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }}>No</TableCell>
+                            {columns.map((column) => (
+                                <TableCell 
+                                    key={column.key}
+                                    sx={{ 
+                                        bgcolor: '#e3f2fd', 
+                                        fontWeight: 'bold', 
+                                        width: column.width, 
+                                        minWidth: column.minWidth,
+                                        flexShrink: column.key === 'selected' || column.type === 'number' || column.type === 'select' ? 0 : undefined,
+                                        flex: column.key !== 'selected' && column.type !== 'number' && column.type !== 'select' && !column.width ? 1 : undefined,
+                                        padding: '6px 16px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'flex-start',
+                                        whiteSpace: 'nowrap',
+                                        ...(column.key === 'selected' && { paddingLeft: '0px' })
+                                    }}
+                                >
+                                    {column.key === 'selected' ? (
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            <DeleteIcon sx={{ fontSize: 16, mr: 0.5, color: '#e53935' }} />
+                                            削除
+                                        </Box>
+                                    ) : (
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            {renderIcon(column.icon)}
+                                            {column.label}
+                                        </Box>
+                                    )}
+                                </TableCell>
+                            ))}
+                        </TableRow>
+                    </TableHead>
+                </Table>
+            </Box>
 
             {/* 仮想化リスト */}
             <Box ref={listContainerRef} sx={{ flex: 1, overflow: 'hidden' }}>
@@ -345,6 +379,7 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                     itemSize={ROW_HEIGHT}
                     width="100%"
                     overscanCount={5}
+                    outerRef={scrollContainerRef}
                     itemKey={(index) => index === fields.length ? 'footer' : (fields[index]?.id || index)}
                 >
                     {Row}
