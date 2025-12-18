@@ -124,9 +124,44 @@ export const useExportExcel = () => {
                 });
             });
 
-            // ===== シート3: データファンクション =====
-            const sheet3 = workbook.addWorksheet('データファンクション');
-            sheet3.columns = [
+            // ===== シート3: 工程別内訳 =====
+            if (processBreakdown) {
+                const sheet3 = workbook.addWorksheet('工程別内訳');
+                sheet3.columns = [
+                    { key: 'process', width: 30 },
+                    { key: 'manMonths', width: 20 },
+                    { key: 'duration', width: 20 }
+                ];
+
+                const processHeader = sheet3.addRow(['工程', '工数(人月)', '工期(月)']);
+                processHeader.font = { bold: true, size: 12 };
+                processHeader.fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'FFD9E1F2' }
+                };
+                processHeader.alignment = { vertical: 'middle', horizontal: 'center' };
+
+                sheet3.addRow(['基本設計', processBreakdown.basicDesign.manMonths, processBreakdown.basicDesign.duration]);
+                sheet3.addRow(['詳細設計', processBreakdown.detailedDesign.manMonths, processBreakdown.detailedDesign.duration]);
+                sheet3.addRow(['実装', processBreakdown.implementation.manMonths, processBreakdown.implementation.duration]);
+                sheet3.addRow(['結合テスト', processBreakdown.integrationTest.manMonths, processBreakdown.integrationTest.duration]);
+                sheet3.addRow(['総合テスト', processBreakdown.systemTest.manMonths, processBreakdown.systemTest.duration]);
+                sheet3.eachRow((row) => {
+                    row.eachCell((cell) => {
+                        cell.border = {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' }
+                        };
+                    });
+                });
+            }
+
+            // ===== シート4: データファンクション =====
+            const sheet4 = workbook.addWorksheet('データファンクション');
+            sheet4.columns = [
                 { key: 'no', width: 10 },
                 { key: 'name', width: 40 },
                 { key: 'type', width: 30 },
@@ -134,7 +169,7 @@ export const useExportExcel = () => {
                 { key: 'remarks', width: 50 }
             ];
 
-            const dataHeader = sheet3.addRow(['No.', '名称', 'データファンクションの種類', 'FP', '備考']);
+            const dataHeader = sheet4.addRow(['No.', '名称', 'データファンクションの種類', 'FP', '備考']);
             dataHeader.font = { bold: true, size: 12 };
             dataHeader.fill = {
                 type: 'pattern',
@@ -147,7 +182,7 @@ export const useExportExcel = () => {
             formData.dataFunctions
                 ?.filter(f => f.name && f.name.trim() !== '' && (f.fpValue ?? 0) > 0)
                 .forEach((f, index) => {
-                    sheet3.addRow({
+                    sheet4.addRow({
                         no: index + 1,
                         name: f.name,
                         type: f.updateType,
@@ -156,7 +191,7 @@ export const useExportExcel = () => {
                     });
                 });
 
-            sheet3.eachRow((row) => {
+            sheet4.eachRow((row) => {
                 row.eachCell((cell) => {
                     cell.border = {
                         top: { style: 'thin' },
@@ -167,9 +202,9 @@ export const useExportExcel = () => {
                 });
             });
 
-            // ===== シート4: トランザクションファンクション =====
-            const sheet4 = workbook.addWorksheet('トランザクションファンクション');
-            sheet4.columns = [
+            // ===== シート5: トランザクションファンクション =====
+            const sheet5 = workbook.addWorksheet('トランザクションファンクション');
+            sheet5.columns = [
                 { key: 'no', width: 10 },
                 { key: 'name', width: 40 },
                 { key: 'externalInput', width: 15 },
@@ -192,7 +227,7 @@ export const useExportExcel = () => {
             formData.transactionFunctions
                 ?.filter(f => f.name && f.name.trim() !== '' && (f.fpValue ?? 0) > 0)
                 .forEach((f, index) => {
-                    sheet4.addRow({
+                    sheet5.addRow({
                         no: index + 1,
                         name: f.name,
                         externalInput: f.externalInput,
@@ -203,7 +238,7 @@ export const useExportExcel = () => {
                     });
                 });
 
-            sheet4.eachRow((row) => {
+            sheet5.eachRow((row) => {
                 row.eachCell((cell) => {
                     cell.border = {
                         top: { style: 'thin' },
@@ -213,42 +248,6 @@ export const useExportExcel = () => {
                     };
                 });
             });
-
-            // ===== シート5: 工程別内訳 =====
-            if (processBreakdown) {
-                const sheet5 = workbook.addWorksheet('工程別内訳');
-                sheet5.columns = [
-                    { key: 'process', width: 30 },
-                    { key: 'manMonths', width: 20 },
-                    { key: 'duration', width: 20 }
-                ];
-
-                const processHeader = sheet5.addRow(['工程', '工数(人月)', '工期(月)']);
-                processHeader.font = { bold: true, size: 12 };
-                processHeader.fill = {
-                    type: 'pattern',
-                    pattern: 'solid',
-                    fgColor: { argb: 'FFD9E1F2' }
-                };
-                processHeader.alignment = { vertical: 'middle', horizontal: 'center' };
-
-                sheet5.addRow(['基本設計', processBreakdown.basicDesign.manMonths, processBreakdown.basicDesign.duration]);
-                sheet5.addRow(['詳細設計', processBreakdown.detailedDesign.manMonths, processBreakdown.detailedDesign.duration]);
-                sheet5.addRow(['実装', processBreakdown.implementation.manMonths, processBreakdown.implementation.duration]);
-                sheet5.addRow(['結合テスト', processBreakdown.integrationTest.manMonths, processBreakdown.integrationTest.duration]);
-                sheet5.addRow(['総合テスト', processBreakdown.systemTest.manMonths, processBreakdown.systemTest.duration]);
-
-                sheet5.eachRow((row) => {
-                    row.eachCell((cell) => {
-                        cell.border = {
-                            top: { style: 'thin' },
-                            left: { style: 'thin' },
-                            bottom: { style: 'thin' },
-                            right: { style: 'thin' }
-                        };
-                    });
-                });
-            }
 
             // ファイル生成・ダウンロード
             const buffer = await workbook.xlsx.writeBuffer();
