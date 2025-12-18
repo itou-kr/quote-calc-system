@@ -143,9 +143,9 @@ export const useExportExcel = () => {
             };
             dataHeader.alignment = { vertical: 'middle', horizontal: 'center' };
 
-            // 名称が入力されている行のみ出力
+            // FPが0より大きい行のみ出力
             formData.dataFunctions
-                ?.filter(f => f.name && f.name.trim() !== '')
+                ?.filter(f => f.name && f.name.trim() !== '' && (f.fpValue ?? 0) > 0)
                 .forEach((f, index) => {
                     sheet3.addRow({
                         no: index + 1,
@@ -188,9 +188,9 @@ export const useExportExcel = () => {
             };
             transactionHeader.alignment = { vertical: 'middle', horizontal: 'center' };
 
-            // 名称が入力されている行のみ出力
+            // FPが0より大きい行のみ出力
             formData.transactionFunctions
-                ?.filter(f => f.name && f.name.trim() !== '')
+                ?.filter(f => f.name && f.name.trim() !== '' && (f.fpValue ?? 0) > 0)
                 .forEach((f, index) => {
                     sheet4.addRow({
                         no: index + 1,
