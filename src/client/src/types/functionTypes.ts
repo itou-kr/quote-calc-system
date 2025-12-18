@@ -15,9 +15,9 @@ export type DataFunction = {
 export type TransactionFunction = {
     selected: boolean;
     name: string;
-    externalInput: number;
-    externalOutput: number;
-    externalInquiry: number;
+    externalInput: number | undefined;
+    externalOutput: number | undefined;
+    externalInquiry: number | undefined;
     fpValue: number;
     remarks: string;
 };
@@ -39,9 +39,9 @@ export const createEmptyDataFunction = (): DataFunction => ({
 export const createEmptyTransactionFunction = (): TransactionFunction => ({
     selected: false,
     name: '',
-    externalInput: 0,
-    externalOutput: 0,
-    externalInquiry: 0,
+    externalInput: undefined,
+    externalOutput: undefined,
+    externalInquiry: undefined,
     fpValue: 0,
     remarks: '',
 });

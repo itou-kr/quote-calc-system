@@ -34,13 +34,14 @@ export type Props<T extends FieldValues = FieldValues> = {
     selectedCount: number;
     onSelectedCountChange: (count: number) => void;
     maxHeight?: string;
+    fieldErrors?: Record<number, Record<string, boolean>>;
 };
 
 /**
  * データファンクション/トランザクションファンクション共通テーブル（react-windowで仮想化）
  */
 function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
-    const { fields, columns, baseName, control, trigger, t, onRowAdd, onDeleteSelected, selectedCount, onSelectedCountChange } = props;
+    const { fields, columns, baseName, control, trigger, t, onRowAdd, onDeleteSelected, selectedCount, onSelectedCountChange, fieldErrors } = props;
 
     const ROW_HEIGHT = 53; // 1行の高さ（px）
     
@@ -128,13 +129,29 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
         }
 
         if (column.type === 'select') {
+            const hasError = fieldErrors?.[index]?.[column.key] || false;
             return (
                 <TableCell key={column.key} sx={{ width: column.width, minWidth: column.minWidth, flexShrink: 0, borderBottom: 'none', display: 'flex', alignItems: 'center', padding: '6px 16px' }}>
                     <Controller
                         name={fieldName}
                         control={control}
                         render={({ field: controllerField }) => (
-                            <Select {...controllerField} size="small" fullWidth displayEmpty sx={{ bgcolor: 'white' }}>
+                            <Select 
+                                {...controllerField} 
+                                size="small" 
+                                fullWidth 
+                                displayEmpty 
+                                error={hasError}
+                                sx={{ 
+                                    bgcolor: 'white',
+                                    ...(hasError && {
+                                        '& .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: '#d32f2f !important',
+                                            borderWidth: '2px !important',
+                                        },
+                                    }),
+                                }}
+                            >
                                 <MenuItem value="">選択してください</MenuItem>
                                 {column.options?.map((option) => (
                                     <MenuItem key={option.value} value={option.value}>
@@ -149,6 +166,7 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
         }
 
         if (column.type === 'number') {
+            const hasError = fieldErrors?.[index]?.[column.key] || false;
             return (
                 <TableCell key={column.key} sx={{ width: column.width, minWidth: column.minWidth, flexShrink: 0, borderBottom: 'none', display: 'flex', alignItems: 'center', padding: '6px 16px' }}>
                     <TextField
@@ -159,6 +177,7 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                         type="number"
                         notFullWidth
                         disabled={column.disabled}
+                        error={hasError}
                         slotProps={{ 
                             htmlInput: { 
                                 min: 0, 
@@ -174,7 +193,13 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                             },
                             '& input[type="number"]': {
                                 paddingRight: '4px',
-                            }
+                            },
+                            ...(hasError && {
+                                '& .MuiOutlinedInput-notchedOutline': {
+                                    borderColor: '#d32f2f !important',
+                                    borderWidth: '2px !important',
+                                },
+                            }),
                         }}
                     />
                 </TableCell>
@@ -188,11 +213,20 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                     control={control}
                     trigger={trigger}
                     t={t}
-                    sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }}
+                    error={fieldErrors?.[index]?.[column.key] || false}
+                    sx={{ 
+                        '& .MuiInputBase-root': { bgcolor: 'white' },
+                        ...(fieldErrors?.[index]?.[column.key] && {
+                            '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: '#d32f2f !important',
+                                borderWidth: '2px !important',
+                            },
+                        }),
+                    }}
                 />
             </TableCell>
         );
-    }, [baseName, control, fields, onSelectedCountChange, trigger, t]);
+    }, [baseName, control, fields, onSelectedCountChange, trigger, t, fieldErrors]);
 
     // 仮想化リストの行コンポーネント（memo化でちらつき軽減）
     const Row = memo(({ index, style }: { index: number; style: React.CSSProperties }) => {
