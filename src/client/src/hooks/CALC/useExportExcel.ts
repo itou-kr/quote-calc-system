@@ -127,13 +127,14 @@ export const useExportExcel = () => {
             // ===== シート3: データファンクション =====
             const sheet3 = workbook.addWorksheet('データファンクション');
             sheet3.columns = [
+                { key: 'no', width: 10 },
                 { key: 'name', width: 40 },
                 { key: 'type', width: 30 },
                 { key: 'fp', width: 15 },
                 { key: 'remarks', width: 50 }
             ];
 
-            const dataHeader = sheet3.addRow(['名称', '種類', 'FP', '備考']);
+            const dataHeader = sheet3.addRow(['No.', '名称', 'データファンクションの種類', 'FP', '備考']);
             dataHeader.font = { bold: true, size: 12 };
             dataHeader.fill = {
                 type: 'pattern',
@@ -145,8 +146,9 @@ export const useExportExcel = () => {
             // 名称が入力されている行のみ出力
             formData.dataFunctions
                 ?.filter(f => f.name && f.name.trim() !== '')
-                .forEach(f => {
+                .forEach((f, index) => {
                     sheet3.addRow({
+                        no: index + 1,
                         name: f.name,
                         type: f.updateType,
                         fp: f.fpValue,
@@ -168,6 +170,7 @@ export const useExportExcel = () => {
             // ===== シート4: トランザクションファンクション =====
             const sheet4 = workbook.addWorksheet('トランザクションファンクション');
             sheet4.columns = [
+                { key: 'no', width: 10 },
                 { key: 'name', width: 40 },
                 { key: 'externalInput', width: 15 },
                 { key: 'externalOutput', width: 15 },
@@ -176,7 +179,7 @@ export const useExportExcel = () => {
                 { key: 'remarks', width: 50 }
             ];
 
-            const transactionHeader = sheet4.addRow(['名称', '外部入力', '外部出力', '外部照会', 'FP', '備考']);
+            const transactionHeader = sheet4.addRow(['No.', '名称', '外部入力', '外部出力', '外部照会', 'FP', '備考']);
             transactionHeader.font = { bold: true, size: 12 };
             transactionHeader.fill = {
                 type: 'pattern',
@@ -188,8 +191,9 @@ export const useExportExcel = () => {
             // 名称が入力されている行のみ出力
             formData.transactionFunctions
                 ?.filter(f => f.name && f.name.trim() !== '')
-                .forEach(f => {
+                .forEach((f, index) => {
                     sheet4.addRow({
+                        no: index + 1,
                         name: f.name,
                         externalInput: f.externalInput,
                         externalOutput: f.externalOutput,
