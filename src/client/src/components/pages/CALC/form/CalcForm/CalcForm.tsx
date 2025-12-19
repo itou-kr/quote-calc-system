@@ -76,9 +76,9 @@ const setupYupScheme = () => {
             yup.object({
                 selected: yup.boolean(),
                 name: yup.string(),
-                externalInput: yup.number().min(0, '0以上の値を入力してください'),
-                externalOutput: yup.number().min(0, '0以上の値を入力してください'),
-                externalInquiry: yup.number().min(0, '0以上の値を入力してください'),
+                externalInput: yup.number().nullable().transform((value, originalValue) => originalValue === '' ? null : value).min(0, '0以上の値を入力してください'),
+                externalOutput: yup.number().nullable().transform((value, originalValue) => originalValue === '' ? null : value).min(0, '0以上の値を入力してください'),
+                externalInquiry: yup.number().nullable().transform((value, originalValue) => originalValue === '' ? null : value).min(0, '0以上の値を入力してください'),
                 fpValue: yup.number().min(0, '0以上の値を入力してください'),
                 remarks: yup.string(),
             })
