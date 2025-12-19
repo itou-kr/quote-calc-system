@@ -27,6 +27,7 @@ type RenderProps<T extends FieldValues = FieldValues, N extends FieldPath<T> = F
     onBlur?: (e: React.FocusEvent<HTMLTextAreaElement | HTMLInputElement>, value: T[N]) => void | Promise<void>;
     trigger: UseFormTrigger<T>;
     t: TFunction<'translation', undefined>;
+    error?: boolean;
 };
 
 function RenderTextField<T extends FieldValues = FieldValues, N extends FieldPath<T> = FieldPath<T>>(props: RenderProps<T, N> & HookFormRenderProps<T, N>) {
@@ -50,9 +51,10 @@ function RenderTextField<T extends FieldValues = FieldValues, N extends FieldPat
         onChange,
         onBlur,
         field: { name, ...field },
-        fieldState: { invalid, error },
+        fieldState: { invalid, error: formError },
         trigger,
         t,
+        error: customError,
     } = props;
     const multilineRows = multilineRowsAuto ? undefined : 4;
 
@@ -107,8 +109,8 @@ function RenderTextField<T extends FieldValues = FieldValues, N extends FieldPat
             autoComplete="off"
             sx={sx}
             className={className}
-            error={!!error}
-            helperText={hideHelperText ? undefined : error?.message}
+            error={customError || !!formError}
+            helperText={hideHelperText ? undefined : formError?.message}
             onChange={handleChange}
             onBlur={handleBlur}
             inputRef={field.ref}

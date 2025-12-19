@@ -1,6 +1,7 @@
 import * as yup from 'yup';
 import { useImportFile } from '@front/hooks/TEST/test';
 import { useExportFile } from '@front/hooks/TEST/test';
+import { useFunctionValidation } from '@front/hooks/useFunctionValidation';
 import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
 import { useMemo, useState, useCallback } from 'react';
 import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
@@ -34,13 +35,27 @@ const setupYupScheme = () => {
         autoProductivity: yup.boolean(),
         productivityFPPerMonth: yup
             .number()
-            .min(1, '1以上の値を入力してください')
+            .test('min-when-manual', '1以上の値を入力してください', function(value) {
+                const autoProductivity = this.parent.autoProductivity;
+                // 自動入力がOFFの場合のみminチェック
+                if (autoProductivity === false && value !== undefined && value !== null) {
+                    return value >= 1;
+                }
+                return true;
+            })
             .test('decimal-places', '小数点第二位までの値を入力してください', (value) => {
                 if (value === undefined || value === null) return true;
                 const decimalPart = value.toString().split('.')[1];
                 return !decimalPart || decimalPart.length <= 2;
             })
-            .required('生産性を入力してください'),
+            .test('required-when-manual', '生産性を入力してください', function(value) {
+                const autoProductivity = this.parent.autoProductivity;
+                // 自動入力がOFFの場合のみ必須チェック
+                if (autoProductivity === false) {
+                    return value !== undefined && value !== null;
+                }
+                return true;
+            }),
         projectType: yup.string().required('案件種別を選択してください'),
         // 使用するIPA代表値
         ipaValueType: yup.string().required('使用するIPA代表値を選択してください'),
@@ -90,12 +105,9 @@ type Props = {
 
 function CalcForm(props: Props) {
     const { viewId } = props;
-
     const schema = useMemo(() => setupYupScheme(), []);
-
     const importFile = useImportFile(viewId as ViewIdType | 'TEST' | 'CALC');
     const exportFile = useExportFile(viewId as ViewIdType | 'TEST' | 'CALC');
-
     const methods = useForm<FormType>({
         mode: 'onSubmit',
         reValidateMode: 'onSubmit',
@@ -111,26 +123,31 @@ function CalcForm(props: Props) {
             ...props.data,
         },
     });
-
-    const { control, trigger, watch, setValue, getValues } = methods;
-    
+    const { control, trigger, watch, setValue, getValues, clearErrors } = methods;
     const { fields: dataFields, append: appendData, remove: removeData } = useFieldArray({
         control,
         name: 'dataFunctions',
     });
-    
     const { fields: transactionFields, append: appendTransaction, remove: removeTransaction } = useFieldArray({
         control,
         name: 'transactionFunctions',
     });
-
     const [tableTabValue, setTableTabValue] = useState(0);
     const [processBreakdownOpen, setProcessBreakdownOpen] = useState(false);
     const [dataSelectedCount, setDataSelectedCount] = useState(0);
     const [transactionSelectedCount, setTransactionSelectedCount] = useState(0);
-    const [totalFP, setTotalFP] = useState(0);
-    const [manMonths, setManMonths] = useState(0);
-    const [standardDuration, setStandardDuration] = useState(0);
+    const [totalFP, setTotalFP] = useState<number | string>(0);
+    const [manMonths, setManMonths] = useState<number | string>(0);
+    const [standardDuration, setStandardDuration] = useState<number | string>(0);
+    const [dataFunctionErrors, setDataFunctionErrors] = useState<Record<number, { name: boolean; updateType: boolean }>>({});
+    const [transactionFunctionErrors, setTransactionFunctionErrors] = useState<Record<number, { name: boolean; externalInput: boolean; externalOutput: boolean; externalInquiry: boolean }>>({});
+
+    // カスタムフックでバリデーション関数を取得
+    const { validateDataFunctions, validateTransactionFunctions } = useFunctionValidation(
+        getValues,
+        setDataFunctionErrors,
+        setTransactionFunctionErrors
+    );
 
     // データファンクションテーブルのカラム定義
     const dataColumns: ColumnDefinition[] = useMemo(() => [
@@ -241,56 +258,105 @@ function CalcForm(props: Props) {
     }, [calculateStandardDuration, processRatios]);
 
     /** ▼ 工数計算実行（バリデーショントリガー） */
-    const onExecuteCalculation = () => {
-        // データファンクションのFP値を計算
-        const currentDataFunctions = getValues('dataFunctions');
-        if (currentDataFunctions) {
-            currentDataFunctions.forEach((item, index) => {
-                // 名称に文字列が入っている場合のみ計算
-                if (item.name && item.name.trim() !== '') {
-                    if (item.updateType === '内部論理ファイル') {
-                        setValue(`dataFunctions.${index}.fpValue`, 7);
-                    } else if (item.updateType === '外部インタフェースファイル') {
-                        setValue(`dataFunctions.${index}.fpValue`, 5);
+    const onExecuteCalculation = async () => {
+        // 自動入力ONの場合は先にFP計算と生産性の自動計算を実行
+        const autoProductivity = getValues('autoProductivity');
+        if (autoProductivity) {
+            // データファンクションのFP値を計算
+            const currentDataFunctions = getValues('dataFunctions');
+            if (currentDataFunctions) {
+                currentDataFunctions.forEach((item, index) => {
+                    // 名称に文字列が入っている場合のみ計算
+                    if (item.name && item.name.trim() !== '') {
+                        if (item.updateType === '内部論理ファイル') {
+                            setValue(`dataFunctions.${index}.fpValue`, 7);
+                        } else if (item.updateType === '外部インタフェースファイル') {
+                            setValue(`dataFunctions.${index}.fpValue`, 5);
+                        }
                     }
-                }
-            });
-        }
+                });
+            }
 
-        // トランザクションファンクションのFP値を計算
-        const currentTransactionFunctions = getValues('transactionFunctions');
-        if (currentTransactionFunctions) {
-            currentTransactionFunctions.forEach((item, index) => {
-                // 名称に文字列が入っている場合のみ計算
-                if (item.name && item.name.trim() !== '') {
-                    const externalInput = Number(item.externalInput) || 0;
-                    const externalOutput = Number(item.externalOutput) || 0;
-                    const externalInquiry = Number(item.externalInquiry) || 0;
-                    
-                    // FP値 = 外部入力*4 + 外部出力*5 + 外部照会*4
-                    const fpValue = externalInput * 4 + externalOutput * 5 + externalInquiry * 4;
-                    setValue(`transactionFunctions.${index}.fpValue`, fpValue);
-                }
-            });
+            // トランザクションファンクションのFP値を計算
+            const currentTransactionFunctions = getValues('transactionFunctions');
+            if (currentTransactionFunctions) {
+                currentTransactionFunctions.forEach((item, index) => {
+                    // 名称に文字列が入っている場合のみ計算
+                    if (item.name && item.name.trim() !== '') {
+                        const externalInput = Number(item.externalInput) || 0;
+                        const externalOutput = Number(item.externalOutput) || 0;
+                        const externalInquiry = Number(item.externalInquiry) || 0;
+                        
+                        // FP値 = 外部入力*4 + 外部出力*5 + 外部照会*4
+                        const fpValue = externalInput * 4 + externalOutput * 5 + externalInquiry * 4;
+                        setValue(`transactionFunctions.${index}.fpValue`, fpValue);
+                    }
+                });
+            }
+
+            // 計算結果を更新
+            const newTotalFP = calculateTotalFP();
+            const newProductivity = calculateProductivity(newTotalFP);
+            setValue('productivityFPPerMonth', newProductivity);
+        }
+        
+        // バリデーション実行
+        // フォーム全体のバリデーション（案件名など）
+        const isFormValid = await trigger();
+        
+        // データファンクションのバリデーション
+        const isDataFunctionsValid = validateDataFunctions();
+        
+        // トランザクションファンクションのバリデーション
+        const isTransactionFunctionsValid = validateTransactionFunctions();
+        
+        // バリデーションエラーがある場合は処理を中断
+        if (!isFormValid || !isDataFunctionsValid || !isTransactionFunctionsValid) {
+            // エラー時は結果をERRORに設定
+            setTotalFP('ERROR');
+            setManMonths('ERROR');
+            setStandardDuration('ERROR');
+            return;
+        }
+        
+        // 自動入力がOFFの場合は、ここでFP計算を実行
+        if (!autoProductivity) {
+            // データファンクションのFP値を計算
+            const currentDataFunctions = getValues('dataFunctions');
+            if (currentDataFunctions) {
+                currentDataFunctions.forEach((item, index) => {
+                    // 名称に文字列が入っている場合のみ計算
+                    if (item.name && item.name.trim() !== '') {
+                        if (item.updateType === '内部論理ファイル') {
+                            setValue(`dataFunctions.${index}.fpValue`, 7);
+                        } else if (item.updateType === '外部インタフェースファイル') {
+                            setValue(`dataFunctions.${index}.fpValue`, 5);
+                        }
+                    }
+                });
+            }
+
+            // トランザクションファンクションのFP値を計算
+            const currentTransactionFunctions = getValues('transactionFunctions');
+            if (currentTransactionFunctions) {
+                currentTransactionFunctions.forEach((item, index) => {
+                    // 名称に文字列が入っている場合のみ計算
+                    if (item.name && item.name.trim() !== '') {
+                        const externalInput = Number(item.externalInput) || 0;
+                        const externalOutput = Number(item.externalOutput) || 0;
+                        const externalInquiry = Number(item.externalInquiry) || 0;
+                        
+                        // FP値 = 外部入力*4 + 外部出力*5 + 外部照会*4
+                        const fpValue = externalInput * 4 + externalOutput * 5 + externalInquiry * 4;
+                        setValue(`transactionFunctions.${index}.fpValue`, fpValue);
+                    }
+                });
+            }
         }
 
         // 計算結果を更新
         const newTotalFP = calculateTotalFP();
         setTotalFP(newTotalFP);
-        
-        // 自動入力ONの場合は生産性を自動計算
-        const autoProductivity = getValues('autoProductivity');
-        if (autoProductivity) {
-            const newProductivity = calculateProductivity(newTotalFP);
-            setValue('productivityFPPerMonth', newProductivity);
-            // input要素に直接値を設定して小数点第一位まで表示
-            setTimeout(() => {
-                const input = document.querySelector('input[name="productivityFPPerMonth"]') as HTMLInputElement;
-                if (input) {
-                    input.value = newProductivity.toFixed(1);
-                }
-            }, 0);
-        }
         
         const newManMonths = calculateManMonths();
         setManMonths(newManMonths);
@@ -396,7 +462,7 @@ function CalcForm(props: Props) {
                             </FormSection>
 
                             {/* 生産性 */}
-                            <ProductivityField control={control} trigger={trigger} setValue={setValue} t={t} />
+                            <ProductivityField control={control} trigger={trigger} setValue={setValue} clearErrors={clearErrors} t={t} />
 
                             {/* 案件種別 */}
                             <FormSection label="案件種別(未対応)">
@@ -497,6 +563,7 @@ function CalcForm(props: Props) {
                                     selectedCount={dataSelectedCount}
                                     onSelectedCountChange={setDataSelectedCount}
                                     maxHeight="100%"
+                                    fieldErrors={dataFunctionErrors}
                                 />
                             </TabPanel>
                             <TabPanel value={tableTabValue} index={1}>
@@ -512,6 +579,7 @@ function CalcForm(props: Props) {
                                     selectedCount={transactionSelectedCount}
                                     onSelectedCountChange={setTransactionSelectedCount}
                                     maxHeight="100%"
+                                    fieldErrors={transactionFunctionErrors}
                                 />
                             </TabPanel>
                         </Box>
