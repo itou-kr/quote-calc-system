@@ -1,7 +1,13 @@
 src/apis/calcApi/index.ts
 src/apis/calcApi/types.ts
+src/apis/exportTestApi/index.ts
+src/apis/exportTestApi/types.ts
 src/models/byteBuffer.ts
 src/models/calcTestApplication200Response.ts
 src/models/calcTestApplicationRequest.ts
 src/models/calcTestApplicationRequestDataFunctionsInner.ts
+src/models/calcTestApplicationRequestImportFile.ts
+src/models/exportTestApplication200Response.ts
+src/models/exportTestApplication200ResponseExportFile.ts
+src/models/exportTestApplicationRequest.ts
 src/models/index.ts

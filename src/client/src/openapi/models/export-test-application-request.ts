@@ -20,63 +20,63 @@ import type { CalcTestApplication200ResponseDataFunctionsInner } from './calc-te
 import type { CalcTestApplication200ResponseImportFile } from './calc-test-application200-response-import-file';
 
 /**
- * 工数計算リクエスト
+ * エクスポートリクエスト
  * @export
- * @interface CalcTestApplicationRequest
+ * @interface ExportTestApplicationRequest
  */
-export interface CalcTestApplicationRequest {
+export interface ExportTestApplicationRequest {
     /**
      * 
      * @type {string}
-     * @memberof CalcTestApplicationRequest
+     * @memberof ExportTestApplicationRequest
      */
     'projectName'?: string;
     /**
      * 
      * @type {number}
-     * @memberof CalcTestApplicationRequest
+     * @memberof ExportTestApplicationRequest
      */
     'productivityFPPerMonth'?: number;
     /**
      * 
      * @type {string}
-     * @memberof CalcTestApplicationRequest
+     * @memberof ExportTestApplicationRequest
      */
     'projectType'?: string;
     /**
      * 
      * @type {string}
-     * @memberof CalcTestApplicationRequest
+     * @memberof ExportTestApplicationRequest
      */
     'ipaValueType'?: string;
     /**
      * 
      * @type {CalcTestApplication200ResponseImportFile}
-     * @memberof CalcTestApplicationRequest
+     * @memberof ExportTestApplicationRequest
      */
     'importFile'?: CalcTestApplication200ResponseImportFile;
     /**
      * 
      * @type {CalcTestApplication200ResponseImportFile}
-     * @memberof CalcTestApplicationRequest
+     * @memberof ExportTestApplicationRequest
      */
     'exportFile'?: CalcTestApplication200ResponseImportFile;
     /**
      * 
      * @type {number}
-     * @memberof CalcTestApplicationRequest
+     * @memberof ExportTestApplicationRequest
      */
     'totalFP'?: number;
     /**
      * 
      * @type {number}
-     * @memberof CalcTestApplicationRequest
+     * @memberof ExportTestApplicationRequest
      */
     'manMonth'?: number;
     /**
      * 
      * @type {Array<CalcTestApplication200ResponseDataFunctionsInner>}
-     * @memberof CalcTestApplicationRequest
+     * @memberof ExportTestApplicationRequest
      */
     'dataFunctions'?: Array<CalcTestApplication200ResponseDataFunctionsInner>;
 }

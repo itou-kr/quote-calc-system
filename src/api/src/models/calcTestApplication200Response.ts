@@ -11,6 +11,7 @@
  */
 
 import { CalcTestApplicationRequestDataFunctionsInner } from './calcTestApplicationRequestDataFunctionsInner';
+import { CalcTestApplicationRequestImportFile } from './calcTestApplicationRequestImportFile';
 
 /**
 * 工数計算レスポンス
@@ -20,6 +21,8 @@ export class CalcTestApplication200Response {
     'productivityFPPerMonth'?: number;
     'projectType'?: string;
     'ipaValueType'?: string;
+    'importFile'?: CalcTestApplicationRequestImportFile;
+    'exportFile'?: CalcTestApplicationRequestImportFile;
     'totalFP'?: number;
     'manMonth'?: number;
     'dataFunctions'?: Array<CalcTestApplicationRequestDataFunctionsInner>;
@@ -46,6 +49,16 @@ export class CalcTestApplication200Response {
             "name": "ipaValueType",
             "baseName": "ipaValueType",
             "type": "string"
+        },
+        {
+            "name": "importFile",
+            "baseName": "importFile",
+            "type": "CalcTestApplicationRequestImportFile"
+        },
+        {
+            "name": "exportFile",
+            "baseName": "exportFile",
+            "type": "CalcTestApplicationRequestImportFile"
         },
         {
             "name": "totalFP",

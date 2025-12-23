@@ -18,12 +18,12 @@ const useSetupColumns = () => {
     return useCallback(
         () => {
             const columns: GridColDef<Columns>[] = [];
-            columns.push({ field: 'isSelected', headerName: '選択', width: 90 });
-            columns.push({ field: 'rowNo', headerName: 'No', width: 90 });
-            columns.push({ field: 'itemName', headerName: '名称', width: 90 });
-            columns.push({ field: 'updateType', headerName: '更新種別', width: 90 });
-            columns.push({ field: 'fpValue', headerName: 'FP値', width: 150, editable: true } );
-            columns.push({ field: 'note', headerName: '備考', width: 150, editable: true } );
+            columns.push({ field: 'no', headerName: 'No', width: 90 });
+            columns.push({ field: 'name', headerName: '名称', width: 90 });
+            columns.push({ field: 'updateType', headerName: 'データファンクションの種類', width: 90 });
+            columns.push({ field: 'fpValue', headerName: 'FP', width: 90 });
+            columns.push({ field: 'remarks', headerName: '備考', width: 90 });
+            columns.push({ field: 'selected', headerName: '削除', width: 150, editable: true } );
             return columns;
         },
         [],
@@ -41,7 +41,7 @@ const TestTable = memo((props: Props) => {
     return (
         <DataGrid
             columns={columns}
-            getRowId={(row) => row.rowNo}
+            getRowId={(row) => row.no}
             rowCount={rowCount}
             rows={data}
             columnHeaderHeight={56}

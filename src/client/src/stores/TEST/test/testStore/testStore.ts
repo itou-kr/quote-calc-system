@@ -9,12 +9,12 @@ export type TestRow = {
   // projectType: string;
 
   // テーブル項目
-  isSelected: string;
-  rowNo: number;
-  itemName: string;
+  no: number;
+  name: string;
   updateType: string;
-  fpValue: string;
-  note: string;
+  fpValue: number;
+  remarks: string;
+  selected: boolean;
 };
 
 export type TestState = {

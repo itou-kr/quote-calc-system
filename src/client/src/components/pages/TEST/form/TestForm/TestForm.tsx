@@ -1,16 +1,18 @@
 import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import Link from '@mui/material/Link';
 import * as yup from 'yup';
 import { Box, Stack, Grid2 as Grid, Typography } from '@mui/material';
 
 import { useImportFile } from '@front/hooks/TEST/test';
 import { useExportFile } from '@front/hooks/TEST/test';
+import { useExportTest } from '@front/hooks/TEST/test';
 import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
 import FormPaperProvider from '@front/components/ui/Layout/Form/FormPaperProvider';
 import EditIcon from '@mui/icons-material/Edit';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
-import { useTypedSelector } from '@front/stores';
+// import { useTypedSelector } from '@front/stores';
 
 import ImportButton from '@front/components/ui/Button/ImportButton';
 import ExportButton from '@front/components/ui/Button/ExportButton';
@@ -30,6 +32,8 @@ const setupYupScheme = () => {
     projectType: yup.string(),
     ipaValueType: yup.string(),
     // fileUpload: yup.string(),
+    importFile: yup.mixed(),
+    exportFile: yup.mixed(),
     totalFP: yup.number(),
     manMonth: yup.number(),
     
@@ -75,28 +79,28 @@ const setupYupScheme = () => {
 
 const dummyData: Columns[] = [
   {
-    isSelected: '1',
-    rowNo: 1,
-    itemName: 'テストマスタ１',
-    updateType: '更新あり',
-    fpValue: '0',
-    note: '備考１'
+    no: 1,
+    name: '名称１',
+    updateType: '内部論理ファイル',
+    fpValue: 2,
+    remarks: '備考１',
+    selected: false
   },
   {
-    isSelected: '1',
-    rowNo: 2,
-    itemName: 'テストマスタ２',
-    updateType: '参照のみ',
-    fpValue: '0',
-    note: '備考２'
+    no: 2,
+    name: '名称２',
+    updateType: '外部インターフェースファイル',
+    fpValue: 3,
+    remarks: '備考２',
+    selected: false
   },
   {
-    isSelected: '1',
-    rowNo: 3,
-    itemName: 'テストマスタ３',
-    updateType: '更新あり',
-    fpValue: '0',
-    note: '備考３'
+    no: 3,
+    name: '名称３',
+    updateType: '内部論理ファイル',
+    fpValue: 4,
+    remarks: '備考３',
+    selected: false
   },
 ];
 
@@ -116,19 +120,20 @@ function TestForm(props: Props) {
     return setupYupScheme();
   }, []);
 
-  const { data: calcData } = useTypedSelector((state) => state.calc)
+  // const { data: calcData } = useTypedSelector((state) => state.calc)
   // const { loading, rowCount, data } = useTypedSelector((state) => state.test);
 
   const importFile = useImportFile(viewId);
   const exportFile = useExportFile(viewId);
+  const exportTest = useExportTest();
 
   const methods = useForm<FormType>({
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
     resolver: yupResolver(yupSchema),
-    values: calcData ?? {
+    // values: calcData ?? {
 
-    },
+    // },
     defaultValues: props.data,
   });
 
@@ -253,12 +258,21 @@ function TestForm(props: Props) {
                     インポート
                   </ImportButton>
                 </Box>
-                <Box>
+                <Box sx={{height: '20vh'}}>
                   <ExportButton onClick={onExportButtonClick} />
                 </Box>
+                <Link
+                  component="button"
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    await exportTest(methods.getValues());
+                  }}
+                >
+                  エクスポート
+                </Link>
+                <Separator />
               </Stack>
 
-              <Separator />
 
               {/* --- 計算結果 ------------------------------------------ */}
               <FormContent>
@@ -326,4 +340,28 @@ function TestForm(props: Props) {
   );
 }
 
+// const base64ToBlob = (base64: string, contentType?: string) => {
+//   const base64Data = base64.startsWith('data:') ? base64.split(',')[1] : base64;
+
+//   const byteCharacters = atob(base64Data);
+//   const byteNumbers = new Array(byteCharacters.length);
+//   for (let i = 0; i < byteCharacters.length; i++) {
+//     byteNumbers[i] = byteCharacters.charCodeAt(i);
+//   }
+//   const byteArray = new Uint8Array(byteNumbers);
+//   return new Blob([byteArray], { type: contentType });
+// }
+
+// const downloadBase64File = (base64: string, fileName: string, contentType?: string) => {
+//   const mimeType = contentType || 'application/octet-stream';
+//   const blob = base64ToBlob(base64, mimeType);
+//   const url = URL.createObjectURL(blob);
+//   const a = document.createElement('a');
+//   a.href = url;
+//   a.download = fileName;
+//   document.body.appendChild(a);
+//   a.click();
+//   document.body.removeChild(a);
+//   URL.revokeObjectURL(url);
+// }
 export default TestForm;
