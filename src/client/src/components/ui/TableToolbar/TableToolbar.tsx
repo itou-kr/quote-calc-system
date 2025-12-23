@@ -30,14 +30,42 @@ function TableToolbar(props: Props) {
     const { tabs, activeTab, onTabChange, actions = [] } = props;
 
     return (
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-            <Tabs value={activeTab} onChange={(_, newValue) => onTabChange(newValue)} sx={{ '& .MuiTab-root': { minWidth: 200 } }}>
+        <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            borderBottom: 1, 
+            borderColor: 'divider', 
+            mb: 2,
+            flexWrap: 'nowrap', // 改行を防止
+            minWidth: 900 // 最小幅を確保
+        }}>
+            <Tabs 
+                value={activeTab} 
+                onChange={(_, newValue) => onTabChange(newValue)} 
+                sx={{ 
+                    flexShrink: 0, // タブエリアの縮小を防止
+                    '& .MuiTab-root': { 
+                        minWidth: 160, // タブの最小幅を少し縮小
+                        whiteSpace: 'nowrap' // テキストの改行を防止
+                    } 
+                }}
+            >
                 {tabs.map((tab, index) => (
                     <Tab key={index} label={tab.label} />
                 ))}
             </Tabs>
             {actions.length > 0 && (
-                <Stack direction="row" spacing={1} alignItems="center" sx={{ mr: 2 }}>
+                <Stack 
+                    direction="row" 
+                    spacing={1} 
+                    alignItems="center" 
+                    sx={{ 
+                        mr: 2, 
+                        flexShrink: 0, // ボタンエリアの縮小を防止
+                        whiteSpace: 'nowrap' // 改行を防止
+                    }}
+                >
                     {actions.map((action, index) => (
                         <Button
                             key={index}
