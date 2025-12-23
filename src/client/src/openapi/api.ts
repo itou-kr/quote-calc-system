@@ -16,6 +16,8 @@
 import axios from './axios';
 
 import { CalcApiFactory } from './apis/calc-api';
+import { ExportTestApiFactory } from './apis/export-test-api';
 
 export const calcApi = CalcApiFactory(undefined, undefined, axios);
+export const exportTestApi = ExportTestApiFactory(undefined, undefined, axios);
 

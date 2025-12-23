@@ -15,6 +15,9 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import type { CalcTestApplication200ResponseDataFunctionsInner } from './calc-test-application200-response-data-functions-inner';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { CalcTestApplication200ResponseImportFile } from './calc-test-application200-response-import-file';
 
 /**
  * 工数計算レスポンス
@@ -46,6 +49,18 @@ export interface CalcTestApplication200Response {
      * @memberof CalcTestApplication200Response
      */
     'ipaValueType'?: string;
+    /**
+     * 
+     * @type {CalcTestApplication200ResponseImportFile}
+     * @memberof CalcTestApplication200Response
+     */
+    'importFile'?: CalcTestApplication200ResponseImportFile;
+    /**
+     * 
+     * @type {CalcTestApplication200ResponseImportFile}
+     * @memberof CalcTestApplication200Response
+     */
+    'exportFile'?: CalcTestApplication200ResponseImportFile;
     /**
      * 
      * @type {number}

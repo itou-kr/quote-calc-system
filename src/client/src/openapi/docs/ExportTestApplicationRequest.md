@@ -1,6 +1,6 @@
-# CalcTestApplication200Response
+# ExportTestApplicationRequest
 
-工数計算レスポンス
+エクスポートリクエスト
 
 ## Properties
 
@@ -19,9 +19,9 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { CalcTestApplication200Response } from './api';
+import { ExportTestApplicationRequest } from './api';
 
-const instance: CalcTestApplication200Response = {
+const instance: ExportTestApplicationRequest = {
     projectName,
     productivityFPPerMonth,
     projectType,

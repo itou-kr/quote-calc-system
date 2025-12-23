@@ -8,3 +8,5 @@ paths:
   #   $ref: ./TEST.yml#/paths/~1TEST~1test
   /TEST/calc:
     $ref: ./TEST.yml#/paths/~1TEST~1calc
+  /TEST/exportTest:
+    $ref: ./TEST.yml#/paths/~1TEST~1export

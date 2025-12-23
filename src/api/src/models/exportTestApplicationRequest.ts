@@ -14,9 +14,9 @@ import { CalcTestApplicationRequestDataFunctionsInner } from './calcTestApplicat
 import { CalcTestApplicationRequestImportFile } from './calcTestApplicationRequestImportFile';
 
 /**
-* 工数計算リクエスト
+* エクスポートリクエスト
 */
-export class CalcTestApplicationRequest {
+export class ExportTestApplicationRequest {
     'projectName'?: string;
     'productivityFPPerMonth'?: number;
     'projectType'?: string;
@@ -77,7 +77,7 @@ export class CalcTestApplicationRequest {
         }    ];
 
     static getAttributeTypeMap() {
-        return CalcTestApplicationRequest.attributeTypeMap;
+        return ExportTestApplicationRequest.attributeTypeMap;
     }
 }
 

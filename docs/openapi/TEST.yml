@@ -30,6 +30,28 @@ paths:
               schema:
                 $ref: "#/components/schemas/CalcTestApplication200Response"
 
+  /TEST/export:
+    post:
+      summary: エクスポート
+      tags:
+        - exportTest
+      operationId: exportTestApplication
+      description: ...
+      requestBody:
+        description: ...
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExportTestApplicationRequest"
+      responses:
+        "200":
+          description: ...
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExportTestApplication200Response"                
+
   # /TEST/test:
   #   post:
   #     tags:
@@ -88,6 +110,26 @@ components:
           type: string
         ipaValueType:
           type: string
+        importFile:
+          type: object
+          properties:
+            name:
+              type: string
+              description: ファイル名
+            content:
+              type: string
+              format: byte
+              description: ファイル内容
+        exportFile:
+          type: object
+          properties:
+            name:
+              type: string
+              description: ファイル名
+            content:
+              type: string
+              format: byte
+              description: ファイル内容
         totalFP:
           type: number
         manMonth:
@@ -119,6 +161,26 @@ components:
           type: string
         ipaValueType:
           type: string
+        importFile:
+          type: object
+          properties:
+            name:
+              type: string
+              description: ファイル名
+            content:
+              type: string
+              format: byte
+              description: ファイル内容
+        exportFile:
+          type: object
+          properties:
+            name:
+              type: string
+              description: ファイル名
+            content:
+              type: string
+              format: byte
+              description: ファイル内容
         totalFP:
           type: number
         manMonth:
@@ -138,3 +200,83 @@ components:
                 type: string
               selected:
                 type: boolean
+    ExportTestApplicationRequest:
+      description: エクスポートリクエスト
+      type: object
+      properties:
+        projectName:
+          type: string
+        productivityFPPerMonth:
+          type: number
+        projectType:
+          type: string
+        ipaValueType:
+          type: string
+        importFile:
+          type: object
+          properties:
+            name:
+              type: string
+              description: ファイル名
+            content:
+              type: string
+              format: byte
+              description: ファイル内容
+        exportFile:
+          type: object
+          properties:
+            name:
+              type: string
+              description: ファイル名
+            content:
+              type: string
+              format: byte
+              description: ファイル内容
+        totalFP:
+          type: number
+        manMonth:
+          type: number
+        dataFunctions:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              updateType:
+                type: string
+              fpValue:
+                type: number
+              remarks:
+                type: string
+              selected:
+                type: boolean
+    ExportTestApplication200Response:
+      description: エクスポートレスポンス
+      type: object
+      properties:
+        dataFunctions:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              updateType:
+                type: string
+              fpValue:
+                type: number
+              remarks:
+                type: string
+              selected:
+                type: boolean
+        exportFile:
+          type: object
+          properties:
+            name:
+              type: string
+              description: ファイル名
+            content:
+              type: string
+              description: ファイル内容
+
