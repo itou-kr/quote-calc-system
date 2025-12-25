@@ -15,6 +15,7 @@ import ExportButton from '@front/components/ui/Button/ExportButton';
 import Button from '@front/components/ui/Button';
 import TextField from '@front/components/ui/TextField';
 import SummaryCard from '@front/components/ui/SummaryCard';
+import SummaryCard2 from '@front/components/ui/SummaryCard2';
 import FormSection from '@front/components/ui/FormSection';
 import ProductivityField from '@front/components/ui/ProductivityField';
 import TableToolbar from '@front/components/ui/TableToolbar';
@@ -495,10 +496,25 @@ function CalcForm(props: Props) {
 
                             {/* 計算結果サマリー */}
                             <Box>
-                                <Text variant="subsectionTitle">計算結果サマリー</Text>
-                                <SummaryCard label="総FP" value={totalFP} />
+                                <Text variant="subsectionTitle">計算結果サマリー（グレーアウト）</Text>
+                                <SummaryCard label="FP" value={totalFP} />
                                 <SummaryCard label="工数(人月)" value={manMonths} />
                                 <SummaryCard label="標準工期(月)" value={standardDuration} />
+                                
+                                <Text variant="subsectionTitle" sx={{ mt: 2 }}>計算結果サマリー（枠線のみ）</Text>
+                                <SummaryCard2 label="FP" value={totalFP} colorVariant="blue" borderOnly />
+                                <SummaryCard2 label="工数(人月)" value={manMonths} colorVariant="green" borderOnly />
+                                <SummaryCard2 label="標準工期(月)" value={standardDuration} colorVariant="orange" borderOnly />
+
+                                <Text variant="subsectionTitle" sx={{ mt: 2 }}>計算結果サマリー（枠線＋カラー背景）</Text>
+                                <SummaryCard2 label="FP" value={totalFP} colorVariant="blue" />
+                                <SummaryCard2 label="工数(人月)" value={manMonths} colorVariant="green" />
+                                <SummaryCard2 label="標準工期(月)" value={standardDuration} colorVariant="orange" />
+                                
+                                <Text variant="subsectionTitle" sx={{ mt: 2 }}>計算結果サマリー（枠線＋グレー背景）</Text>
+                                <SummaryCard2 label="FP" value={totalFP} colorVariant="blue" grayBackground />
+                                <SummaryCard2 label="工数(人月)" value={manMonths} colorVariant="green" grayBackground />
+                                <SummaryCard2 label="標準工期(月)" value={standardDuration} colorVariant="orange" grayBackground />
                             </Box>
                         </Box>
 
