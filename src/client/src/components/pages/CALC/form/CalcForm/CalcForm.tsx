@@ -35,11 +35,11 @@ const setupYupScheme = () => {
         autoProductivity: yup.boolean(),
         productivityFPPerMonth: yup
             .number()
-            .test('min-when-manual', '1以上の値を入力してください', function(value) {
+            .test('min-when-manual', '0.1以上の値を入力してください', function(value) {
                 const autoProductivity = this.parent.autoProductivity;
                 // 自動入力がOFFの場合のみminチェック
                 if (autoProductivity === false && value !== undefined && value !== null) {
-                    return value >= 1;
+                    return value >= 0.1;
                 }
                 return true;
             })
@@ -496,25 +496,10 @@ function CalcForm(props: Props) {
 
                             {/* 計算結果サマリー */}
                             <Box>
-                                <Text variant="subsectionTitle">計算結果サマリー（グレーアウト）</Text>
-                                <SummaryCard label="FP" value={totalFP} />
-                                <SummaryCard label="工数(人月)" value={manMonths} />
-                                <SummaryCard label="標準工期(月)" value={standardDuration} />
-                                
-                                <Text variant="subsectionTitle" sx={{ mt: 2 }}>計算結果サマリー（枠線のみ）</Text>
-                                <SummaryCard2 label="FP" value={totalFP} colorVariant="blue" borderOnly />
-                                <SummaryCard2 label="工数(人月)" value={manMonths} colorVariant="green" borderOnly />
-                                <SummaryCard2 label="標準工期(月)" value={standardDuration} colorVariant="orange" borderOnly />
-
-                                <Text variant="subsectionTitle" sx={{ mt: 2 }}>計算結果サマリー（枠線＋カラー背景）</Text>
+                                <Text variant="subsectionTitle" sx={{ mt: 2 }}>計算結果サマリー</Text>
                                 <SummaryCard2 label="FP" value={totalFP} colorVariant="blue" />
                                 <SummaryCard2 label="工数(人月)" value={manMonths} colorVariant="green" />
                                 <SummaryCard2 label="標準工期(月)" value={standardDuration} colorVariant="orange" />
-                                
-                                <Text variant="subsectionTitle" sx={{ mt: 2 }}>計算結果サマリー（枠線＋グレー背景）</Text>
-                                <SummaryCard2 label="FP" value={totalFP} colorVariant="blue" grayBackground />
-                                <SummaryCard2 label="工数(人月)" value={manMonths} colorVariant="green" grayBackground />
-                                <SummaryCard2 label="標準工期(月)" value={standardDuration} colorVariant="orange" grayBackground />
                             </Box>
                         </Box>
 
