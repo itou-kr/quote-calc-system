@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { Control, UseFormTrigger, UseFormSetValue, FieldValues } from 'react-hook-form';
+import { Control, UseFormTrigger, UseFormSetValue, UseFormClearErrors, FieldValues } from 'react-hook-form';
 import { TFunction } from 'i18next';
 import { Checkbox } from '@mui/material';
 import FormSection from '@front/components/ui/FormSection';
@@ -11,6 +11,7 @@ export type Props<T extends FieldValues = any> = {
     control: Control<T>;
     trigger: UseFormTrigger<T>;
     setValue: UseFormSetValue<T>;
+    clearErrors: UseFormClearErrors<T>;
     t: TFunction<'translation', undefined>;
 };
 
@@ -19,7 +20,7 @@ export type Props<T extends FieldValues = any> = {
  * このコンポーネントを分離することで、チェックボックスのオン/オフ時にこの部分だけが再レンダリングされる
  */
 function ProductivityField<T extends FieldValues = any>(props: Props<T>) {
-    const { control, trigger, setValue, t } = props;
+    const { control, trigger, setValue, clearErrors, t } = props;
 
     const [autoProductivity, setAutoProductivity] = useState(true);
 
@@ -43,7 +44,11 @@ function ProductivityField<T extends FieldValues = any>(props: Props<T>) {
         const checked = e.target.checked;
         setAutoProductivity(checked);
         setValue('autoProductivity' as any, checked as any);
-    }, [setValue]);
+        // チェックをONにしたタイミングでエラーを解除
+        if (checked) {
+            clearErrors('productivityFPPerMonth' as any);
+        }
+    }, [setValue, clearErrors]);
 
     // スタイルをメモ化
     const productivitySx = useMemo(() => ({
@@ -52,7 +57,7 @@ function ProductivityField<T extends FieldValues = any>(props: Props<T>) {
 
     const productivitySlotProps = useMemo(() => ({
         htmlInput: {
-            min: 1.0,
+            min: 0.1,
             step: 0.1,
             onKeyDown: handleProductivityKeyDown,
             onBlur: handleProductivityBlur
