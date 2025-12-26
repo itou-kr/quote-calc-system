@@ -14,7 +14,6 @@ import ImportButton from '@front/components/ui/Button/ImportButton';
 import ExportButton from '@front/components/ui/Button/ExportButton';
 import Button from '@front/components/ui/Button';
 import TextField from '@front/components/ui/TextField';
-import SummaryCard from '@front/components/ui/SummaryCard';
 import SummaryCard2 from '@front/components/ui/SummaryCard2';
 import FormSection from '@front/components/ui/FormSection';
 import ProductivityField from '@front/components/ui/ProductivityField';
