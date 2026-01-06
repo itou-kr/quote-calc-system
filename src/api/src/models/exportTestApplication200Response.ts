@@ -10,14 +10,14 @@
  * Do not edit the class manually.
  */
 
-import { CalcTestApplicationRequestDataFunctionsInner } from './calcTestApplicationRequestDataFunctionsInner';
 import { ExportTestApplication200ResponseExportFile } from './exportTestApplication200ResponseExportFile';
+import { ExportTestApplicationRequestDataFunctionsInner } from './exportTestApplicationRequestDataFunctionsInner';
 
 /**
 * エクスポートレスポンス
 */
 export class ExportTestApplication200Response {
-    'dataFunctions'?: Array<CalcTestApplicationRequestDataFunctionsInner>;
+    'dataFunctions'?: Array<ExportTestApplicationRequestDataFunctionsInner>;
     'exportFile'?: ExportTestApplication200ResponseExportFile;
 
     static discriminator: string | undefined = undefined;
@@ -26,7 +26,7 @@ export class ExportTestApplication200Response {
         {
             "name": "dataFunctions",
             "baseName": "dataFunctions",
-            "type": "Array<CalcTestApplicationRequestDataFunctionsInner>"
+            "type": "Array<ExportTestApplicationRequestDataFunctionsInner>"
         },
         {
             "name": "exportFile",

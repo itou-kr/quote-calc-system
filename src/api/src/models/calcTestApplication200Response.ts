@@ -10,8 +10,8 @@
  * Do not edit the class manually.
  */
 
-import { CalcTestApplicationRequestDataFunctionsInner } from './calcTestApplicationRequestDataFunctionsInner';
-import { CalcTestApplicationRequestImportFile } from './calcTestApplicationRequestImportFile';
+import { CalcTestApplication200ResponseDataFunctionsInner } from './calcTestApplication200ResponseDataFunctionsInner';
+import { CalcTestApplicationRequestProcessRatios } from './calcTestApplicationRequestProcessRatios';
 
 /**
 * 工数計算レスポンス
@@ -19,13 +19,14 @@ import { CalcTestApplicationRequestImportFile } from './calcTestApplicationReque
 export class CalcTestApplication200Response {
     'projectName'?: string;
     'productivityFPPerMonth'?: number;
-    'projectType'?: string;
-    'ipaValueType'?: string;
-    'importFile'?: CalcTestApplicationRequestImportFile;
-    'exportFile'?: CalcTestApplicationRequestImportFile;
     'totalFP'?: number;
-    'manMonth'?: number;
-    'dataFunctions'?: Array<CalcTestApplicationRequestDataFunctionsInner>;
+    'totalManMonths'?: number;
+    'standardDurationMonths'?: number;
+    'dataFunctions'?: Array<CalcTestApplication200ResponseDataFunctionsInner>;
+    'transactionFunctions'?: Array<CalcTestApplication200ResponseDataFunctionsInner>;
+    'processRatios'?: CalcTestApplicationRequestProcessRatios;
+    'processManMonths'?: CalcTestApplicationRequestProcessRatios;
+    'processDurations'?: CalcTestApplicationRequestProcessRatios;
 
     static discriminator: string | undefined = undefined;
 
@@ -41,39 +42,44 @@ export class CalcTestApplication200Response {
             "type": "number"
         },
         {
-            "name": "projectType",
-            "baseName": "projectType",
-            "type": "string"
-        },
-        {
-            "name": "ipaValueType",
-            "baseName": "ipaValueType",
-            "type": "string"
-        },
-        {
-            "name": "importFile",
-            "baseName": "importFile",
-            "type": "CalcTestApplicationRequestImportFile"
-        },
-        {
-            "name": "exportFile",
-            "baseName": "exportFile",
-            "type": "CalcTestApplicationRequestImportFile"
-        },
-        {
             "name": "totalFP",
             "baseName": "totalFP",
             "type": "number"
         },
         {
-            "name": "manMonth",
-            "baseName": "manMonth",
+            "name": "totalManMonths",
+            "baseName": "totalManMonths",
+            "type": "number"
+        },
+        {
+            "name": "standardDurationMonths",
+            "baseName": "standardDurationMonths",
             "type": "number"
         },
         {
             "name": "dataFunctions",
             "baseName": "dataFunctions",
-            "type": "Array<CalcTestApplicationRequestDataFunctionsInner>"
+            "type": "Array<CalcTestApplication200ResponseDataFunctionsInner>"
+        },
+        {
+            "name": "transactionFunctions",
+            "baseName": "transactionFunctions",
+            "type": "Array<CalcTestApplication200ResponseDataFunctionsInner>"
+        },
+        {
+            "name": "processRatios",
+            "baseName": "processRatios",
+            "type": "CalcTestApplicationRequestProcessRatios"
+        },
+        {
+            "name": "processManMonths",
+            "baseName": "processManMonths",
+            "type": "CalcTestApplicationRequestProcessRatios"
+        },
+        {
+            "name": "processDurations",
+            "baseName": "processDurations",
+            "type": "CalcTestApplicationRequestProcessRatios"
         }    ];
 
     static getAttributeTypeMap() {

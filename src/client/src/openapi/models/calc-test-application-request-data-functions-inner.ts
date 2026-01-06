@@ -16,13 +16,13 @@
 /**
  * 
  * @export
- * @interface CalcTestApplication200ResponseDataFunctionsInner
+ * @interface CalcTestApplicationRequestDataFunctionsInner
  */
-export interface CalcTestApplication200ResponseDataFunctionsInner {
+export interface CalcTestApplicationRequestDataFunctionsInner {
     /**
      * 
-     * @type {number}
-     * @memberof CalcTestApplication200ResponseDataFunctionsInner
+     * @type {string}
+     * @memberof CalcTestApplicationRequestDataFunctionsInner
      */
-    'fpValue'?: number;
+    'updateType'?: string;
 }

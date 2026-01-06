@@ -1,19 +1,19 @@
-# CalcTestApplication200ResponseDataFunctionsInner
+# CalcTestApplicationRequestDataFunctionsInner
 
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**fpValue** | **number** |  | [optional] [default to undefined]
+**updateType** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { CalcTestApplication200ResponseDataFunctionsInner } from './api';
+import { CalcTestApplicationRequestDataFunctionsInner } from './api';
 
-const instance: CalcTestApplication200ResponseDataFunctionsInner = {
-    fpValue,
+const instance: CalcTestApplicationRequestDataFunctionsInner = {
+    updateType,
 };
 ```
 

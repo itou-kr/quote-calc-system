@@ -14,10 +14,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { CalcTestApplication200ResponseDataFunctionsInner } from './calc-test-application200-response-data-functions-inner';
+import type { ExportTestApplication200ResponseDataFunctionsInner } from './export-test-application200-response-data-functions-inner';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { CalcTestApplication200ResponseImportFile } from './calc-test-application200-response-import-file';
+import type { ExportTestApplicationRequestImportFile } from './export-test-application-request-import-file';
 
 /**
  * エクスポートリクエスト
@@ -51,16 +51,16 @@ export interface ExportTestApplicationRequest {
     'ipaValueType'?: string;
     /**
      * 
-     * @type {CalcTestApplication200ResponseImportFile}
+     * @type {ExportTestApplicationRequestImportFile}
      * @memberof ExportTestApplicationRequest
      */
-    'importFile'?: CalcTestApplication200ResponseImportFile;
+    'importFile'?: ExportTestApplicationRequestImportFile;
     /**
      * 
-     * @type {CalcTestApplication200ResponseImportFile}
+     * @type {ExportTestApplicationRequestImportFile}
      * @memberof ExportTestApplicationRequest
      */
-    'exportFile'?: CalcTestApplication200ResponseImportFile;
+    'exportFile'?: ExportTestApplicationRequestImportFile;
     /**
      * 
      * @type {number}
@@ -75,8 +75,8 @@ export interface ExportTestApplicationRequest {
     'manMonth'?: number;
     /**
      * 
-     * @type {Array<CalcTestApplication200ResponseDataFunctionsInner>}
+     * @type {Array<ExportTestApplication200ResponseDataFunctionsInner>}
      * @memberof ExportTestApplicationRequest
      */
-    'dataFunctions'?: Array<CalcTestApplication200ResponseDataFunctionsInner>;
+    'dataFunctions'?: Array<ExportTestApplication200ResponseDataFunctionsInner>;
 }

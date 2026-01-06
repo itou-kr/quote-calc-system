@@ -11,7 +11,8 @@
  */
 
 import { CalcTestApplicationRequestDataFunctionsInner } from './calcTestApplicationRequestDataFunctionsInner';
-import { CalcTestApplicationRequestImportFile } from './calcTestApplicationRequestImportFile';
+import { CalcTestApplicationRequestProcessRatios } from './calcTestApplicationRequestProcessRatios';
+import { CalcTestApplicationRequestTransactionFunctionsInner } from './calcTestApplicationRequestTransactionFunctionsInner';
 
 /**
 * 工数計算リクエスト
@@ -21,11 +22,9 @@ export class CalcTestApplicationRequest {
     'productivityFPPerMonth'?: number;
     'projectType'?: string;
     'ipaValueType'?: string;
-    'importFile'?: CalcTestApplicationRequestImportFile;
-    'exportFile'?: CalcTestApplicationRequestImportFile;
-    'totalFP'?: number;
-    'manMonth'?: number;
     'dataFunctions'?: Array<CalcTestApplicationRequestDataFunctionsInner>;
+    'transactionFunctions'?: Array<CalcTestApplicationRequestTransactionFunctionsInner>;
+    'processRatios'?: CalcTestApplicationRequestProcessRatios;
 
     static discriminator: string | undefined = undefined;
 
@@ -51,29 +50,19 @@ export class CalcTestApplicationRequest {
             "type": "string"
         },
         {
-            "name": "importFile",
-            "baseName": "importFile",
-            "type": "CalcTestApplicationRequestImportFile"
-        },
-        {
-            "name": "exportFile",
-            "baseName": "exportFile",
-            "type": "CalcTestApplicationRequestImportFile"
-        },
-        {
-            "name": "totalFP",
-            "baseName": "totalFP",
-            "type": "number"
-        },
-        {
-            "name": "manMonth",
-            "baseName": "manMonth",
-            "type": "number"
-        },
-        {
             "name": "dataFunctions",
             "baseName": "dataFunctions",
             "type": "Array<CalcTestApplicationRequestDataFunctionsInner>"
+        },
+        {
+            "name": "transactionFunctions",
+            "baseName": "transactionFunctions",
+            "type": "Array<CalcTestApplicationRequestTransactionFunctionsInner>"
+        },
+        {
+            "name": "processRatios",
+            "baseName": "processRatios",
+            "type": "CalcTestApplicationRequestProcessRatios"
         }    ];
 
     static getAttributeTypeMap() {

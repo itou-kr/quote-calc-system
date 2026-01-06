@@ -10,8 +10,8 @@
  * Do not edit the class manually.
  */
 
-import { CalcTestApplicationRequestDataFunctionsInner } from './calcTestApplicationRequestDataFunctionsInner';
-import { CalcTestApplicationRequestImportFile } from './calcTestApplicationRequestImportFile';
+import { ExportTestApplicationRequestDataFunctionsInner } from './exportTestApplicationRequestDataFunctionsInner';
+import { ExportTestApplicationRequestImportFile } from './exportTestApplicationRequestImportFile';
 
 /**
 * エクスポートリクエスト
@@ -21,11 +21,11 @@ export class ExportTestApplicationRequest {
     'productivityFPPerMonth'?: number;
     'projectType'?: string;
     'ipaValueType'?: string;
-    'importFile'?: CalcTestApplicationRequestImportFile;
-    'exportFile'?: CalcTestApplicationRequestImportFile;
+    'importFile'?: ExportTestApplicationRequestImportFile;
+    'exportFile'?: ExportTestApplicationRequestImportFile;
     'totalFP'?: number;
     'manMonth'?: number;
-    'dataFunctions'?: Array<CalcTestApplicationRequestDataFunctionsInner>;
+    'dataFunctions'?: Array<ExportTestApplicationRequestDataFunctionsInner>;
 
     static discriminator: string | undefined = undefined;
 
@@ -53,12 +53,12 @@ export class ExportTestApplicationRequest {
         {
             "name": "importFile",
             "baseName": "importFile",
-            "type": "CalcTestApplicationRequestImportFile"
+            "type": "ExportTestApplicationRequestImportFile"
         },
         {
             "name": "exportFile",
             "baseName": "exportFile",
-            "type": "CalcTestApplicationRequestImportFile"
+            "type": "ExportTestApplicationRequestImportFile"
         },
         {
             "name": "totalFP",
@@ -73,7 +73,7 @@ export class ExportTestApplicationRequest {
         {
             "name": "dataFunctions",
             "baseName": "dataFunctions",
-            "type": "Array<CalcTestApplicationRequestDataFunctionsInner>"
+            "type": "Array<ExportTestApplicationRequestDataFunctionsInner>"
         }    ];
 
     static getAttributeTypeMap() {
