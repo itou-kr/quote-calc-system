@@ -17,7 +17,7 @@
 import type { CalcTestApplication200ResponseDataFunctionsInner } from './calc-test-application200-response-data-functions-inner';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { CalcTestApplication200ResponseImportFile } from './calc-test-application200-response-import-file';
+import type { CalcTestApplication200ResponseProcessRatios } from './calc-test-application200-response-process-ratios';
 
 /**
  * 工数計算レスポンス
@@ -39,30 +39,6 @@ export interface CalcTestApplication200Response {
     'productivityFPPerMonth'?: number;
     /**
      * 
-     * @type {string}
-     * @memberof CalcTestApplication200Response
-     */
-    'projectType'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CalcTestApplication200Response
-     */
-    'ipaValueType'?: string;
-    /**
-     * 
-     * @type {CalcTestApplication200ResponseImportFile}
-     * @memberof CalcTestApplication200Response
-     */
-    'importFile'?: CalcTestApplication200ResponseImportFile;
-    /**
-     * 
-     * @type {CalcTestApplication200ResponseImportFile}
-     * @memberof CalcTestApplication200Response
-     */
-    'exportFile'?: CalcTestApplication200ResponseImportFile;
-    /**
-     * 
      * @type {number}
      * @memberof CalcTestApplication200Response
      */
@@ -72,11 +48,41 @@ export interface CalcTestApplication200Response {
      * @type {number}
      * @memberof CalcTestApplication200Response
      */
-    'manMonth'?: number;
+    'totalManMonths'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof CalcTestApplication200Response
+     */
+    'standardDurationMonths'?: number;
     /**
      * 
      * @type {Array<CalcTestApplication200ResponseDataFunctionsInner>}
      * @memberof CalcTestApplication200Response
      */
     'dataFunctions'?: Array<CalcTestApplication200ResponseDataFunctionsInner>;
+    /**
+     * 
+     * @type {Array<CalcTestApplication200ResponseDataFunctionsInner>}
+     * @memberof CalcTestApplication200Response
+     */
+    'transactionFunctions'?: Array<CalcTestApplication200ResponseDataFunctionsInner>;
+    /**
+     * 
+     * @type {CalcTestApplication200ResponseProcessRatios}
+     * @memberof CalcTestApplication200Response
+     */
+    'processRatios'?: CalcTestApplication200ResponseProcessRatios;
+    /**
+     * 
+     * @type {CalcTestApplication200ResponseProcessRatios}
+     * @memberof CalcTestApplication200Response
+     */
+    'processManMonths'?: CalcTestApplication200ResponseProcessRatios;
+    /**
+     * 
+     * @type {CalcTestApplication200ResponseProcessRatios}
+     * @memberof CalcTestApplication200Response
+     */
+    'processDurations'?: CalcTestApplication200ResponseProcessRatios;
 }

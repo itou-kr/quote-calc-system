@@ -12,7 +12,7 @@
 
 import { ByteBuffer } from './byteBuffer';
 
-export class CalcTestApplicationRequestImportFile {
+export class ExportTestApplicationRequestImportFile {
     /**
     * ファイル名
     */
@@ -37,7 +37,7 @@ export class CalcTestApplicationRequestImportFile {
         }    ];
 
     static getAttributeTypeMap() {
-        return CalcTestApplicationRequestImportFile.attributeTypeMap;
+        return ExportTestApplicationRequestImportFile.attributeTypeMap;
     }
 }
 

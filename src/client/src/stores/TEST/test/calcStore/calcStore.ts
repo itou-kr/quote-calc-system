@@ -4,18 +4,12 @@ import { LoadingStatus } from '@front/types';
 import { CalcTestApplication200Response } from '@front/openapi';
 
 export type TestRow = {
-  // id: number;
-  // projectName: string;
-  // productivityFPPerMonth: number;
-  // projectType: string;
-
   // テーブル項目
-  isSelected: string;
-  rowNo: number;
-  itemName: string;
+  selected: string;
+  name: number;
   updateType: string;
   fpValue: string;
-  note: string;
+  remarks: string;
 };
 
 export type CalcState = {

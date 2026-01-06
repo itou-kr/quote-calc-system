@@ -11,20 +11,20 @@
  */
 
 
-export class CalcTestApplicationRequestDataFunctionsInner {
-    'updateType'?: string;
+export class CalcTestApplication200ResponseDataFunctionsInner {
+    'fpValue'?: number;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
-            "name": "updateType",
-            "baseName": "updateType",
-            "type": "string"
+            "name": "fpValue",
+            "baseName": "fpValue",
+            "type": "number"
         }    ];
 
     static getAttributeTypeMap() {
-        return CalcTestApplicationRequestDataFunctionsInner.attributeTypeMap;
+        return CalcTestApplication200ResponseDataFunctionsInner.attributeTypeMap;
     }
 }
 

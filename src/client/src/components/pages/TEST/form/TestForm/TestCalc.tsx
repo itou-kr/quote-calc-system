@@ -27,8 +27,6 @@ function TestCalc(props: Props) {
         const data: CalcTestApplicationRequest = {
             ...onValid,
         };
-        console.log('onValid.totalFP', onValid.totalFP)
-        console.log('onValid.manMonth', onValid.manMonth)
         const result = await calcTest(data, setError);
         console.log('data', data)
         console.log('result', result)

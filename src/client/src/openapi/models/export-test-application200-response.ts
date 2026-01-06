@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { CalcTestApplication200ResponseDataFunctionsInner } from './calc-test-application200-response-data-functions-inner';
+import type { ExportTestApplication200ResponseDataFunctionsInner } from './export-test-application200-response-data-functions-inner';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { ExportTestApplication200ResponseExportFile } from './export-test-application200-response-export-file';
@@ -27,10 +27,10 @@ import type { ExportTestApplication200ResponseExportFile } from './export-test-a
 export interface ExportTestApplication200Response {
     /**
      * 
-     * @type {Array<CalcTestApplication200ResponseDataFunctionsInner>}
+     * @type {Array<ExportTestApplication200ResponseDataFunctionsInner>}
      * @memberof ExportTestApplication200Response
      */
-    'dataFunctions'?: Array<CalcTestApplication200ResponseDataFunctionsInner>;
+    'dataFunctions'?: Array<ExportTestApplication200ResponseDataFunctionsInner>;
     /**
      * 
      * @type {ExportTestApplication200ResponseExportFile}
