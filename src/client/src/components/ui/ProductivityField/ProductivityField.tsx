@@ -11,7 +11,7 @@ export type Props<T extends FieldValues = any> = {
     control: Control<T>;
     trigger: UseFormTrigger<T>;
     setValue: UseFormSetValue<T>;
-    clearErrors: UseFormClearErrors<T>;
+    clearErrors?: UseFormClearErrors<T>;
     t: TFunction<'translation', undefined>;
 };
 
@@ -46,7 +46,7 @@ function ProductivityField<T extends FieldValues = any>(props: Props<T>) {
         setValue('autoProductivity' as any, checked as any);
         // チェックをONにしたタイミングでエラーを解除
         if (checked) {
-            clearErrors('productivityFPPerMonth' as any);
+            clearErrors?.('productivityFPPerMonth' as any);
         }
     }, [setValue, clearErrors]);
 

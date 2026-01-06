@@ -454,7 +454,7 @@ function TestForm(props: Props) {
                             </FormSection>
 
                             {/* 生産性 */}
-                            <ProductivityField control={control} trigger={trigger} setValue={setValue} t={t} />
+                            <ProductivityField control={control} trigger={trigger} setValue={setValue} t={t}/>
 
                             {/* 案件種別 */}
                             <FormSection label="案件種別(未対応)">
