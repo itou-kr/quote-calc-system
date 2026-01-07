@@ -450,7 +450,7 @@ function TestForm(props: Props) {
 
                             {/* 案件名 */}
                             <FormSection label="案件名" required>
-                                <TextField name="projectName" control={control} trigger={trigger} t={t} hideHelperText sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} />
+                                <TextField name="projectName" control={control} trigger={trigger} t={t} hideHelperText sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} maxLength={10}/>
                             </FormSection>
 
                             {/* 生産性 */}
