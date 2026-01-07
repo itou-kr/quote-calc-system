@@ -9,15 +9,10 @@ import { Container } from '@mui/system';
 const Test = memo (() => {
     const data = useTypedSelector((state) => state.calc.data)
     const { isDirty } = useTypedSelector((state) => state.test);
-    
-    // const formData = useMemo(() => {
-    //     if (!data) return undefined;
-    //     return data;
-    // }, [data]);
 
-    if (!data) {
-        return null;
-    }
+    // if (!data) {
+    //     return null;
+    // }
 
     return (
         <Container disableGutters sx={{ height: '100%' }}>
@@ -29,10 +24,6 @@ const Test = memo (() => {
                     projectName: data?.projectName ?? '',
                     productivityFPPerMonth: data?.productivityFPPerMonth ?? 0,
                 }}
-                // data={{...formData,
-                //     projectName: formData?.projectName,
-                //     productivityFPPerMonth: formData?.productivityFPPerMonth
-                // }}
             />
         </Container>
     );

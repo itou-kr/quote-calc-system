@@ -10,7 +10,7 @@ import * as yup from 'yup';
  * @param t
  */
 
-export function yupSettings(_: unknown) {
+export function yupSetting(_: unknown) {
     const locale: yup.LocaleObject = {
         mixed: {
             required: (params: { label: string} ) => format('は必須です', params.label),
