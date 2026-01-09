@@ -3,7 +3,7 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 
 export type Props = {
     label: string;
-    value: number | string;
+    value: number | undefined;
 };
 
 /**

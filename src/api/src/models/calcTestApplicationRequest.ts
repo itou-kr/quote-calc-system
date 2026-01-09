@@ -19,6 +19,7 @@ import { CalcTestApplicationRequestTransactionFunctionsInner } from './calcTestA
 */
 export class CalcTestApplicationRequest {
     'projectName'?: string;
+    'autoProductivity'?: boolean;
     'productivityFPPerMonth'?: number;
     'projectType'?: string;
     'ipaValueType'?: string;
@@ -33,6 +34,11 @@ export class CalcTestApplicationRequest {
             "name": "projectName",
             "baseName": "projectName",
             "type": "string"
+        },
+        {
+            "name": "autoProductivity",
+            "baseName": "autoProductivity",
+            "type": "boolean"
         },
         {
             "name": "productivityFPPerMonth",

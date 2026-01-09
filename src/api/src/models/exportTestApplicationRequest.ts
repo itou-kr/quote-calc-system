@@ -21,10 +21,11 @@ export class ExportTestApplicationRequest {
     'productivityFPPerMonth'?: number;
     'projectType'?: string;
     'ipaValueType'?: string;
+    'totalFP'?: number;
+    'totalManMonths'?: number;
+    'standardDurationMonths'?: number;
     'importFile'?: ExportTestApplicationRequestImportFile;
     'exportFile'?: ExportTestApplicationRequestImportFile;
-    'totalFP'?: number;
-    'manMonth'?: number;
     'dataFunctions'?: Array<ExportTestApplicationRequestDataFunctionsInner>;
 
     static discriminator: string | undefined = undefined;
@@ -51,6 +52,21 @@ export class ExportTestApplicationRequest {
             "type": "string"
         },
         {
+            "name": "totalFP",
+            "baseName": "totalFP",
+            "type": "number"
+        },
+        {
+            "name": "totalManMonths",
+            "baseName": "totalManMonths",
+            "type": "number"
+        },
+        {
+            "name": "standardDurationMonths",
+            "baseName": "standardDurationMonths",
+            "type": "number"
+        },
+        {
             "name": "importFile",
             "baseName": "importFile",
             "type": "ExportTestApplicationRequestImportFile"
@@ -59,16 +75,6 @@ export class ExportTestApplicationRequest {
             "name": "exportFile",
             "baseName": "exportFile",
             "type": "ExportTestApplicationRequestImportFile"
-        },
-        {
-            "name": "totalFP",
-            "baseName": "totalFP",
-            "type": "number"
-        },
-        {
-            "name": "manMonth",
-            "baseName": "manMonth",
-            "type": "number"
         },
         {
             "name": "dataFunctions",

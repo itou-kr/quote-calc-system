@@ -36,6 +36,12 @@ export interface CalcTestApplicationRequest {
     'projectName'?: string;
     /**
      * 
+     * @type {boolean}
+     * @memberof CalcTestApplicationRequest
+     */
+    'autoProductivity'?: boolean;
+    /**
+     * 
      * @type {number}
      * @memberof CalcTestApplicationRequest
      */

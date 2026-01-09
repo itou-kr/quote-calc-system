@@ -51,6 +51,24 @@ export interface ExportTestApplicationRequest {
     'ipaValueType'?: string;
     /**
      * 
+     * @type {number}
+     * @memberof ExportTestApplicationRequest
+     */
+    'totalFP'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ExportTestApplicationRequest
+     */
+    'totalManMonths'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ExportTestApplicationRequest
+     */
+    'standardDurationMonths'?: number;
+    /**
+     * 
      * @type {ExportTestApplicationRequestImportFile}
      * @memberof ExportTestApplicationRequest
      */
@@ -61,18 +79,6 @@ export interface ExportTestApplicationRequest {
      * @memberof ExportTestApplicationRequest
      */
     'exportFile'?: ExportTestApplicationRequestImportFile;
-    /**
-     * 
-     * @type {number}
-     * @memberof ExportTestApplicationRequest
-     */
-    'totalFP'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof ExportTestApplicationRequest
-     */
-    'manMonth'?: number;
     /**
      * 
      * @type {Array<ExportTestApplication200ResponseDataFunctionsInner>}

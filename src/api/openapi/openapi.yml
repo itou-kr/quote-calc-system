@@ -22,6 +22,8 @@ paths:
               properties:
                 projectName:
                   type: string
+                autoProductivity:
+                  type: boolean
                 productivityFPPerMonth:
                   type: number
                 projectType:
@@ -155,6 +157,12 @@ paths:
                   type: string
                 ipaValueType:
                   type: string
+                totalFP:
+                  type: number
+                totalManMonths:
+                  type: number
+                standardDurationMonths:
+                  type: number
                 importFile:
                   type: object
                   properties:
@@ -175,10 +183,6 @@ paths:
                       type: string
                       format: byte
                       description: ファイル内容
-                totalFP:
-                  type: number
-                manMonth:
-                  type: number
                 dataFunctions:
                   type: array
                   items:
