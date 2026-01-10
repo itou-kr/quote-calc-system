@@ -2,7 +2,7 @@ import * as yup from 'yup';
 import { useCalcTest, useExportTest, useImportFile } from '@front/hooks/TEST/test';
 // import { useFunctionValidation } from '@front/hooks/useFunctionValidation';
 import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useEffect } from 'react';
 import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Stack, Paper, Divider, Select, MenuItem } from '@mui/material';
@@ -17,7 +17,7 @@ import SummaryCard from '@front/components/ui/SummaryCard';
 import FormSection from '@front/components/ui/FormSection';
 import ProductivityField from '@front/components/ui/ProductivityField';
 import TableToolbar from '@front/components/ui/TableToolbar';
-// import ProcessBreakdownTable from '@front/components/ui/ProcessBreakdownTable';
+import ProcessBreakdownTable from '@front/components/ui/ProcessBreakdownTable';
 import FunctionTable, { ColumnDefinition } from '@front/components/ui/FunctionTable';
 import FlexBox from '@front/components/ui/FlexBox';
 import TabPanel from '@front/components/ui/TabPanel';
@@ -96,33 +96,33 @@ const setupYupScheme = () => {
         // 工程別比率
         processRatios: yup
         .object({
-            basicDesign: yup.number().min(0).max(1),
-            detailedDesign: yup.number().min(0).max(1),
-            implementation: yup.number().min(0).max(1),
-            integrationTest: yup.number().min(0).max(1),
-            systemTest: yup.number().min(0).max(1),
+            basicDesign: yup.number().min(0).max(1).required(),
+            detailedDesign: yup.number().min(0).max(1).required(),
+            implementation: yup.number().min(0).max(1).required(),
+            integrationTest: yup.number().min(0).max(1).required(),
+            systemTest: yup.number().min(0).max(1).required(),
         })
         .optional(),
 
         // 工程別工数
         processManMonths: yup
         .object({
-            basicDesign: yup.number().min(0),
-            detailedDesign: yup.number().min(0),
-            implementation: yup.number().min(0),
-            integrationTest: yup.number().min(0),
-            systemTest: yup.number().min(0),
+            basicDesign: yup.number().min(0).required(),
+            detailedDesign: yup.number().min(0).required(),
+            implementation: yup.number().min(0).required(),
+            integrationTest: yup.number().min(0).required(),
+            systemTest: yup.number().min(0).required(),
         })
         .optional(),
 
         // 工程別工期
         processDurations: yup
         .object({
-            basicDesign: yup.number().min(0),
-            detailedDesign: yup.number().min(0),
-            implementation: yup.number().min(0),
-            integrationTest: yup.number().min(0),
-            systemTest: yup.number().min(0),
+            basicDesign: yup.number().min(0).required(),
+            detailedDesign: yup.number().min(0).required(),
+            implementation: yup.number().min(0).required(),
+            integrationTest: yup.number().min(0).required(),
+            systemTest: yup.number().min(0).required(),
         })
         .optional(),
     });
@@ -198,7 +198,7 @@ function TestForm(props: Props) {
     });
 
     const [tableTabValue, setTableTabValue] = useState(0);
-    // const [processBreakdownOpen, setProcessBreakdownOpen] = useState(false);
+    const [processBreakdownOpen, setProcessBreakdownOpen] = useState(false);
     const [dataSelectedCount, setDataSelectedCount] = useState(0);
     const [transactionSelectedCount, setTransactionSelectedCount] = useState(0);
     // const [totalFP, setTotalFP] = useState<number | string>(0);
@@ -456,7 +456,12 @@ function TestForm(props: Props) {
     // };
     const totalFP = methods.watch('totalFP');
     const manMonths = methods.watch('totalManMonths');
+    const projectType = methods.watch('projectType');
+    const ipaValueType = methods.watch('ipaValueType');
     const standardDuration = methods.watch('standardDurationMonths');
+    const processManMonths = methods.getValues('processManMonths');
+    const processDurations = methods.getValues('processDurations');
+    const processRatios = methods.watch('processRatios');
 
     /** ▼ データファンクション行追加 */
     const onAddDataRow = useCallback(() => {
@@ -510,6 +515,52 @@ function TestForm(props: Props) {
         console.log(latestValues)
         await exportFile(latestValues);
     };
+
+    // TODO：分岐を増やす＆正しい値を設定する
+    useEffect(() => {
+        if (!projectType || !ipaValueType) return;
+
+        let processRatios;
+
+        if (projectType === '新規開発' && ipaValueType === '中央値') {
+            processRatios = {
+                basicDesign: 0.1,
+                detailedDesign: 0.2,
+                implementation: 0.3,
+                integrationTest: 0.4,
+                systemTest: 0.5,
+            };
+        } else if (projectType === '新規開発' && ipaValueType === '平均値') {
+            processRatios = {
+                basicDesign: 0.6,
+                detailedDesign: 0.7,
+                implementation: 0.8,
+                integrationTest: 0.9,
+                systemTest: 1.0,
+            };
+        } else if (projectType === '改良開発') {
+            processRatios = {
+                basicDesign: 0.1,
+                detailedDesign: 0.2,
+                implementation: 0.3,
+                integrationTest: 0.4,
+                systemTest: 0.5,
+            };
+        } else {
+            processRatios = {
+                basicDesign: 0,
+                detailedDesign: 0,
+                implementation: 0,
+                integrationTest: 0,
+                systemTest: 0,
+            };
+        }
+
+    methods.setValue('processRatios', processRatios, {
+        // shouldDirty: true,
+        // shouldValidate: false,
+    });
+}, [projectType, ipaValueType, methods]);
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -658,13 +709,13 @@ function TestForm(props: Props) {
                         </Box>
 
                         {/* 工程別工数・工期テーブル */}
-                        {/* <ProcessBreakdownTable
+                        <ProcessBreakdownTable
                             processRatios={processRatios}
-                            calculateProcessManMonths={methods.calculateProcessManMonths}
-                            calculateProcessDuration={calculateProcessDuration}
+                            processManMonths={processManMonths}
+                            processDurations={processDurations}
                             isOpen={processBreakdownOpen}
                             onToggle={useCallback(() => setProcessBreakdownOpen(prev => !prev), [])}
-                        /> */}
+                        />
                     </Box>
                 </Box>
             </FormProvider>
