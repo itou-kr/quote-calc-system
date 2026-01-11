@@ -101,8 +101,8 @@ const setupYupScheme = () => {
             implementation: yup.number().min(0).max(1).required(),
             integrationTest: yup.number().min(0).max(1).required(),
             systemTest: yup.number().min(0).max(1).required(),
-        })
-        .optional(),
+        }),
+        // .optional(),
 
         // 工程別工数
         processManMonths: yup
@@ -112,8 +112,8 @@ const setupYupScheme = () => {
             implementation: yup.number().min(0).required(),
             integrationTest: yup.number().min(0).required(),
             systemTest: yup.number().min(0).required(),
-        })
-        .optional(),
+        }),
+        // .optional(),
 
         // 工程別工期
         processDurations: yup
@@ -123,8 +123,8 @@ const setupYupScheme = () => {
             implementation: yup.number().min(0).required(),
             integrationTest: yup.number().min(0).required(),
             systemTest: yup.number().min(0).required(),
-        })
-        .optional(),
+        }),
+        // .optional(),
     });
 };
 
@@ -201,25 +201,8 @@ function TestForm(props: Props) {
     const [processBreakdownOpen, setProcessBreakdownOpen] = useState(false);
     const [dataSelectedCount, setDataSelectedCount] = useState(0);
     const [transactionSelectedCount, setTransactionSelectedCount] = useState(0);
-    // const [totalFP, setTotalFP] = useState<number | string>(0);
-    // const [manMonths, setManMonths] = useState<number | string>(0);
-    // const [standardDuration, setStandardDuration] = useState<number | string>(0);
-    // const [dataFunctionErrors, setDataFunctionErrors] = useState<Record<number, { name: boolean; updateType: boolean }>>({});
-    // const [transactionFunctionErrors, setTransactionFunctionErrors] = useState<Record<number, { name: boolean; externalInput: boolean; externalOutput: boolean; externalInquiry: boolean }>>({});
-    // const [totalFP] = useState<number | string>(0);
-    // const [manMonths] = useState<number | string>(0);
-    // const [standardDuration] = useState<number | string>(0);
     const [dataFunctionErrors] = useState<Record<number, { name: boolean; updateType: boolean }>>({});
     const [transactionFunctionErrors] = useState<Record<number, { name: boolean; externalInput: boolean; externalOutput: boolean; externalInquiry: boolean }>>({});
-
-
-
-    // // カスタムフックでバリデーション関数を取得
-    // const { validateDataFunctions, validateTransactionFunctions } = useFunctionValidation(
-    //     getValues,
-    //     setDataFunctionErrors,
-    //     setTransactionFunctionErrors
-    // );
 
     // データファンクションテーブルのカラム定義
     const dataColumns: ColumnDefinition[] = useMemo(() => [
@@ -244,91 +227,6 @@ function TestForm(props: Props) {
         { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
     ], []);
 
-    // 工程別の比率（デフォルト値）- メモ化
-    // const processRatios = useMemo(() => ({
-    //     basicDesign: 0.157,
-    //     detailedDesign: 0.189,
-    //     implementation: 0.354,
-    //     integrationTest: 0.164,
-    //     systemTest: 0.136,
-    // }), []);
-
-    /** ▼ FP合計を計算 */
-    // const calculateTotalFP = useCallback(() => {
-    //     const dataFunctions = getValues('dataFunctions') || [];
-    //     const transactionFunctions = getValues('transactionFunctions') || [];
-    //     const dataTotal = dataFunctions.reduce((sum, item) => sum + (Number(item.fpValue) || 0), 0);
-    //     const transactionTotal = transactionFunctions.reduce((sum, item) => sum + (Number(item.fpValue) || 0), 0);
-    //     return dataTotal + transactionTotal;
-    // }, [getValues]);
-
-    // /** ▼ 総FPに基づいて生産性を計算 */
-    // const calculateProductivity = useCallback((totalFP: number) => {
-    //     if (totalFP < 400) {
-    //         return 10.5;
-    //     } else if (totalFP < 1000) {
-    //         return 13.1;
-    //     } else if (totalFP < 3000) {
-    //         return 9.0;
-    //     } else {
-    //         return 8.4;
-    //     }
-    // }, []);
-
-    /** ▼ 総工数を計算 */
-    // const calculateManMonths = useCallback(() => {
-    //     const totalFP = calculateTotalFP();
-    //     const productivityFPPerMonth = getValues('productivityFPPerMonth') || 0;
-    //     if (productivityFPPerMonth > 0) {
-    //         // 小数点第三位を切り上げ(第二位まで表示)
-    //         return Math.ceil((totalFP / productivityFPPerMonth) * 100) / 100;
-    //     }
-    //     return 0;
-    // }, [calculateTotalFP, getValues]);
-
-    /** ▼ 標準工期を計算 */
-    // const calculateStandardDuration = useCallback(() => {
-    //     const totalManMonths = calculateManMonths();
-    //     // 標準工期 = 2.64 × 総工数^(1/3)
-    //     return Math.round(2.64 * Math.pow(totalManMonths, 1/3) * 100) / 100;
-    // }, [calculateManMonths]);
-
-    /** ▼ 工程別の工数を計算 */
-    // const calculateProcessManMonths = useCallback((ratio: number, isLast: boolean = false) => {
-    //     const totalManMonths = calculateManMonths();
-        
-    //     if (isLast) {
-    //         // 実装（比率が最大の工程）は、総工数から他の工程の合計を引いた値にする
-    //         const basicDesign = Math.round(processRatios.basicDesign * totalManMonths * 100) / 100;
-    //         const detailedDesign = Math.round(processRatios.detailedDesign * totalManMonths * 100) / 100;
-    //         const integrationTest = Math.round(processRatios.integrationTest * totalManMonths * 100) / 100;
-    //         const systemTest = Math.round(processRatios.systemTest * totalManMonths * 100) / 100;
-    //         const sumOthers = basicDesign + detailedDesign + integrationTest + systemTest;
-    //         return Math.round((totalManMonths - sumOthers) * 100) / 100;
-    //     }
-        
-    //     // 通常の工程は四捨五入
-    //     return Math.round(ratio * totalManMonths * 100) / 100;
-    // }, [calculateManMonths, processRatios]);
-
-    // /** ▼ 工程別の工期を計算 */
-    // const calculateProcessDuration = useCallback((ratio: number, isLast: boolean = false) => {
-    //     const standardDuration = calculateStandardDuration();
-        
-    //     if (isLast) {
-    //         // 実装（比率が最大の工程）は、標準工期から他の工程の合計を引いた値にする
-    //         const basicDesign = Math.round(processRatios.basicDesign * standardDuration * 100) / 100;
-    //         const detailedDesign = Math.round(processRatios.detailedDesign * standardDuration * 100) / 100;
-    //         const integrationTest = Math.round(processRatios.integrationTest * standardDuration * 100) / 100;
-    //         const systemTest = Math.round(processRatios.systemTest * standardDuration * 100) / 100;
-    //         const sumOthers = basicDesign + detailedDesign + integrationTest + systemTest;
-    //         return Math.round((standardDuration - sumOthers) * 100) / 100;
-    //     }
-        
-    //     // 通常の工程は四捨五入
-    //     return Math.round(ratio * standardDuration * 100) / 100;
-    // }, [calculateStandardDuration, processRatios]);
-
     // /** ▼ 工数計算実行（バリデーショントリガー） */
     const handleCalcClick = async (onValid: FormType) => {
         const result = await calc(onValid, methods.setError);
@@ -343,117 +241,6 @@ function TestForm(props: Props) {
         console.log('onValid', onValid)
     }; 
 
-    // const onExecuteCalculation = async () => {
-    //     // 自動入力ONの場合は先にFP計算と生産性の自動計算を実行
-    //     const autoProductivity = getValues('autoProductivity');
-    //     if (autoProductivity) {
-    //         // データファンクションのFP値を計算
-    //         const currentDataFunctions = getValues('dataFunctions');
-    //         if (currentDataFunctions) {
-    //             currentDataFunctions.forEach((item, index) => {
-    //                 // 名称に文字列が入っている場合のみ計算
-    //                 if (item.name && item.name.trim() !== '') {
-    //                     if (item.updateType === '内部論理ファイル') {
-    //                         setValue(`dataFunctions.${index}.fpValue`, 7);
-    //                     } else if (item.updateType === '外部インタフェースファイル') {
-    //                         setValue(`dataFunctions.${index}.fpValue`, 5);
-    //                     }
-    //                 }
-    //             });
-    //         }
-
-    //         // トランザクションファンクションのFP値を計算
-    //         const currentTransactionFunctions = getValues('transactionFunctions');
-    //         if (currentTransactionFunctions) {
-    //             currentTransactionFunctions.forEach((item, index) => {
-    //                 // 名称に文字列が入っている場合のみ計算
-    //                 if (item.name && item.name.trim() !== '') {
-    //                     const externalInput = Number(item.externalInput) || 0;
-    //                     const externalOutput = Number(item.externalOutput) || 0;
-    //                     const externalInquiry = Number(item.externalInquiry) || 0;
-                        
-    //                     // FP値 = 外部入力*4 + 外部出力*5 + 外部照会*4
-    //                     const fpValue = externalInput * 4 + externalOutput * 5 + externalInquiry * 4;
-    //                     setValue(`transactionFunctions.${index}.fpValue`, fpValue);
-    //                 }
-    //             });
-    //         }
-
-    //         // 計算結果を更新
-    //         const newTotalFP = calculateTotalFP();
-    //         const newProductivity = calculateProductivity(newTotalFP);
-    //         setValue('productivityFPPerMonth', newProductivity);
-    //     }
-
-    //     // バリデーション実行
-    //     // フォーム全体のバリデーション（案件名など）
-    //     const isFormValid = await trigger();
-        
-    //     // データファンクションのバリデーション
-    //     const isDataFunctionsValid = validateDataFunctions();
-        
-    //     // トランザクションファンクションのバリデーション
-    //     const isTransactionFunctionsValid = validateTransactionFunctions();
-        
-    //     // バリデーションエラーがある場合は処理を中断
-    //     if (!isFormValid || !isDataFunctionsValid || !isTransactionFunctionsValid) {
-    //         // エラー時は結果をERRORに設定
-    //         setTotalFP('ERROR');
-    //         setManMonths('ERROR');
-    //         setStandardDuration('ERROR');
-    //         return;
-    //     }
-
-    //     // 自動入力がOFFの場合は、ここでFP計算を実行
-    //     if (!autoProductivity) {
-    //         // データファンクションのFP値を計算
-    //         const currentDataFunctions = getValues('dataFunctions');
-    //         if (currentDataFunctions) {
-    //             currentDataFunctions.forEach((item, index) => {
-    //                 // 名称に文字列が入っている場合のみ計算
-    //                 if (item.name && item.name.trim() !== '') {
-    //                     if (item.updateType === '内部論理ファイル') {
-    //                         setValue(`dataFunctions.${index}.fpValue`, 7);
-    //                     } else if (item.updateType === '外部インタフェースファイル') {
-    //                         setValue(`dataFunctions.${index}.fpValue`, 5);
-    //                     }
-    //                 }
-    //             });
-    //         }
-
-    //         // トランザクションファンクションのFP値を計算
-    //         const currentTransactionFunctions = getValues('transactionFunctions');
-    //         if (currentTransactionFunctions) {
-    //             currentTransactionFunctions.forEach((item, index) => {
-    //                 // 名称に文字列が入っている場合のみ計算
-    //                 if (item.name && item.name.trim() !== '') {
-    //                     const externalInput = Number(item.externalInput) || 0;
-    //                     const externalOutput = Number(item.externalOutput) || 0;
-    //                     const externalInquiry = Number(item.externalInquiry) || 0;
-                        
-    //                     // FP値 = 外部入力*4 + 外部出力*5 + 外部照会*4
-    //                     const fpValue = externalInput * 4 + externalOutput * 5 + externalInquiry * 4;
-    //                     setValue(`transactionFunctions.${index}.fpValue`, fpValue);
-    //                 }
-    //             });
-    //         }
-    //     }
-
-    //     // 計算結果を更新
-    //     const newTotalFP = calculateTotalFP();
-    //     setTotalFP(newTotalFP);
-        
-    //     const newManMonths = calculateManMonths();
-    //     setManMonths(newManMonths);
-        
-    //     const newStandardDuration = calculateStandardDuration();
-    //     setStandardDuration(newStandardDuration);
-
-    //     // フォームのバリデーションを実行
-    //     trigger();
-    //     // 工程別比率の表を自動で表示
-    //     setProcessBreakdownOpen(true);
-    // };
     const totalFP = methods.watch('totalFP');
     const manMonths = methods.watch('totalManMonths');
     const projectType = methods.watch('projectType');
@@ -725,27 +512,3 @@ function TestForm(props: Props) {
 
 export default TestForm;
 
-// const base64ToBlob = (base64: string, contentType?: string) => {
-//   const base64Data = base64.startsWith('data:') ? base64.split(',')[1] : base64;
-
-//   const byteCharacters = atob(base64Data);
-//   const byteNumbers = new Array(byteCharacters.length);
-//   for (let i = 0; i < byteCharacters.length; i++) {
-//     byteNumbers[i] = byteCharacters.charCodeAt(i);
-//   }
-//   const byteArray = new Uint8Array(byteNumbers);
-//   return new Blob([byteArray], { type: contentType });
-// }
-
-// const downloadBase64File = (base64: string, fileName: string, contentType?: string) => {
-//   const mimeType = contentType || 'application/octet-stream';
-//   const blob = base64ToBlob(base64, mimeType);
-//   const url = URL.createObjectURL(blob);
-//   const a = document.createElement('a');
-//   a.href = url;
-//   a.download = fileName;
-//   document.body.appendChild(a);
-//   a.click();
-//   document.body.removeChild(a);
-//   URL.revokeObjectURL(url);
-// }

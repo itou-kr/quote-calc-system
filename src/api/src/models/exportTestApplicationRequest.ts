@@ -10,8 +10,10 @@
  * Do not edit the class manually.
  */
 
+import { CalcTestApplicationRequestProcessRatios } from './calcTestApplicationRequestProcessRatios';
 import { ExportTestApplicationRequestDataFunctionsInner } from './exportTestApplicationRequestDataFunctionsInner';
 import { ExportTestApplicationRequestImportFile } from './exportTestApplicationRequestImportFile';
+import { ExportTestApplicationRequestTransactionFunctionsInner } from './exportTestApplicationRequestTransactionFunctionsInner';
 
 /**
 * エクスポートリクエスト
@@ -24,9 +26,13 @@ export class ExportTestApplicationRequest {
     'totalFP'?: number;
     'totalManMonths'?: number;
     'standardDurationMonths'?: number;
+    'processRatios'?: CalcTestApplicationRequestProcessRatios;
+    'processManMonths'?: CalcTestApplicationRequestProcessRatios;
+    'processDurations'?: CalcTestApplicationRequestProcessRatios;
     'importFile'?: ExportTestApplicationRequestImportFile;
     'exportFile'?: ExportTestApplicationRequestImportFile;
     'dataFunctions'?: Array<ExportTestApplicationRequestDataFunctionsInner>;
+    'transactionFunctions'?: Array<ExportTestApplicationRequestTransactionFunctionsInner>;
 
     static discriminator: string | undefined = undefined;
 
@@ -67,6 +73,21 @@ export class ExportTestApplicationRequest {
             "type": "number"
         },
         {
+            "name": "processRatios",
+            "baseName": "processRatios",
+            "type": "CalcTestApplicationRequestProcessRatios"
+        },
+        {
+            "name": "processManMonths",
+            "baseName": "processManMonths",
+            "type": "CalcTestApplicationRequestProcessRatios"
+        },
+        {
+            "name": "processDurations",
+            "baseName": "processDurations",
+            "type": "CalcTestApplicationRequestProcessRatios"
+        },
+        {
             "name": "importFile",
             "baseName": "importFile",
             "type": "ExportTestApplicationRequestImportFile"
@@ -80,6 +101,11 @@ export class ExportTestApplicationRequest {
             "name": "dataFunctions",
             "baseName": "dataFunctions",
             "type": "Array<ExportTestApplicationRequestDataFunctionsInner>"
+        },
+        {
+            "name": "transactionFunctions",
+            "baseName": "transactionFunctions",
+            "type": "Array<ExportTestApplicationRequestTransactionFunctionsInner>"
         }    ];
 
     static getAttributeTypeMap() {

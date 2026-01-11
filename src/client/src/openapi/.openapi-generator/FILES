@@ -16,7 +16,9 @@ docs/ExportTestApplication200Response.md
 docs/ExportTestApplication200ResponseDataFunctionsInner.md
 docs/ExportTestApplication200ResponseExportFile.md
 docs/ExportTestApplicationRequest.md
+docs/ExportTestApplicationRequestDataFunctionsInner.md
 docs/ExportTestApplicationRequestImportFile.md
+docs/ExportTestApplicationRequestTransactionFunctionsInner.md
 index.ts
 models/calc-test-application-request-data-functions-inner.ts
 models/calc-test-application-request-transaction-functions-inner.ts
@@ -24,7 +26,9 @@ models/calc-test-application-request.ts
 models/calc-test-application200-response-data-functions-inner.ts
 models/calc-test-application200-response-process-ratios.ts
 models/calc-test-application200-response.ts
+models/export-test-application-request-data-functions-inner.ts
 models/export-test-application-request-import-file.ts
+models/export-test-application-request-transaction-functions-inner.ts
 models/export-test-application-request.ts
 models/export-test-application200-response-data-functions-inner.ts
 models/export-test-application200-response-export-file.ts

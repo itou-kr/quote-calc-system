@@ -21,10 +21,10 @@ response.productivityFPPerMonth = calcTestApplicationRequest.productivityFPPerMo
 response.dataFunctions = calcTestApplicationRequest.dataFunctions?.map(df => {
   let fpValue;
   switch (df.updateType) {
-    case '更新あり':
+    case '内部論理ファイル':
       fpValue = 7;
       break;
-    case '参照のみ':
+    case '外部インタフェースファイル':
       fpValue = 5;
       break;
     default:

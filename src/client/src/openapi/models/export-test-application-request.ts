@@ -14,10 +14,16 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { ExportTestApplication200ResponseDataFunctionsInner } from './export-test-application200-response-data-functions-inner';
+import type { CalcTestApplication200ResponseProcessRatios } from './calc-test-application200-response-process-ratios';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ExportTestApplicationRequestDataFunctionsInner } from './export-test-application-request-data-functions-inner';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { ExportTestApplicationRequestImportFile } from './export-test-application-request-import-file';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ExportTestApplicationRequestTransactionFunctionsInner } from './export-test-application-request-transaction-functions-inner';
 
 /**
  * エクスポートリクエスト
@@ -69,6 +75,24 @@ export interface ExportTestApplicationRequest {
     'standardDurationMonths'?: number;
     /**
      * 
+     * @type {CalcTestApplication200ResponseProcessRatios}
+     * @memberof ExportTestApplicationRequest
+     */
+    'processRatios'?: CalcTestApplication200ResponseProcessRatios;
+    /**
+     * 
+     * @type {CalcTestApplication200ResponseProcessRatios}
+     * @memberof ExportTestApplicationRequest
+     */
+    'processManMonths'?: CalcTestApplication200ResponseProcessRatios;
+    /**
+     * 
+     * @type {CalcTestApplication200ResponseProcessRatios}
+     * @memberof ExportTestApplicationRequest
+     */
+    'processDurations'?: CalcTestApplication200ResponseProcessRatios;
+    /**
+     * 
      * @type {ExportTestApplicationRequestImportFile}
      * @memberof ExportTestApplicationRequest
      */
@@ -81,8 +105,14 @@ export interface ExportTestApplicationRequest {
     'exportFile'?: ExportTestApplicationRequestImportFile;
     /**
      * 
-     * @type {Array<ExportTestApplication200ResponseDataFunctionsInner>}
+     * @type {Array<ExportTestApplicationRequestDataFunctionsInner>}
      * @memberof ExportTestApplicationRequest
      */
-    'dataFunctions'?: Array<ExportTestApplication200ResponseDataFunctionsInner>;
+    'dataFunctions'?: Array<ExportTestApplicationRequestDataFunctionsInner>;
+    /**
+     * 
+     * @type {Array<ExportTestApplicationRequestTransactionFunctionsInner>}
+     * @memberof ExportTestApplicationRequest
+     */
+    'transactionFunctions'?: Array<ExportTestApplicationRequestTransactionFunctionsInner>;
 }

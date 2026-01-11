@@ -163,6 +163,45 @@ paths:
                   type: number
                 standardDurationMonths:
                   type: number
+                processRatios:
+                  type: object
+                  properties:
+                    basicDesign:
+                      type: number
+                    detailedDesign:
+                      type: number
+                    implementation:
+                      type: number
+                    integrationTest:
+                      type: number
+                    systemTest:
+                      type: number
+                processManMonths:
+                  type: object
+                  properties:
+                    basicDesign:
+                      type: number
+                    detailedDesign:
+                      type: number
+                    implementation:
+                      type: number
+                    integrationTest:
+                      type: number
+                    systemTest:
+                      type: number
+                processDurations:
+                  type: object
+                  properties:
+                    basicDesign:
+                      type: number
+                    detailedDesign:
+                      type: number
+                    implementation:
+                      type: number
+                    integrationTest:
+                      type: number
+                    systemTest:
+                      type: number
                 importFile:
                   type: object
                   properties:
@@ -196,8 +235,23 @@ paths:
                         type: number
                       remarks:
                         type: string
-                      selected:
-                        type: boolean
+                transactionFunctions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      externalInput:
+                        type: number
+                      externalOutput:
+                        type: number
+                      externalInquiry:
+                        type: number
+                      fpValue:
+                        type: number
+                      remarks:
+                        type: string
       responses:
         '200':
           description: ...

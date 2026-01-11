@@ -11,9 +11,11 @@
  */
 
 
-export class ExportTestApplicationRequestDataFunctionsInner {
+export class ExportTestApplicationRequestTransactionFunctionsInner {
     'name'?: string;
-    'updateType'?: string;
+    'externalInput'?: number;
+    'externalOutput'?: number;
+    'externalInquiry'?: number;
     'fpValue'?: number;
     'remarks'?: string;
 
@@ -26,9 +28,19 @@ export class ExportTestApplicationRequestDataFunctionsInner {
             "type": "string"
         },
         {
-            "name": "updateType",
-            "baseName": "updateType",
-            "type": "string"
+            "name": "externalInput",
+            "baseName": "externalInput",
+            "type": "number"
+        },
+        {
+            "name": "externalOutput",
+            "baseName": "externalOutput",
+            "type": "number"
+        },
+        {
+            "name": "externalInquiry",
+            "baseName": "externalInquiry",
+            "type": "number"
         },
         {
             "name": "fpValue",
@@ -42,7 +54,7 @@ export class ExportTestApplicationRequestDataFunctionsInner {
         }    ];
 
     static getAttributeTypeMap() {
-        return ExportTestApplicationRequestDataFunctionsInner.attributeTypeMap;
+        return ExportTestApplicationRequestTransactionFunctionsInner.attributeTypeMap;
     }
 }
 
