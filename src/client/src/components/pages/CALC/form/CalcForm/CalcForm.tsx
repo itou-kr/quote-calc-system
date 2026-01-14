@@ -34,6 +34,7 @@ const setupYupScheme = () => {
         autoProductivity: yup.boolean(),
         productivityFPPerMonth: yup
             .number()
+            .rangeCheck(0.1, 9999.9)
             .test('min-when-manual', '0.1以上の値を入力してください', function(value) {
                 const autoProductivity = this.parent.autoProductivity;
                 // 自動入力がOFFの場合のみminチェック
@@ -75,9 +76,9 @@ const setupYupScheme = () => {
             yup.object({
                 selected: yup.boolean(),
                 name: yup.string(),
-                externalInput: yup.number().nullable().transform((value, originalValue) => originalValue === '' ? null : value).min(0, '0以上の値を入力してください'),
-                externalOutput: yup.number().nullable().transform((value, originalValue) => originalValue === '' ? null : value).min(0, '0以上の値を入力してください'),
-                externalInquiry: yup.number().nullable().transform((value, originalValue) => originalValue === '' ? null : value).min(0, '0以上の値を入力してください'),
+                externalInput: yup.number().rangeCheck(0, 9999).nullable().transform((value, originalValue) => originalValue === '' ? null : value).min(0, '0以上の値を入力してください'),
+                externalOutput: yup.number().rangeCheck(0, 9999).nullable().transform((value, originalValue) => originalValue === '' ? null : value).min(0, '0以上の値を入力してください'),
+                externalInquiry: yup.number().rangeCheck(0, 9999).nullable().transform((value, originalValue) => originalValue === '' ? null : value).min(0, '0以上の値を入力してください'),
                 fpValue: yup.number().min(0, '0以上の値を入力してください'),
                 remarks: yup.string(),
             })
@@ -85,11 +86,11 @@ const setupYupScheme = () => {
 
         // 工程別比率
         processRatios: yup.object({
-            basicDesign: yup.number().min(0, '0以上の値を入力してください').max(1, '1以下の値を入力してください'),
-            detailedDesign: yup.number().min(0, '0以上の値を入力してください').max(1, '1以下の値を入力してください'),
-            implementation: yup.number().min(0, '0以上の値を入力してください').max(1, '1以下の値を入力してください'),
-            integrationTest: yup.number().min(0, '0以上の値を入力してください').max(1, '1以下の値を入力してください'),
-            systemTest: yup.number().min(0, '0以上の値を入力してください').max(1, '1以下の値を入力してください'),
+            basicDesign: yup.number().rangeCheck(0.001, 1.000),
+            detailedDesign: yup.number().rangeCheck(0.001, 1.000),
+            implementation: yup.number().rangeCheck(0.001, 1.000),
+            integrationTest: yup.number().rangeCheck(0.001, 1.000),
+            systemTest: yup.number().rangeCheck(0.001, 1.000),
         }),
     });
 };
@@ -150,24 +151,24 @@ function CalcForm(props: Props) {
 
     // データファンクションテーブルのカラム定義
     const dataColumns: ColumnDefinition[] = useMemo(() => [
-        { key: 'name', label: '名称', width: 500, icon: 'edit', type: 'text' },
+        { key: 'name', label: '名称', width: 500, icon: 'edit', type: 'text', maxLength: 100 },
         { key: 'updateType', label: 'データファンクションの種類', width: 300, icon: 'edit', type: 'select', options: [
             { value: '内部論理ファイル', label: '内部論理ファイル' },
             { value: '外部インタフェースファイル', label: '外部インタフェースファイル' }
         ]},
         { key: 'fpValue', label: 'FP', width: 100, icon: 'auto', type: 'number', disabled: true },
-        { key: 'remarks', label: '備考', minWidth: 300, icon: 'edit', type: 'text' },
+        { key: 'remarks', label: '備考', minWidth: 300, icon: 'edit', type: 'text' , maxLength: 200},
         { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
     ], []);
 
     // トランザクションファンクションテーブルのカラム定義
     const transactionColumns: ColumnDefinition[] = useMemo(() => [
-        { key: 'name', label: '名称', width: 500, icon: 'edit', type: 'text' },
+        { key: 'name', label: '名称', width: 500, icon: 'edit', type: 'text', maxLength: 100 },
         { key: 'externalInput', label: '外部入力', width: 100, icon: 'edit', type: 'number' },
         { key: 'externalOutput', label: '外部出力', width: 100, icon: 'edit', type: 'number' },
         { key: 'externalInquiry', label: '外部照会', width: 100, icon: 'edit', type: 'number' },
         { key: 'fpValue', label: 'FP', width: 100, icon: 'auto', type: 'number', disabled: true },
-        { key: 'remarks', label: '備考', minWidth: 300, icon: 'edit', type: 'text' },
+        { key: 'remarks', label: '備考', minWidth: 300, icon: 'edit', type: 'text', maxLength: 200 },
         { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
     ], []);
 
@@ -457,7 +458,7 @@ function CalcForm(props: Props) {
 
                             {/* 案件名 */}
                             <FormSection label="案件名" required>
-                                <TextField name="projectName" control={control} trigger={trigger} t={t} hideHelperText sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} />
+                                <TextField name="projectName" control={control} trigger={trigger} t={t} hideHelperText sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} maxLength={100}/>
                             </FormSection>
 
                             {/* 生産性 */}

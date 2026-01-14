@@ -20,6 +20,7 @@ export type ColumnDefinition = {
     icon?: 'edit' | 'auto';
     options?: { value: string; label: string }[];
     disabled?: boolean;
+    maxLength?: number;
 };
 
 export type Props<T extends FieldValues = FieldValues> = {
@@ -236,6 +237,7 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                     trigger={trigger}
                     t={t}
                     error={fieldErrors?.[index]?.[column.key] || false}
+                    maxLength={column.maxLength}
                     sx={{ 
                         '& .MuiInputBase-root': { bgcolor: 'white' },
                         ...(fieldErrors?.[index]?.[column.key] && {
