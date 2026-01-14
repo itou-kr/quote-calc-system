@@ -8,4 +8,6 @@ export * from './export-test-application200-response';
 export * from './export-test-application200-response-data-functions-inner';
 export * from './export-test-application200-response-export-file';
 export * from './export-test-application-request';
+export * from './export-test-application-request-data-functions-inner';
 export * from './export-test-application-request-import-file';
+export * from './export-test-application-request-transaction-functions-inner';

@@ -1,8 +1,8 @@
 import * as yup from 'yup';
-import { useImportFile } from '@front/hooks/TEST/test';
-import { useExportFile } from '@front/hooks/TEST/test';
+import { useCalcTest, useExportTest, useImportFile } from '@front/hooks/TEST/test';
+// import { useFunctionValidation } from '@front/hooks/useFunctionValidation';
 import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useEffect } from 'react';
 import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Stack, Paper, Divider, Select, MenuItem } from '@mui/material';
@@ -37,13 +37,27 @@ const setupYupScheme = () => {
         productivityFPPerMonth: yup
             .number()
             .rangeCheck(1, 9999)
-            .min(1, '1以上の値を入力してください')
+            .test('min-when-manual', '0.1以上の値を入力してください', function(value) {
+                const autoProductivity = this.parent.autoProductivity;
+                // 自動入力がOFFの場合のみminチェック
+                if (autoProductivity === false && value !== undefined && value !== null) {
+                    return value >= 0.1;
+                }
+                return true;
+            })
             .test('decimal-places', '小数点第二位までの値を入力してください', (value) => {
                 if (value === undefined || value === null) return true;
                 const decimalPart = value.toString().split('.')[1];
                 return !decimalPart || decimalPart.length <= 2;
             })
-            .required('生産性を入力してください'),
+            .test('required-when-manual', '生産性を入力してください', function(value) {
+                const autoProductivity = this.parent.autoProductivity;
+                // 自動入力がOFFの場合のみ必須チェック
+                if (autoProductivity === false) {
+                    return value !== undefined && value !== null;
+                }
+                return true;
+            }),
         // 案件種別
         projectType: yup.string(),
         // 使用するIPA代表値
@@ -82,35 +96,35 @@ const setupYupScheme = () => {
         // 工程別比率
         processRatios: yup
         .object({
-            basicDesign: yup.number().min(0).max(1),
-            detailedDesign: yup.number().min(0).max(1),
-            implementation: yup.number().min(0).max(1),
-            integrationTest: yup.number().min(0).max(1),
-            systemTest: yup.number().min(0).max(1),
-        })
-        .optional(),
+            basicDesign: yup.number().min(0).max(1).required(),
+            detailedDesign: yup.number().min(0).max(1).required(),
+            implementation: yup.number().min(0).max(1).required(),
+            integrationTest: yup.number().min(0).max(1).required(),
+            systemTest: yup.number().min(0).max(1).required(),
+        }),
+        // .optional(),
 
         // 工程別工数
         processManMonths: yup
         .object({
-            basicDesign: yup.number().min(0),
-            detailedDesign: yup.number().min(0),
-            implementation: yup.number().min(0),
-            integrationTest: yup.number().min(0),
-            systemTest: yup.number().min(0),
-        })
-        .optional(),
+            basicDesign: yup.number().min(0).required(),
+            detailedDesign: yup.number().min(0).required(),
+            implementation: yup.number().min(0).required(),
+            integrationTest: yup.number().min(0).required(),
+            systemTest: yup.number().min(0).required(),
+        }),
+        // .optional(),
 
         // 工程別工期
         processDurations: yup
         .object({
-            basicDesign: yup.number().min(0),
-            detailedDesign: yup.number().min(0),
-            implementation: yup.number().min(0),
-            integrationTest: yup.number().min(0),
-            systemTest: yup.number().min(0),
-        })
-        .optional(),
+            basicDesign: yup.number().min(0).required(),
+            detailedDesign: yup.number().min(0).required(),
+            implementation: yup.number().min(0).required(),
+            integrationTest: yup.number().min(0).required(),
+            systemTest: yup.number().min(0).required(),
+        }),
+        // .optional(),
     });
 };
 
@@ -127,8 +141,9 @@ function TestForm(props: Props) {
 
     const schema = useMemo(() => setupYupScheme(), []);
 
+    const calc = useCalcTest(viewId as ViewIdType);
     const importFile = useImportFile(viewId as ViewIdType | 'TEST' | 'CALC');
-    const exportFile = useExportFile(viewId as ViewIdType | 'TEST' | 'CALC');
+    const exportFile = useExportTest();
 
     const methods = useForm<FormType>({
         mode: 'onSubmit',
@@ -170,7 +185,7 @@ function TestForm(props: Props) {
         },
     });
 
-    const { control, trigger, watch, setValue, getValues } = methods;
+    const { control, trigger, watch, setValue, getValues, handleSubmit } = methods;
     
     const { fields: dataFields, append: appendData, remove: removeData } = useFieldArray({
         control,
@@ -186,9 +201,8 @@ function TestForm(props: Props) {
     const [processBreakdownOpen, setProcessBreakdownOpen] = useState(false);
     const [dataSelectedCount, setDataSelectedCount] = useState(0);
     const [transactionSelectedCount, setTransactionSelectedCount] = useState(0);
-    const [totalFP, setTotalFP] = useState(0);
-    const [manMonths, setManMonths] = useState(0);
-    const [standardDuration, setStandardDuration] = useState(0);
+    const [dataFunctionErrors] = useState<Record<number, { name: boolean; updateType: boolean }>>({});
+    const [transactionFunctionErrors] = useState<Record<number, { name: boolean; externalInput: boolean; externalOutput: boolean; externalInquiry: boolean }>>({});
 
     // データファンクションテーブルのカラム定義
     const dataColumns: ColumnDefinition[] = useMemo(() => [
@@ -213,154 +227,28 @@ function TestForm(props: Props) {
         { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
     ], []);
 
-    // 工程別の比率（デフォルト値）- メモ化
-    const processRatios = useMemo(() => ({
-        basicDesign: 0.157,
-        detailedDesign: 0.189,
-        implementation: 0.354,
-        integrationTest: 0.164,
-        systemTest: 0.136,
-    }), []);
+    // /** ▼ 工数計算実行（バリデーショントリガー） */
+    const handleCalcClick = async (onValid: FormType) => {
+        const result = await calc(onValid, methods.setError);
+        console.log('result', result)
 
-    /** ▼ FP合計を計算 */
-    const calculateTotalFP = useCallback(() => {
-        const dataFunctions = getValues('dataFunctions') || [];
-        const transactionFunctions = getValues('transactionFunctions') || [];
-        const dataTotal = dataFunctions.reduce((sum, item) => sum + (Number(item.fpValue) || 0), 0);
-        const transactionTotal = transactionFunctions.reduce((sum, item) => sum + (Number(item.fpValue) || 0), 0);
-        return dataTotal + transactionTotal;
-    }, [getValues]);
+        if(!result) return;
 
-    /** ▼ 総FPに基づいて生産性を計算 */
-    const calculateProductivity = useCallback((totalFP: number) => {
-        if (totalFP < 400) {
-            return 10.5;
-        } else if (totalFP < 1000) {
-            return 13.1;
-        } else if (totalFP < 3000) {
-            return 9.0;
-        } else {
-            return 8.4;
-        }
-    }, []);
+        methods.reset({
+            ...onValid,
+            ...result,
+        });
+        console.log('onValid', onValid)
+    }; 
 
-    /** ▼ 総工数を計算 */
-    const calculateManMonths = useCallback(() => {
-        const totalFP = calculateTotalFP();
-        const productivityFPPerMonth = getValues('productivityFPPerMonth') || 0;
-        if (productivityFPPerMonth > 0) {
-            // 小数点第三位を切り上げ(第二位まで表示)
-            return Math.ceil((totalFP / productivityFPPerMonth) * 100) / 100;
-        }
-        return 0;
-    }, [calculateTotalFP, getValues]);
-
-    /** ▼ 標準工期を計算 */
-    const calculateStandardDuration = useCallback(() => {
-        const totalManMonths = calculateManMonths();
-        // 標準工期 = 2.64 × 総工数^(1/3)
-        return Math.round(2.64 * Math.pow(totalManMonths, 1/3) * 100) / 100;
-    }, [calculateManMonths]);
-
-    /** ▼ 工程別の工数を計算 */
-    const calculateProcessManMonths = useCallback((ratio: number, isLast: boolean = false) => {
-        const totalManMonths = calculateManMonths();
-        
-        if (isLast) {
-            // 実装（比率が最大の工程）は、総工数から他の工程の合計を引いた値にする
-            const basicDesign = Math.round(processRatios.basicDesign * totalManMonths * 100) / 100;
-            const detailedDesign = Math.round(processRatios.detailedDesign * totalManMonths * 100) / 100;
-            const integrationTest = Math.round(processRatios.integrationTest * totalManMonths * 100) / 100;
-            const systemTest = Math.round(processRatios.systemTest * totalManMonths * 100) / 100;
-            const sumOthers = basicDesign + detailedDesign + integrationTest + systemTest;
-            return Math.round((totalManMonths - sumOthers) * 100) / 100;
-        }
-        
-        // 通常の工程は四捨五入
-        return Math.round(ratio * totalManMonths * 100) / 100;
-    }, [calculateManMonths, processRatios]);
-
-    /** ▼ 工程別の工期を計算 */
-    const calculateProcessDuration = useCallback((ratio: number, isLast: boolean = false) => {
-        const standardDuration = calculateStandardDuration();
-        
-        if (isLast) {
-            // 実装（比率が最大の工程）は、標準工期から他の工程の合計を引いた値にする
-            const basicDesign = Math.round(processRatios.basicDesign * standardDuration * 100) / 100;
-            const detailedDesign = Math.round(processRatios.detailedDesign * standardDuration * 100) / 100;
-            const integrationTest = Math.round(processRatios.integrationTest * standardDuration * 100) / 100;
-            const systemTest = Math.round(processRatios.systemTest * standardDuration * 100) / 100;
-            const sumOthers = basicDesign + detailedDesign + integrationTest + systemTest;
-            return Math.round((standardDuration - sumOthers) * 100) / 100;
-        }
-        
-        // 通常の工程は四捨五入
-        return Math.round(ratio * standardDuration * 100) / 100;
-    }, [calculateStandardDuration, processRatios]);
-
-    /** ▼ 工数計算実行（バリデーショントリガー） */
-    const onExecuteCalculation = () => {
-        // データファンクションのFP値を計算
-        const currentDataFunctions = getValues('dataFunctions');
-        if (currentDataFunctions) {
-            currentDataFunctions.forEach((item, index) => {
-                // 名称に文字列が入っている場合のみ計算
-                if (item.name && item.name.trim() !== '') {
-                    if (item.updateType === '内部論理ファイル') {
-                        setValue(`dataFunctions.${index}.fpValue`, 7);
-                    } else if (item.updateType === '外部インタフェースファイル') {
-                        setValue(`dataFunctions.${index}.fpValue`, 5);
-                    }
-                }
-            });
-        }
-
-        // トランザクションファンクションのFP値を計算
-        const currentTransactionFunctions = getValues('transactionFunctions');
-        if (currentTransactionFunctions) {
-            currentTransactionFunctions.forEach((item, index) => {
-                // 名称に文字列が入っている場合のみ計算
-                if (item.name && item.name.trim() !== '') {
-                    const externalInput = Number(item.externalInput) || 0;
-                    const externalOutput = Number(item.externalOutput) || 0;
-                    const externalInquiry = Number(item.externalInquiry) || 0;
-                    
-                    // FP値 = 外部入力*4 + 外部出力*5 + 外部照会*4
-                    const fpValue = externalInput * 4 + externalOutput * 5 + externalInquiry * 4;
-                    setValue(`transactionFunctions.${index}.fpValue`, fpValue);
-                }
-            });
-        }
-
-        // 計算結果を更新
-        const newTotalFP = calculateTotalFP();
-        setTotalFP(newTotalFP);
-        
-        // 自動入力ONの場合は生産性を自動計算
-        const autoProductivity = getValues('autoProductivity');
-        if (autoProductivity) {
-            const newProductivity = calculateProductivity(newTotalFP);
-            setValue('productivityFPPerMonth', newProductivity);
-            // input要素に直接値を設定して小数点第一位まで表示
-            setTimeout(() => {
-                const input = document.querySelector('input[name="productivityFPPerMonth"]') as HTMLInputElement;
-                if (input) {
-                    input.value = newProductivity.toFixed(1);
-                }
-            }, 0);
-        }
-        
-        const newManMonths = calculateManMonths();
-        setManMonths(newManMonths);
-        
-        const newStandardDuration = calculateStandardDuration();
-        setStandardDuration(newStandardDuration);
-
-        // フォームのバリデーションを実行
-        trigger();
-        // 工程別比率の表を自動で表示
-        setProcessBreakdownOpen(true);
-    };
+    const totalFP = methods.watch('totalFP');
+    const manMonths = methods.watch('totalManMonths');
+    const projectType = methods.watch('projectType');
+    const ipaValueType = methods.watch('ipaValueType');
+    const standardDuration = methods.watch('standardDurationMonths');
+    const processManMonths = methods.getValues('processManMonths');
+    const processDurations = methods.getValues('processDurations');
+    const processRatios = methods.watch('processRatios');
 
     /** ▼ データファンクション行追加 */
     const onAddDataRow = useCallback(() => {
@@ -410,12 +298,56 @@ function TestForm(props: Props) {
 
     /** ▼ エクスポート処理 */
     const onExportButtonClick = async () => {
-        const data = methods.getValues();
-        await exportFile({
-            name: 'export.json',
-            content: JSON.stringify(data, null, 2),
-        });
+        const latestValues = getValues();
+        console.log(latestValues)
+        await exportFile(latestValues);
     };
+
+    // TODO：分岐を増やす＆正しい値を設定する
+    useEffect(() => {
+        if (!projectType || !ipaValueType) return;
+
+        let processRatios;
+
+        if (projectType === '新規開発' && ipaValueType === '中央値') {
+            processRatios = {
+                basicDesign: 0.1,
+                detailedDesign: 0.2,
+                implementation: 0.3,
+                integrationTest: 0.4,
+                systemTest: 0.5,
+            };
+        } else if (projectType === '新規開発' && ipaValueType === '平均値') {
+            processRatios = {
+                basicDesign: 0.6,
+                detailedDesign: 0.7,
+                implementation: 0.8,
+                integrationTest: 0.9,
+                systemTest: 1.0,
+            };
+        } else if (projectType === '改良開発') {
+            processRatios = {
+                basicDesign: 0.1,
+                detailedDesign: 0.2,
+                implementation: 0.3,
+                integrationTest: 0.4,
+                systemTest: 0.5,
+            };
+        } else {
+            processRatios = {
+                basicDesign: 0,
+                detailedDesign: 0,
+                implementation: 0,
+                integrationTest: 0,
+                systemTest: 0,
+            };
+        }
+
+    methods.setValue('processRatios', processRatios, {
+        // shouldDirty: true,
+        // shouldValidate: false,
+    });
+}, [projectType, ipaValueType, methods]);
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -480,7 +412,7 @@ function TestForm(props: Props) {
                                 <Text variant="subsectionTitle">インポート / エクスポート(未対応)</Text>
                                 <Stack direction="row" spacing={1}>
                                     <ImportButton onFileSelect={onImportButtonClick} onClick={() => {}} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }}>インポート</ImportButton>
-                                    <ExportButton onClick={onExportButtonClick} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }} />
+                                    <ExportButton onClick={handleSubmit(onExportButtonClick)} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }} />
                                 </Stack>
                             </Box>
 
@@ -495,10 +427,12 @@ function TestForm(props: Props) {
                             </Box>
                         </Box>
 
+
+
                         {/* 固定された下部ボタンエリア */}
                         <Box sx={{ borderTop: 1, borderColor: 'divider', p: 3, bgcolor: 'white' }}>
                             {/* 工数計算実行ボタン */}
-                            <Button variant="contained" onClick={onExecuteCalculation} sx={{ width: '100%', bgcolor: '#00d02aff', '&:hover': { bgcolor: '#00a708ff' } }}>工数計算を実行</Button>
+                            <Button variant="contained" onClick={methods.handleSubmit(handleCalcClick)} sx={{ width: '100%', bgcolor: '#00d02aff', '&:hover': { bgcolor: '#00a708ff' } }}>工数計算を実行</Button>
                         </Box>
                     </Box>
 
@@ -540,6 +474,7 @@ function TestForm(props: Props) {
                                     selectedCount={dataSelectedCount}
                                     onSelectedCountChange={setDataSelectedCount}
                                     maxHeight="100%"
+                                    fieldErrors={dataFunctionErrors}
                                 />
                             </TabPanel>
                             <TabPanel value={tableTabValue} index={1}>
@@ -555,6 +490,7 @@ function TestForm(props: Props) {
                                     selectedCount={transactionSelectedCount}
                                     onSelectedCountChange={setTransactionSelectedCount}
                                     maxHeight="100%"
+                                    fieldErrors={transactionFunctionErrors}
                                 />
                             </TabPanel>
                         </Box>
@@ -562,8 +498,8 @@ function TestForm(props: Props) {
                         {/* 工程別工数・工期テーブル */}
                         <ProcessBreakdownTable
                             processRatios={processRatios}
-                            calculateProcessManMonths={calculateProcessManMonths}
-                            calculateProcessDuration={calculateProcessDuration}
+                            processManMonths={processManMonths}
+                            processDurations={processDurations}
                             isOpen={processBreakdownOpen}
                             onToggle={useCallback(() => setProcessBreakdownOpen(prev => !prev), [])}
                         />
@@ -576,27 +512,3 @@ function TestForm(props: Props) {
 
 export default TestForm;
 
-// const base64ToBlob = (base64: string, contentType?: string) => {
-//   const base64Data = base64.startsWith('data:') ? base64.split(',')[1] : base64;
-
-//   const byteCharacters = atob(base64Data);
-//   const byteNumbers = new Array(byteCharacters.length);
-//   for (let i = 0; i < byteCharacters.length; i++) {
-//     byteNumbers[i] = byteCharacters.charCodeAt(i);
-//   }
-//   const byteArray = new Uint8Array(byteNumbers);
-//   return new Blob([byteArray], { type: contentType });
-// }
-
-// const downloadBase64File = (base64: string, fileName: string, contentType?: string) => {
-//   const mimeType = contentType || 'application/octet-stream';
-//   const blob = base64ToBlob(base64, mimeType);
-//   const url = URL.createObjectURL(blob);
-//   const a = document.createElement('a');
-//   a.href = url;
-//   a.download = fileName;
-//   document.body.appendChild(a);
-//   a.click();
-//   document.body.removeChild(a);
-//   URL.revokeObjectURL(url);
-// }

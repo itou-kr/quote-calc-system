@@ -222,40 +222,40 @@ function CalcForm(props: Props) {
     }, [calculateManMonths]);
 
     /** ▼ 工程別の工数を計算 */
-    const calculateProcessManMonths = useCallback((ratio: number, isLast: boolean = false) => {
-        const totalManMonths = calculateManMonths();
+    // const calculateProcessManMonths = useCallback((ratio: number, isLast: boolean = false) => {
+    //     const totalManMonths = calculateManMonths();
         
-        if (isLast) {
-            // 実装（比率が最大の工程）は、総工数から他の工程の合計を引いた値にする
-            const basicDesign = Math.round(processRatios.basicDesign * totalManMonths * 100) / 100;
-            const detailedDesign = Math.round(processRatios.detailedDesign * totalManMonths * 100) / 100;
-            const integrationTest = Math.round(processRatios.integrationTest * totalManMonths * 100) / 100;
-            const systemTest = Math.round(processRatios.systemTest * totalManMonths * 100) / 100;
-            const sumOthers = basicDesign + detailedDesign + integrationTest + systemTest;
-            return Math.round((totalManMonths - sumOthers) * 100) / 100;
-        }
+    //     if (isLast) {
+    //         // 実装（比率が最大の工程）は、総工数から他の工程の合計を引いた値にする
+    //         const basicDesign = Math.round(processRatios.basicDesign * totalManMonths * 100) / 100;
+    //         const detailedDesign = Math.round(processRatios.detailedDesign * totalManMonths * 100) / 100;
+    //         const integrationTest = Math.round(processRatios.integrationTest * totalManMonths * 100) / 100;
+    //         const systemTest = Math.round(processRatios.systemTest * totalManMonths * 100) / 100;
+    //         const sumOthers = basicDesign + detailedDesign + integrationTest + systemTest;
+    //         return Math.round((totalManMonths - sumOthers) * 100) / 100;
+    //     }
         
-        // 通常の工程は四捨五入
-        return Math.round(ratio * totalManMonths * 100) / 100;
-    }, [calculateManMonths, processRatios]);
+    //     // 通常の工程は四捨五入
+    //     return Math.round(ratio * totalManMonths * 100) / 100;
+    // }, [calculateManMonths, processRatios]);
 
     /** ▼ 工程別の工期を計算 */
-    const calculateProcessDuration = useCallback((ratio: number, isLast: boolean = false) => {
-        const standardDuration = calculateStandardDuration();
+    // const calculateProcessDuration = useCallback((ratio: number, isLast: boolean = false) => {
+    //     const standardDuration = calculateStandardDuration();
         
-        if (isLast) {
-            // 実装（比率が最大の工程）は、標準工期から他の工程の合計を引いた値にする
-            const basicDesign = Math.round(processRatios.basicDesign * standardDuration * 100) / 100;
-            const detailedDesign = Math.round(processRatios.detailedDesign * standardDuration * 100) / 100;
-            const integrationTest = Math.round(processRatios.integrationTest * standardDuration * 100) / 100;
-            const systemTest = Math.round(processRatios.systemTest * standardDuration * 100) / 100;
-            const sumOthers = basicDesign + detailedDesign + integrationTest + systemTest;
-            return Math.round((standardDuration - sumOthers) * 100) / 100;
-        }
+    //     if (isLast) {
+    //         // 実装（比率が最大の工程）は、標準工期から他の工程の合計を引いた値にする
+    //         const basicDesign = Math.round(processRatios.basicDesign * standardDuration * 100) / 100;
+    //         const detailedDesign = Math.round(processRatios.detailedDesign * standardDuration * 100) / 100;
+    //         const integrationTest = Math.round(processRatios.integrationTest * standardDuration * 100) / 100;
+    //         const systemTest = Math.round(processRatios.systemTest * standardDuration * 100) / 100;
+    //         const sumOthers = basicDesign + detailedDesign + integrationTest + systemTest;
+    //         return Math.round((standardDuration - sumOthers) * 100) / 100;
+    //     }
         
-        // 通常の工程は四捨五入
-        return Math.round(ratio * standardDuration * 100) / 100;
-    }, [calculateStandardDuration, processRatios]);
+    //     // 通常の工程は四捨五入
+    //     return Math.round(ratio * standardDuration * 100) / 100;
+    // }, [calculateStandardDuration, processRatios]);
 
     /** ▼ 工数計算実行（バリデーショントリガー） */
     const onExecuteCalculation = async () => {
@@ -572,8 +572,8 @@ function CalcForm(props: Props) {
                         {/* 工程別工数・工期テーブル */}
                         <ProcessBreakdownTable
                             processRatios={processRatios}
-                            calculateProcessManMonths={calculateProcessManMonths}
-                            calculateProcessDuration={calculateProcessDuration}
+                            // calculateProcessManMonths={calculateProcessManMonths}
+                            // calculateProcessDuration={calculateProcessDuration}
                             isOpen={processBreakdownOpen}
                             onToggle={useCallback(() => setProcessBreakdownOpen(prev => !prev), [])}
                         />

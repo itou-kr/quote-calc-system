@@ -11,22 +11,37 @@ export type ProcessRatios = {
     systemTest: number;
 };
 
+export type ProcessManMonths = {
+    basicDesign: number;
+    detailedDesign: number;
+    implementation: number;
+    integrationTest: number;
+    systemTest: number;
+};
+
+export type ProcessDurations = {
+    basicDesign: number;
+    detailedDesign: number;
+    implementation: number;
+    integrationTest: number;
+    systemTest: number;
+};
+
 export type Props = {
-    processRatios: ProcessRatios;
-    calculateProcessManMonths: (ratio: number, isLast?: boolean) => number;
-    calculateProcessDuration: (ratio: number, isLast?: boolean) => number;
+    processRatios?: ProcessRatios;
+    processManMonths?: ProcessManMonths;
+    processDurations?: ProcessDurations;
     isOpen: boolean;
     onToggle: () => void;
 };
 
 /**
  * 工程別内訳テーブル
- * @param props - processRatios: 工程比率, calculateProcessManMonths: 工数計算関数, calculateProcessDuration: 工期計算関数, isOpen: 開閉状態, onToggle: 開閉ハンドラー
+ * @param props - processRatios: 工程比率, processManMonths: 工数, processDurations: 工期, isOpen: 開閉状態, onToggle: 開閉ハンドラー
  * @returns 工程別内訳テーブルコンポーネント
  */
 function ProcessBreakdownTable(props: Props) {
-    const { processRatios, calculateProcessManMonths, calculateProcessDuration, isOpen, onToggle } = props;
-
+    const { processRatios, processManMonths, processDurations, isOpen, onToggle } = props;
     return (
         <Box sx={{ mt: 3 }}>
             <Box 
@@ -76,27 +91,27 @@ function ProcessBreakdownTable(props: Props) {
                         <TableBody>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>比率</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processRatios.basicDesign}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processRatios.detailedDesign}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processRatios.implementation}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processRatios.integrationTest}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5' }}>{processRatios.systemTest}</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processRatios?.basicDesign}</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processRatios?.detailedDesign}</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processRatios?.implementation}</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processRatios?.integrationTest}</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5' }}>{processRatios?.systemTest}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>工数(人月)</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{calculateProcessManMonths(processRatios.basicDesign, false)}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{calculateProcessManMonths(processRatios.detailedDesign, false)}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{calculateProcessManMonths(processRatios.implementation, true)}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{calculateProcessManMonths(processRatios.integrationTest, false)}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5' }}>{calculateProcessManMonths(processRatios.systemTest, false)}</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processManMonths?.basicDesign}</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processManMonths?.detailedDesign}</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processManMonths?.implementation}</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processManMonths?.integrationTest}</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5' }}>{processManMonths?.systemTest}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>工期(月)</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{calculateProcessDuration(processRatios.basicDesign, false)}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{calculateProcessDuration(processRatios.detailedDesign, false)}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{calculateProcessDuration(processRatios.implementation, true)}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{calculateProcessDuration(processRatios.integrationTest, false)}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5' }}>{calculateProcessDuration(processRatios.systemTest, false)}</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processDurations?.basicDesign}</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processDurations?.detailedDesign}</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processDurations?.implementation}</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processDurations?.integrationTest}</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5' }}>{processDurations?.systemTest}</TableCell>
                             </TableRow>
                         </TableBody>
                     </Table>

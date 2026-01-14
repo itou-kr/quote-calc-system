@@ -1,8 +1,25 @@
+// import { useCallback } from 'react';
+
+// import { useClear as useClearAlertMessage, useSetAlertMessage } from '@front/hooks/useAlert';
+
+// import { CalcModel } from/ '@front/models/CALC/CalcModel';
+// import { ViewIdType } from '@front/stores/TEST/test/testStore';
+
 import { exportTestApi } from '@front/openapi';
+
+// 不要？
 import type { ExportTestApplicationRequest } from '@front/openapi/models';
 
+// const downloadFile = (file: { name: string; content: string }) => {
+//   const a = document.createElement('a');
+//   a.href = `data:text/plain;base64,${encodeURIComponent(file.content)}`;
+//   a.download = file.name;
+//   a.click();
+//   a.remove();
+// };
 
-export const useExportTest = () => {
+
+export const useExportTest =() => {
   return async (formData: ExportTestApplicationRequest) => {
     const response = await exportTestApi.exportTestApplication(formData);
     console.log(formData, 'うううううううううううううううううううううううううううう');

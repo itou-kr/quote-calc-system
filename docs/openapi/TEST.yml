@@ -104,6 +104,8 @@ components:
       properties:
         projectName:
           type: string
+        autoProductivity:
+          type: boolean
         productivityFPPerMonth:
           type: number
         projectType:
@@ -141,6 +143,9 @@ components:
               type: number
             systemTest:
               type: number
+      # required:
+      #   - projectName
+      #   - productivityFPPerMonth
     CalcTestApplication200Response:
       description: 工数計算レスポンス
       type: object
@@ -220,6 +225,51 @@ components:
           type: string
         ipaValueType:
           type: string
+        totalFP:
+          type: number
+        totalManMonths:
+          type: number
+        standardDurationMonths:
+          type: number
+        processRatios:
+          type: object
+          properties:
+            basicDesign:
+              type: number
+            detailedDesign:
+              type: number
+            implementation:
+              type: number
+            integrationTest:
+              type: number
+            systemTest:
+              type: number
+        processManMonths:
+          type: object
+          properties:
+            basicDesign:
+              type: number
+            detailedDesign:
+              type: number
+            implementation:
+              type: number
+            integrationTest:
+              type: number
+            systemTest:
+              type: number
+        processDurations:
+          type: object
+          properties:
+            basicDesign:
+              type: number
+            detailedDesign:
+              type: number
+            implementation:
+              type: number
+            integrationTest:
+              type: number
+            systemTest:
+              type: number  
         importFile:
           type: object
           properties:
@@ -240,10 +290,6 @@ components:
               type: string
               format: byte
               description: ファイル内容
-        totalFP:
-          type: number
-        manMonth:
-          type: number
         dataFunctions:
           type: array
           items:
@@ -257,8 +303,23 @@ components:
                 type: number
               remarks:
                 type: string
-              selected:
-                type: boolean
+        transactionFunctions:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              externalInput:
+                type: number
+              externalOutput:
+                type: number
+              externalInquiry:
+                type: number
+              fpValue:
+                type: number
+              remarks:
+                type: string
     ExportTestApplication200Response:
       description: エクスポートレスポンス
       type: object

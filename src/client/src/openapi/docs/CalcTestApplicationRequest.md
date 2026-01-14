@@ -7,6 +7,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **projectName** | **string** |  | [optional] [default to undefined]
+**autoProductivity** | **boolean** |  | [optional] [default to undefined]
 **productivityFPPerMonth** | **number** |  | [optional] [default to undefined]
 **projectType** | **string** |  | [optional] [default to undefined]
 **ipaValueType** | **string** |  | [optional] [default to undefined]
@@ -21,6 +22,7 @@ import { CalcTestApplicationRequest } from './api';
 
 const instance: CalcTestApplicationRequest = {
     projectName,
+    autoProductivity,
     productivityFPPerMonth,
     projectType,
     ipaValueType,

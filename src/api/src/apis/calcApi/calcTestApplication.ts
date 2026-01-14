@@ -4,9 +4,13 @@ import * as CalcApi from './types';
 export const calcTestApplication: CalcApi.calcTestApplication = async ({
   calcTestApplicationRequest = {},
 }) => {
-
-const response = new CalcTestApplication200Response();
-
+  
+  const response = new CalcTestApplication200Response();
+  
+  if(!calcTestApplicationRequest.productivityFPPerMonth) {
+    throw new Error('生産性(FP/月)が指定されていません');
+  }
+  
 // 案件名
 response.projectName = calcTestApplicationRequest.projectName;
 
@@ -17,10 +21,10 @@ response.productivityFPPerMonth = calcTestApplicationRequest.productivityFPPerMo
 response.dataFunctions = calcTestApplicationRequest.dataFunctions?.map(df => {
   let fpValue;
   switch (df.updateType) {
-    case '更新あり':
+    case '内部論理ファイル':
       fpValue = 7;
       break;
-    case '参照のみ':
+    case '外部インタフェースファイル':
       fpValue = 5;
       break;
     default:
@@ -62,10 +66,29 @@ response.transactionFunctions =
 
   response.totalFP = dataFunctionsFP + transactionFunctionsFP;
 
-  // 総工数(人月)計算
-  response.totalManMonths = response.totalFP / (calcTestApplicationRequest.productivityFPPerMonth ?? 1);
+  // 生産性(FP/月)
+  if (calcTestApplicationRequest.autoProductivity) {
+    if (response.totalFP < 400) {
+      response.productivityFPPerMonth = 10.5;
+    } else if (response.totalFP < 1000) {
+      response.productivityFPPerMonth = 13.1;
+    } else if (response.totalFP < 3000) {
+      response.productivityFPPerMonth = 9.0;
+    } else {
+      response.productivityFPPerMonth = 8.4;
+    }
+  } else {
+    response.productivityFPPerMonth = calcTestApplicationRequest.productivityFPPerMonth;
+  }
 
+  // 総工数(人月)計算
+  response.totalManMonths = Math.ceil((response.totalFP / calcTestApplicationRequest.productivityFPPerMonth) * 100) / 100;
+
+  // 標準工期計算
+  response.standardDurationMonths = Math.round(2.64 * Math.pow(response.totalManMonths, 1/3) * 100) / 100;
+  
   // 工程別工数計算
+  // すみません、ここは確実に要修正です
   response.processManMonths = {
     basicDesign:
       (response.totalManMonths ?? 0) *
@@ -89,6 +112,7 @@ response.transactionFunctions =
   };
 
   // 工程別工期計算
+  // すみません、ここは確実に要修正です
   response.processDurations = {
     basicDesign:
       2.64 * (response.processManMonths.basicDesign ?? 0),

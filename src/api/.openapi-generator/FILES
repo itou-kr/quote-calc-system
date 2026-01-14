@@ -10,8 +10,10 @@ src/models/calcTestApplicationRequestDataFunctionsInner.ts
 src/models/calcTestApplicationRequestProcessRatios.ts
 src/models/calcTestApplicationRequestTransactionFunctionsInner.ts
 src/models/exportTestApplication200Response.ts
+src/models/exportTestApplication200ResponseDataFunctionsInner.ts
 src/models/exportTestApplication200ResponseExportFile.ts
 src/models/exportTestApplicationRequest.ts
 src/models/exportTestApplicationRequestDataFunctionsInner.ts
 src/models/exportTestApplicationRequestImportFile.ts
+src/models/exportTestApplicationRequestTransactionFunctionsInner.ts
 src/models/index.ts
