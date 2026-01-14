@@ -110,45 +110,37 @@ components:
           type: string
         ipaValueType:
           type: string
-        importFile:
-          type: object
-          properties:
-            name:
-              type: string
-              description: ファイル名
-            content:
-              type: string
-              format: byte
-              description: ファイル内容
-        exportFile:
-          type: object
-          properties:
-            name:
-              type: string
-              description: ファイル名
-            content:
-              type: string
-              format: byte
-              description: ファイル内容
-        totalFP:
-          type: number
-        manMonth:
-          type: number
         dataFunctions:
           type: array
           items:
             type: object
             properties:
-              name:
-                type: string
               updateType:
                 type: string
-              fpValue:
+        transactionFunctions:
+          type: array
+          items:
+            type: object
+            properties:
+              externalInput:
                 type: number
-              remarks:
-                type: string
-              selected:
-                type: boolean
+              externalOutput:
+                type: number
+              externalInquiry:
+                type: number
+        processRatios:
+          type: object
+          properties:
+            basicDesign:
+              type: number
+            detailedDesign:
+              type: number
+            implementation:
+              type: number
+            integrationTest:
+              type: number
+            systemTest:
+              type: number
     CalcTestApplication200Response:
       description: 工数計算レスポンス
       type: object
@@ -157,49 +149,65 @@ components:
           type: string
         productivityFPPerMonth:
           type: number
-        projectType:
-          type: string
-        ipaValueType:
-          type: string
-        importFile:
-          type: object
-          properties:
-            name:
-              type: string
-              description: ファイル名
-            content:
-              type: string
-              format: byte
-              description: ファイル内容
-        exportFile:
-          type: object
-          properties:
-            name:
-              type: string
-              description: ファイル名
-            content:
-              type: string
-              format: byte
-              description: ファイル内容
         totalFP:
           type: number
-        manMonth:
+        totalManMonths:
           type: number
+        standardDurationMonths:
+          type: number  
         dataFunctions:
           type: array
           items:
             type: object
             properties:
-              name:
-                type: string
-              updateType:
-                type: string
               fpValue:
                 type: number
-              remarks:
-                type: string
-              selected:
-                type: boolean
+        transactionFunctions:
+          type: array
+          items:
+            type: object
+            properties:
+              fpValue:
+                type: number
+        processRatios:
+          type: object
+          properties:
+            basicDesign:
+              type: number
+            detailedDesign:
+              type: number
+            implementation:
+              type: number
+            integrationTest:
+              type: number
+            systemTest:
+              type: number        
+        processManMonths:
+          type: object
+          properties:
+            basicDesign:
+              type: number
+            detailedDesign:
+              type: number
+            implementation:
+              type: number
+            integrationTest:
+              type: number
+            systemTest:
+              type: number
+        processDurations:
+          type: object
+          properties:
+            basicDesign:
+              type: number
+            detailedDesign:
+              type: number
+            implementation:
+              type: number
+            integrationTest:
+              type: number
+            systemTest:
+              type: number
     ExportTestApplicationRequest:
       description: エクスポートリクエスト
       type: object

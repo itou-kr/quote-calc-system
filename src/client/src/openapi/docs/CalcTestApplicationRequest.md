@@ -10,11 +10,9 @@ Name | Type | Description | Notes
 **productivityFPPerMonth** | **number** |  | [optional] [default to undefined]
 **projectType** | **string** |  | [optional] [default to undefined]
 **ipaValueType** | **string** |  | [optional] [default to undefined]
-**importFile** | [**CalcTestApplication200ResponseImportFile**](CalcTestApplication200ResponseImportFile.md) |  | [optional] [default to undefined]
-**exportFile** | [**CalcTestApplication200ResponseImportFile**](CalcTestApplication200ResponseImportFile.md) |  | [optional] [default to undefined]
-**totalFP** | **number** |  | [optional] [default to undefined]
-**manMonth** | **number** |  | [optional] [default to undefined]
-**dataFunctions** | [**Array&lt;CalcTestApplication200ResponseDataFunctionsInner&gt;**](CalcTestApplication200ResponseDataFunctionsInner.md) |  | [optional] [default to undefined]
+**dataFunctions** | [**Array&lt;CalcTestApplicationRequestDataFunctionsInner&gt;**](CalcTestApplicationRequestDataFunctionsInner.md) |  | [optional] [default to undefined]
+**transactionFunctions** | [**Array&lt;CalcTestApplicationRequestTransactionFunctionsInner&gt;**](CalcTestApplicationRequestTransactionFunctionsInner.md) |  | [optional] [default to undefined]
+**processRatios** | [**CalcTestApplication200ResponseProcessRatios**](CalcTestApplication200ResponseProcessRatios.md) |  | [optional] [default to undefined]
 
 ## Example
 
@@ -26,11 +24,9 @@ const instance: CalcTestApplicationRequest = {
     productivityFPPerMonth,
     projectType,
     ipaValueType,
-    importFile,
-    exportFile,
-    totalFP,
-    manMonth,
     dataFunctions,
+    transactionFunctions,
+    processRatios,
 };
 ```
 
