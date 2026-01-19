@@ -19,7 +19,10 @@ response.productivityFPPerMonth = calcTestApplicationRequest.productivityFPPerMo
 
 // データファンクションFP値計算
 response.dataFunctions = calcTestApplicationRequest.dataFunctions?.map(df => {
-  let fpValue;
+  let fpValue; 
+  //-----小山記載 ここから----- 
+  //TODO：名称に文字列が入っている場合のみ計算する分岐を入れる
+  //-----小山記載 ここまで----- 
   switch (df.updateType) {
     case '内部論理ファイル':
       fpValue = 7;
@@ -40,6 +43,9 @@ response.dataFunctions = calcTestApplicationRequest.dataFunctions?.map(df => {
 // トランザクションファンクションFP計算
 response.transactionFunctions =
   calcTestApplicationRequest.transactionFunctions?.map(tf => {
+    //-----小山記載 ここから----- 
+    //TODO：名称に文字列が入っている場合のみ計算する分岐を入れる
+    //-----小山記載 ここまで----- 
     const fpValue =
       (tf.externalInput ?? 0) * 4 +
       (tf.externalOutput ?? 0) * 5 +
@@ -85,10 +91,12 @@ response.transactionFunctions =
   response.totalManMonths = Math.ceil((response.totalFP / calcTestApplicationRequest.productivityFPPerMonth) * 100) / 100;
 
   // 標準工期計算
-  response.standardDurationMonths = Math.round(2.64 * Math.pow(response.totalManMonths, 1/3) * 100) / 100;
-  
+  //-----小山修正 ここから----- 
+  const FORMLA = 2.64
+  response.standardDurationMonths = Math.round(FORMLA * Math.pow(response.totalManMonths, 1/3) * 100) / 100;
+  //-----小山修正 ここまで----- 
+
   // 工程別工数計算
-  // すみません、ここは確実に要修正です
   response.processManMonths = {
     basicDesign:
       (response.totalManMonths ?? 0) *
@@ -112,22 +120,23 @@ response.transactionFunctions =
   };
 
   // 工程別工期計算
-  // すみません、ここは確実に要修正です
   response.processDurations = {
     basicDesign:
-      2.64 * (response.processManMonths.basicDesign ?? 0),
+    //-----小山修正 ここから----- 
+      FORMLA * Math.pow((response.processManMonths.basicDesign ?? 0),1/3),
 
     detailedDesign:
-      2.64 * (response.processManMonths.detailedDesign ?? 0),
+      FORMLA * Math.pow((response.processManMonths.detailedDesign ?? 0),1/3),
 
     implementation:
-      2.64 * (response.processManMonths.implementation ?? 0),
+      FORMLA * Math.pow((response.processManMonths.implementation ?? 0),1/3),
 
     integrationTest:
-      2.64 * (response.processManMonths.integrationTest ?? 0),
+      FORMLA * Math.pow((response.processManMonths.integrationTest ?? 0),1/3),
 
     systemTest:
-      2.64 * (response.processManMonths.systemTest ?? 0),
+      FORMLA * Math.pow((response.processManMonths.systemTest ?? 0),1/3),
+      //-----小山修正 ここまで----- 
   };
 
   return response;
