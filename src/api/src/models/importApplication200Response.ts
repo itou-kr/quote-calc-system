@@ -11,14 +11,13 @@
  */
 
 import { CalcTestApplicationRequestProcessRatios } from './calcTestApplicationRequestProcessRatios';
-import { ExportTestApplicationRequestDataFunctionsInner } from './exportTestApplicationRequestDataFunctionsInner';
-import { ExportTestApplicationRequestImportFile } from './exportTestApplicationRequestImportFile';
-import { ExportTestApplicationRequestTransactionFunctionsInner } from './exportTestApplicationRequestTransactionFunctionsInner';
+import { ExportApplication200ResponseDataFunctionsInner } from './exportApplication200ResponseDataFunctionsInner';
+import { ExportApplicationRequestTransactionFunctionsInner } from './exportApplicationRequestTransactionFunctionsInner';
 
 /**
-* エクスポートリクエスト
+* インポートレスポンス
 */
-export class ExportTestApplicationRequest {
+export class ImportApplication200Response {
     'projectName'?: string;
     'productivityFPPerMonth'?: number;
     'projectType'?: string;
@@ -29,10 +28,8 @@ export class ExportTestApplicationRequest {
     'processRatios'?: CalcTestApplicationRequestProcessRatios;
     'processManMonths'?: CalcTestApplicationRequestProcessRatios;
     'processDurations'?: CalcTestApplicationRequestProcessRatios;
-    'importFile'?: ExportTestApplicationRequestImportFile;
-    'exportFile'?: ExportTestApplicationRequestImportFile;
-    'dataFunctions'?: Array<ExportTestApplicationRequestDataFunctionsInner>;
-    'transactionFunctions'?: Array<ExportTestApplicationRequestTransactionFunctionsInner>;
+    'dataFunctions'?: Array<ExportApplication200ResponseDataFunctionsInner>;
+    'transactionFunctions'?: Array<ExportApplicationRequestTransactionFunctionsInner>;
 
     static discriminator: string | undefined = undefined;
 
@@ -88,28 +85,18 @@ export class ExportTestApplicationRequest {
             "type": "CalcTestApplicationRequestProcessRatios"
         },
         {
-            "name": "importFile",
-            "baseName": "importFile",
-            "type": "ExportTestApplicationRequestImportFile"
-        },
-        {
-            "name": "exportFile",
-            "baseName": "exportFile",
-            "type": "ExportTestApplicationRequestImportFile"
-        },
-        {
             "name": "dataFunctions",
             "baseName": "dataFunctions",
-            "type": "Array<ExportTestApplicationRequestDataFunctionsInner>"
+            "type": "Array<ExportApplication200ResponseDataFunctionsInner>"
         },
         {
             "name": "transactionFunctions",
             "baseName": "transactionFunctions",
-            "type": "Array<ExportTestApplicationRequestTransactionFunctionsInner>"
+            "type": "Array<ExportApplicationRequestTransactionFunctionsInner>"
         }    ];
 
     static getAttributeTypeMap() {
-        return ExportTestApplicationRequest.attributeTypeMap;
+        return ImportApplication200Response.attributeTypeMap;
     }
 }
 

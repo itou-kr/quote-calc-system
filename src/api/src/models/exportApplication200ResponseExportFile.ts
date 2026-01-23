@@ -10,9 +10,8 @@
  * Do not edit the class manually.
  */
 
-import { ByteBuffer } from './byteBuffer';
 
-export class ExportTestApplicationRequestImportFile {
+export class ExportApplication200ResponseExportFile {
     /**
     * ファイル名
     */
@@ -20,7 +19,7 @@ export class ExportTestApplicationRequestImportFile {
     /**
     * ファイル内容
     */
-    'content'?: ByteBuffer;
+    'content'?: string;
 
     static discriminator: string | undefined = undefined;
 
@@ -33,11 +32,11 @@ export class ExportTestApplicationRequestImportFile {
         {
             "name": "content",
             "baseName": "content",
-            "type": "ByteBuffer"
+            "type": "string"
         }    ];
 
     static getAttributeTypeMap() {
-        return ExportTestApplicationRequestImportFile.attributeTypeMap;
+        return ExportApplication200ResponseExportFile.attributeTypeMap;
     }
 }
 

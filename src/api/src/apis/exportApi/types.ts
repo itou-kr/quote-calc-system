@@ -12,7 +12,7 @@
 
 export type RequestFile = File;
 import { ApiContext } from '@quote-calc-system/context';
-import { CalcTestApplication200Response } from '@quote-calc-system/models';
-import { CalcTestApplicationRequest } from '@quote-calc-system/models';
+import { ExportApplication200Response } from '@quote-calc-system/models';
+import { ExportApplicationRequest } from '@quote-calc-system/models';
 
-export type calcTestApplication = (params: { calcTestApplicationRequest: CalcTestApplicationRequest }, context: ApiContext) => Promise<CalcTestApplication200Response>;
+export type exportApplication = (params: { exportApplicationRequest: ExportApplicationRequest }, context: ApiContext) => Promise<ExportApplication200Response>;

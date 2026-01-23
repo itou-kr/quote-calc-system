@@ -11,12 +11,11 @@
  */
 
 
-export class ExportTestApplication200ResponseDataFunctionsInner {
+export class ExportApplicationRequestDataFunctionsInner {
     'name'?: string;
     'updateType'?: string;
     'fpValue'?: number;
     'remarks'?: string;
-    'selected'?: boolean;
 
     static discriminator: string | undefined = undefined;
 
@@ -40,15 +39,10 @@ export class ExportTestApplication200ResponseDataFunctionsInner {
             "name": "remarks",
             "baseName": "remarks",
             "type": "string"
-        },
-        {
-            "name": "selected",
-            "baseName": "selected",
-            "type": "boolean"
         }    ];
 
     static getAttributeTypeMap() {
-        return ExportTestApplication200ResponseDataFunctionsInner.attributeTypeMap;
+        return ExportApplicationRequestDataFunctionsInner.attributeTypeMap;
     }
 }
 

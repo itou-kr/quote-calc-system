@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 import { useImportFile } from '@front/hooks/TEST/test';
-import { useExportFile } from '@front/hooks/TEST/test';
+// import { useExportFile } from '@front/hooks/TEST/test';
 import { useFunctionValidation } from '@front/hooks/useFunctionValidation';
 import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
 import { useMemo, useState, useCallback } from 'react';
@@ -11,7 +11,7 @@ import SummarizeIcon from '@mui/icons-material/Summarize';
 import EditIcon from '@mui/icons-material/Edit';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import ImportButton from '@front/components/ui/Button/ImportButton';
-import ExportButton from '@front/components/ui/Button/ExportButton';
+// import ExportButton from '@front/components/ui/Button/ExportButton';
 import Button from '@front/components/ui/Button';
 import TextField from '@front/components/ui/TextField';
 import SummaryCard2 from '@front/components/ui/SummaryCard2';
@@ -104,10 +104,10 @@ type Props = {
 };
 
 function CalcForm(props: Props) {
-    const { viewId } = props;
+    // const { viewId } = props;
     const schema = useMemo(() => setupYupScheme(), []);
-    const importFile = useImportFile(viewId as ViewIdType | 'TEST' | 'CALC');
-    const exportFile = useExportFile(viewId as ViewIdType | 'TEST' | 'CALC');
+    const importFile = useImportFile();
+    // const exportFile = useExportFile();
     const methods = useForm<FormType>({
         mode: 'onSubmit',
         reValidateMode: 'onSubmit',
@@ -409,7 +409,7 @@ function CalcForm(props: Props) {
         const result = await importFile(file);
 
         try {
-            const json = JSON.parse(result.content);
+            const json = JSON.parse(result.projectName!);
             methods.reset(json);
         } catch (e) {
             console.error('JSON parse error:', e);
@@ -417,13 +417,13 @@ function CalcForm(props: Props) {
     };
 
     /** ▼ エクスポート処理 */
-    const onExportButtonClick = async () => {
-        const data = methods.getValues();
-        await exportFile({
-            name: 'export.json',
-            content: JSON.stringify(data, null, 2),
-        });
-    };
+    // const onExportButtonClick = async () => {
+    //     const data = methods.getValues();
+    //     await exportFile({
+    //         name: 'export.json',
+    //         content: JSON.stringify(data, null, 2),
+    //     });
+    // };
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -488,7 +488,7 @@ function CalcForm(props: Props) {
                                 <Text variant="subsectionTitle">インポート / エクスポート(未対応)</Text>
                                 <Stack direction="row" spacing={1}>
                                     <ImportButton onFileSelect={onImportButtonClick} onClick={() => {}} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }}>インポート</ImportButton>
-                                    <ExportButton onClick={onExportButtonClick} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }} />
+                                    {/* <ExportButton onClick={onExportButtonClick} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }} /> */}
                                 </Stack>
                             </Box>
 

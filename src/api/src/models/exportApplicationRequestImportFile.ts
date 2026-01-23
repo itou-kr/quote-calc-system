@@ -10,12 +10,17 @@
  * Do not edit the class manually.
  */
 
+import { ByteBuffer } from './byteBuffer';
 
-export class ExportTestApplicationRequestDataFunctionsInner {
+export class ExportApplicationRequestImportFile {
+    /**
+    * ファイル名
+    */
     'name'?: string;
-    'updateType'?: string;
-    'fpValue'?: number;
-    'remarks'?: string;
+    /**
+    * ファイル内容
+    */
+    'content'?: ByteBuffer;
 
     static discriminator: string | undefined = undefined;
 
@@ -26,23 +31,13 @@ export class ExportTestApplicationRequestDataFunctionsInner {
             "type": "string"
         },
         {
-            "name": "updateType",
-            "baseName": "updateType",
-            "type": "string"
-        },
-        {
-            "name": "fpValue",
-            "baseName": "fpValue",
-            "type": "number"
-        },
-        {
-            "name": "remarks",
-            "baseName": "remarks",
-            "type": "string"
+            "name": "content",
+            "baseName": "content",
+            "type": "ByteBuffer"
         }    ];
 
     static getAttributeTypeMap() {
-        return ExportTestApplicationRequestDataFunctionsInner.attributeTypeMap;
+        return ExportApplicationRequestImportFile.attributeTypeMap;
     }
 }
 

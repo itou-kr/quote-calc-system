@@ -34,8 +34,8 @@ paths:
     post:
       summary: エクスポート
       tags:
-        - exportTest
-      operationId: exportTestApplication
+        - export
+      operationId: exportApplication
       description: ...
       requestBody:
         description: ...
@@ -43,14 +43,43 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ExportTestApplicationRequest"
+              $ref: "#/components/schemas/ExportApplicationRequest"
       responses:
         "200":
           description: ...
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ExportTestApplication200Response"                
+                $ref: "#/components/schemas/ExportApplication200Response"
+
+  /TEST/import:
+    post:
+      summary: インポート
+      tags:
+        - import
+      operationId: importApplication
+      description: ...
+      requestBody:
+        description: ...
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Excel file
+      responses:
+        "200":
+          description: ...
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportApplication200Response"                 
 
   # /TEST/test:
   #   post:
@@ -213,7 +242,7 @@ components:
               type: number
             systemTest:
               type: number
-    ExportTestApplicationRequest:
+    ExportApplicationRequest:
       description: エクスポートリクエスト
       type: object
       properties:
@@ -320,7 +349,7 @@ components:
                 type: number
               remarks:
                 type: string
-    ExportTestApplication200Response:
+    ExportApplication200Response:
       description: エクスポートレスポンス
       type: object
       properties:
@@ -348,4 +377,93 @@ components:
             content:
               type: string
               description: ファイル内容
+    ImportApplication200Response:
+      description: インポートレスポンス
+      type: object
+      properties:
+        projectName:
+          type: string
+        productivityFPPerMonth:
+          type: number
+        projectType:
+          type: string
+        ipaValueType:
+          type: string
+        totalFP:
+          type: number
+        totalManMonths:
+          type: number
+        standardDurationMonths:
+          type: number
+        processRatios:
+          type: object
+          properties:
+            basicDesign:
+              type: number
+            detailedDesign:
+              type: number
+            implementation:
+              type: number
+            integrationTest:
+              type: number
+            systemTest:
+              type: number
+        processManMonths:
+          type: object
+          properties:
+            basicDesign:
+              type: number
+            detailedDesign:
+              type: number
+            implementation:
+              type: number
+            integrationTest:
+              type: number
+            systemTest:
+              type: number
+        processDurations:
+          type: object
+          properties:
+            basicDesign:
+              type: number
+            detailedDesign:
+              type: number
+            implementation:
+              type: number
+            integrationTest:
+              type: number
+            systemTest:
+              type: number
+        dataFunctions:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              updateType:
+                type: string
+              fpValue:
+                type: number
+              remarks:
+                type: string
+              selected:
+                type: boolean
+        transactionFunctions:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              externalInput:
+                type: number
+              externalOutput:
+                type: number
+              externalInquiry:
+                type: number
+              fpValue:
+                type: number
+              remarks:
+                type: string
 

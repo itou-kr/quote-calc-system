@@ -1,37 +1,37 @@
 import FileuploadIcon from '@mui/icons-material/FileUpload';
 import ProgressButton, { Props as BaseButtonProps } from '@front/components/ui/Button/ProgressButton';
+import React from 'react';
 
 type Props = Omit<BaseButtonProps, 'startIcon' | 'endIcon'> & {
-    onFileSelect: (file: File) => void | Promise<void>;
+  onFileSelect: (file: File) => void | Promise<void>;
 };
 
-/**
- * インポートボタン
- */
 function ImportButton({ onFileSelect, ...props }: Props) {
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) onFileSelect(file);
-    };
+    const inputRef = React.useRef<HTMLInputElement>(null);
 
     return (
         <>
-            <input
-                type="file"
-                style={{ display: 'none' }}
-                id="import-input"
-                onChange={handleChange}
-            />
+            <ProgressButton
+                type="button"
+                {...props}
+                startIcon={<FileuploadIcon />}
+                onClick={() => inputRef.current?.click()}
+            >
+                インポート
+            </ProgressButton>
 
-            <label htmlFor="import-input" style={{ display: 'flex', flex: 1 }}>
-                <ProgressButton {...props} startIcon={<FileuploadIcon />} sx={{ ...props.sx, width: '100%' }}>
-                    {/* ★要修正 */}
-                    {'インポート'}
-                </ProgressButton>
-            </label>
+            <input
+                ref={inputRef}
+                type="file"
+                hidden
+                onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) onFileSelect(file);
+                }}
+            />
         </>
     );
 }
+
 
 export default ImportButton;

@@ -10,4 +10,4 @@
  * Do not edit the class manually.
  */
 
-export { exportTestApplication } from './exportTestApplication';
+export { exportApplication } from './exportApplication';

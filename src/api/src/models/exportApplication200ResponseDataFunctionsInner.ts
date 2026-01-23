@@ -11,13 +11,12 @@
  */
 
 
-export class ExportTestApplicationRequestTransactionFunctionsInner {
+export class ExportApplication200ResponseDataFunctionsInner {
     'name'?: string;
-    'externalInput'?: number;
-    'externalOutput'?: number;
-    'externalInquiry'?: number;
+    'updateType'?: string;
     'fpValue'?: number;
     'remarks'?: string;
+    'selected'?: boolean;
 
     static discriminator: string | undefined = undefined;
 
@@ -28,19 +27,9 @@ export class ExportTestApplicationRequestTransactionFunctionsInner {
             "type": "string"
         },
         {
-            "name": "externalInput",
-            "baseName": "externalInput",
-            "type": "number"
-        },
-        {
-            "name": "externalOutput",
-            "baseName": "externalOutput",
-            "type": "number"
-        },
-        {
-            "name": "externalInquiry",
-            "baseName": "externalInquiry",
-            "type": "number"
+            "name": "updateType",
+            "baseName": "updateType",
+            "type": "string"
         },
         {
             "name": "fpValue",
@@ -51,10 +40,15 @@ export class ExportTestApplicationRequestTransactionFunctionsInner {
             "name": "remarks",
             "baseName": "remarks",
             "type": "string"
+        },
+        {
+            "name": "selected",
+            "baseName": "selected",
+            "type": "boolean"
         }    ];
 
     static getAttributeTypeMap() {
-        return ExportTestApplicationRequestTransactionFunctionsInner.attributeTypeMap;
+        return ExportApplication200ResponseDataFunctionsInner.attributeTypeMap;
     }
 }
 

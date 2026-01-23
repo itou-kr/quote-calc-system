@@ -5,6 +5,8 @@ import { useConfirm, ConfirmOptions } from '@front/hooks/ui/confirm';
 
 export type Props = BaseButtonProps & {
     confirm?: ConfirmOptions;
+    component?: React.ElementType;
+    type?: 'button' | 'submit' | 'reset';
 };
 
 function ProgressButton(props: Props) {

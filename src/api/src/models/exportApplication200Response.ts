@@ -10,15 +10,15 @@
  * Do not edit the class manually.
  */
 
-import { ExportTestApplication200ResponseDataFunctionsInner } from './exportTestApplication200ResponseDataFunctionsInner';
-import { ExportTestApplication200ResponseExportFile } from './exportTestApplication200ResponseExportFile';
+import { ExportApplication200ResponseDataFunctionsInner } from './exportApplication200ResponseDataFunctionsInner';
+import { ExportApplication200ResponseExportFile } from './exportApplication200ResponseExportFile';
 
 /**
 * エクスポートレスポンス
 */
-export class ExportTestApplication200Response {
-    'dataFunctions'?: Array<ExportTestApplication200ResponseDataFunctionsInner>;
-    'exportFile'?: ExportTestApplication200ResponseExportFile;
+export class ExportApplication200Response {
+    'dataFunctions'?: Array<ExportApplication200ResponseDataFunctionsInner>;
+    'exportFile'?: ExportApplication200ResponseExportFile;
 
     static discriminator: string | undefined = undefined;
 
@@ -26,16 +26,16 @@ export class ExportTestApplication200Response {
         {
             "name": "dataFunctions",
             "baseName": "dataFunctions",
-            "type": "Array<ExportTestApplication200ResponseDataFunctionsInner>"
+            "type": "Array<ExportApplication200ResponseDataFunctionsInner>"
         },
         {
             "name": "exportFile",
             "baseName": "exportFile",
-            "type": "ExportTestApplication200ResponseExportFile"
+            "type": "ExportApplication200ResponseExportFile"
         }    ];
 
     static getAttributeTypeMap() {
-        return ExportTestApplication200Response.attributeTypeMap;
+        return ExportApplication200Response.attributeTypeMap;
     }
 }
 
