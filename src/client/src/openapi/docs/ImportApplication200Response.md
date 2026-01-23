@@ -18,6 +18,7 @@ Name | Type | Description | Notes
 **processDurations** | [**CalcTestApplication200ResponseProcessRatios**](CalcTestApplication200ResponseProcessRatios.md) |  | [optional] [default to undefined]
 **dataFunctions** | [**Array&lt;ExportApplication200ResponseDataFunctionsInner&gt;**](ExportApplication200ResponseDataFunctionsInner.md) |  | [optional] [default to undefined]
 **transactionFunctions** | [**Array&lt;ExportApplicationRequestTransactionFunctionsInner&gt;**](ExportApplicationRequestTransactionFunctionsInner.md) |  | [optional] [default to undefined]
+**errorMessages** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -37,6 +38,7 @@ const instance: ImportApplication200Response = {
     processDurations,
     dataFunctions,
     transactionFunctions,
+    errorMessages,
 };
 ```
 

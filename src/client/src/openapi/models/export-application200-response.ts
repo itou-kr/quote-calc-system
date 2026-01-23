@@ -37,4 +37,10 @@ export interface ExportApplication200Response {
      * @memberof ExportApplication200Response
      */
     'exportFile'?: ExportApplication200ResponseExportFile;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ExportApplication200Response
+     */
+    'errorMessages'?: Array<string>;
 }

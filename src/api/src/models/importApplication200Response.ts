@@ -30,6 +30,7 @@ export class ImportApplication200Response {
     'processDurations'?: CalcTestApplicationRequestProcessRatios;
     'dataFunctions'?: Array<ExportApplication200ResponseDataFunctionsInner>;
     'transactionFunctions'?: Array<ExportApplicationRequestTransactionFunctionsInner>;
+    'errorMessages'?: Array<string>;
 
     static discriminator: string | undefined = undefined;
 
@@ -93,6 +94,11 @@ export class ImportApplication200Response {
             "name": "transactionFunctions",
             "baseName": "transactionFunctions",
             "type": "Array<ExportApplicationRequestTransactionFunctionsInner>"
+        },
+        {
+            "name": "errorMessages",
+            "baseName": "errorMessages",
+            "type": "Array<string>"
         }    ];
 
     static getAttributeTypeMap() {

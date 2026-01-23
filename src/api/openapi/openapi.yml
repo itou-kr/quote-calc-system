@@ -133,6 +133,10 @@ paths:
                         type: number
                       systemTest:
                         type: number
+                  errorMessages:
+                    type: array
+                    items:
+                      type: string
   /TEST/export:
     post:
       summary: エクスポート
@@ -285,6 +289,10 @@ paths:
                       content:
                         type: string
                         description: ファイル内容
+                  errorMessages:
+                    type: array
+                    items:
+                      type: string
   /TEST/import:
     post:
       summary: インポート
@@ -400,3 +408,7 @@ paths:
                           type: number
                         remarks:
                           type: string
+                  errorMessages:
+                    type: array
+                    items:
+                      type: string
