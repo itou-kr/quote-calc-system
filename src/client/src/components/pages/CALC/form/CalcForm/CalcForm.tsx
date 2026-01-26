@@ -3,7 +3,7 @@ import { useImportFile } from '@front/hooks/TEST/test';
 // import { useExportFile } from '@front/hooks/TEST/test';
 import { useFunctionValidation } from '@front/hooks/useFunctionValidation';
 import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useEffect } from 'react';
 import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Stack, Paper, Divider, Select, MenuItem } from '@mui/material';
@@ -18,7 +18,7 @@ import SummaryCard2 from '@front/components/ui/SummaryCard2';
 import FormSection from '@front/components/ui/FormSection';
 import ProductivityField from '@front/components/ui/ProductivityField';
 import TableToolbar from '@front/components/ui/TableToolbar';
-import ProcessBreakdownTable from '@front/components/ui/ProcessBreakdownTable';
+import ProcessBreakdownTable, { ProcessRatios } from '@front/components/ui/ProcessBreakdownTable';
 import FunctionTable, { ColumnDefinition } from '@front/components/ui/FunctionTable';
 import FlexBox from '@front/components/ui/FlexBox';
 import TabPanel from '@front/components/ui/TabPanel';
@@ -56,10 +56,11 @@ const setupYupScheme = () => {
                 }
                 return true;
             }),
-        projectType: yup.string().required('案件種別を選択してください'),
+        // 案件種別
+        projectType: yup.string(),
         // 使用するIPA代表値
-        ipaValueType: yup.string().required('使用するIPA代表値を選択してください'),
-        
+        ipaValueType: yup.string(),
+
         // データファンクション情報
         dataFunctions: yup.array().of(
             yup.object({
@@ -103,6 +104,109 @@ type Props = {
     isDirty: boolean;
 };
 
+/** ▼ 工程別比率を計算する関数 */
+const getProcessRatios = (projectType: string, ipaValueType: string) => {
+    if (projectType === '新規開発' && ipaValueType === '中央値') {
+        return {
+            basicDesign: 0.205,
+            detailedDesign: 0.181,
+            implementation: 0.241,
+            integrationTest: 0.191,
+            systemTest: 0.182,
+        };
+    } else if (projectType === '新規開発' && ipaValueType === '平均値') {
+        return {
+            basicDesign: 0.207,
+            detailedDesign: 0.175,
+            implementation: 0.249,
+            integrationTest: 0.193,
+            systemTest: 0.176,
+        };
+    } else if (projectType === '改良開発' && ipaValueType === '中央値') {
+        return {
+            basicDesign: 0.216,
+            detailedDesign: 0.185,
+            implementation: 0.243,
+            integrationTest: 0.193,
+            systemTest: 0.163,
+        };
+    } else if (projectType === '改良開発' && ipaValueType === '平均値') {
+        return {
+            basicDesign: 0.216,
+            detailedDesign: 0.176,
+            implementation: 0.244,
+            integrationTest: 0.190,
+            systemTest: 0.174,
+        };
+    } else if (projectType === '再開発' && ipaValueType === '中央値') {
+        return {
+            basicDesign: 0.195,
+            detailedDesign: 0.161,
+            implementation: 0.277,
+            integrationTest: 0.193,
+            systemTest: 0.174,
+        };
+    } else if (projectType === '再開発' && ipaValueType === '平均値') {
+        return {
+            basicDesign: 0.188,
+            detailedDesign: 0.158,
+            implementation: 0.271,
+            integrationTest: 0.208,
+            systemTest: 0.175,
+        };
+    } else {
+        return {
+            basicDesign: 0.205,
+            detailedDesign: 0.181,
+            implementation: 0.241,
+            integrationTest: 0.191,
+            systemTest: 0.182,
+        };
+    }
+};
+
+/** ▼ 生産性を計算する関数（案件種別、IPA代表値、総FPに基づく） */
+const getProductivity = (projectType: string, ipaValueType: string, totalFP: number) => {
+    // 案件種別とIPA代表値の組み合わせごとに、FP範囲に応じた生産性を返す
+    if (projectType === '新規開発' && ipaValueType === '中央値') {
+        if (totalFP < 400) return 10.5;
+        if (totalFP < 1000) return 13.1;
+        if (totalFP < 3000) return 9.0;
+        return 8.4;
+    } else if (projectType === '新規開発' && ipaValueType === '平均値') {
+        if (totalFP < 400) return 11.1;
+        if (totalFP < 1000) return 21.2;
+        if (totalFP < 3000) return 19.7;
+        return 12.9;
+    } else if (projectType === '改良開発' && ipaValueType === '中央値') {
+        if (totalFP < 200) return 10.4;
+        if (totalFP < 400) return 8.9;
+        if (totalFP < 1000) return 12.3;
+        return 13.2;
+    } else if (projectType === '改良開発' && ipaValueType === '平均値') {
+        if (totalFP < 200) return 18.9;     // データ無のため、全体の平均値を採用
+        if (totalFP < 400) return 14.6;
+        if (totalFP < 1000) return 20.6;
+        return 20.7;
+    } else if (projectType === '再開発' && ipaValueType === '中央値') {
+        if (totalFP < 200) return 20.1;     // データ無のため、全体の中央値を採用
+        if (totalFP < 400) return 20.1;     // データ無のため、全体の中央値を採用
+        if (totalFP < 1000) return 51.5;
+        return 18.9;
+    } else if (projectType === '再開発' && ipaValueType === '平均値') {
+        if (totalFP < 200) return 37.8;     // データ無のため、全体の平均値を採用
+        if (totalFP < 400) return 37.8;     // データ無のため、全体の平均値を採用
+        if (totalFP < 1000) return 37.8;    // データ無のため、全体の平均値を採用
+        return 39.3;
+    } else {
+        // デフォルト値（新規開発・中央値と同じ）
+        if (totalFP < 400) return 10.5;
+        if (totalFP < 1000) return 13.1;
+        if (totalFP < 3000) return 9.0;
+        return 8.4;
+    }
+};
+
 function CalcForm(props: Props) {
     // const { viewId } = props;
     const schema = useMemo(() => setupYupScheme(), []);
@@ -120,6 +224,7 @@ function CalcForm(props: Props) {
             ipaValueType: '中央値',
             dataFunctions: createDataFunctions(50),
             transactionFunctions: createTransactionFunctions(50),
+            processRatios: getProcessRatios('新規開発', '中央値'),
             ...props.data,
         },
     });
@@ -172,14 +277,14 @@ function CalcForm(props: Props) {
         { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
     ], []);
 
-    // 工程別の比率（デフォルト値）- メモ化
-    const processRatios = useMemo(() => ({
-        basicDesign: 0.157,
-        detailedDesign: 0.189,
-        implementation: 0.354,
-        integrationTest: 0.164,
-        systemTest: 0.136,
-    }), []);
+    // 工程別の比率 - フォームから取得
+    const processRatios: ProcessRatios = (watch('processRatios') ?? {
+        basicDesign: 0.205,
+        detailedDesign: 0.181,
+        implementation: 0.241,
+        integrationTest: 0.191,
+        systemTest: 0.182,
+    }) as ProcessRatios;
 
     /** ▼ FP合計を計算 */
     const calculateTotalFP = useCallback(() => {
@@ -189,19 +294,6 @@ function CalcForm(props: Props) {
         const transactionTotal = transactionFunctions.reduce((sum, item) => sum + (Number(item.fpValue) || 0), 0);
         return dataTotal + transactionTotal;
     }, [getValues]);
-
-    /** ▼ 総FPに基づいて生産性を計算 */
-    const calculateProductivity = useCallback((totalFP: number) => {
-        if (totalFP < 400) {
-            return 10.5;
-        } else if (totalFP < 1000) {
-            return 13.1;
-        } else if (totalFP < 3000) {
-            return 9.0;
-        } else {
-            return 8.4;
-        }
-    }, []);
 
     /** ▼ 総工数を計算 */
     const calculateManMonths = useCallback(() => {
@@ -296,7 +388,9 @@ function CalcForm(props: Props) {
 
             // 計算結果を更新
             const newTotalFP = calculateTotalFP();
-            const newProductivity = calculateProductivity(newTotalFP);
+            const currentProjectType = getValues('projectType') || '新規開発';
+            const currentIpaValueType = getValues('ipaValueType') || '中央値';
+            const newProductivity = getProductivity(currentProjectType, currentIpaValueType, newTotalFP);
             setValue('productivityFPPerMonth', newProductivity);
         }
         
@@ -424,6 +518,21 @@ function CalcForm(props: Props) {
     //         content: JSON.stringify(data, null, 2),
     //     });
     // };
+    
+    // プルダウンの値を監視
+    const projectType = watch('projectType');
+    const ipaValueType = watch('ipaValueType');
+    
+    useEffect(() => {
+        if (!projectType || !ipaValueType) return;
+
+        const processRatios = getProcessRatios(projectType, ipaValueType);
+
+        setValue('processRatios', processRatios, {
+            // shouldDirty: true,
+            // shouldValidate: false,
+        });
+    }, [projectType, ipaValueType, setValue]);
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
