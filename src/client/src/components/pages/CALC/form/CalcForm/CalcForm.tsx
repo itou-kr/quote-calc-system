@@ -151,7 +151,7 @@ function CalcForm(props: Props) {
 
     // データファンクションテーブルのカラム定義
     const dataColumns: ColumnDefinition[] = useMemo(() => [
-        { key: 'name', label: '名称', width: 500, icon: 'edit', type: 'text', maxLength: 100 },
+        { key: 'name', label: '名称', width: 500, icon: 'edit', type: 'text', maxLength: 50 },
         { key: 'updateType', label: 'データファンクションの種類', width: 300, icon: 'edit', type: 'select', options: [
             { value: '内部論理ファイル', label: '内部論理ファイル' },
             { value: '外部インタフェースファイル', label: '外部インタフェースファイル' }
@@ -163,7 +163,7 @@ function CalcForm(props: Props) {
 
     // トランザクションファンクションテーブルのカラム定義
     const transactionColumns: ColumnDefinition[] = useMemo(() => [
-        { key: 'name', label: '名称', width: 500, icon: 'edit', type: 'text', maxLength: 100 },
+        { key: 'name', label: '名称', width: 500, icon: 'edit', type: 'text', maxLength: 50 },
         { key: 'externalInput', label: '外部入力', width: 100, icon: 'edit', type: 'number' },
         { key: 'externalOutput', label: '外部出力', width: 100, icon: 'edit', type: 'number' },
         { key: 'externalInquiry', label: '外部照会', width: 100, icon: 'edit', type: 'number' },
