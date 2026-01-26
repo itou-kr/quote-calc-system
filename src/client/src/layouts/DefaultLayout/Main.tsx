@@ -4,6 +4,7 @@ import { Outlet as MainContent } from 'react-router-dom';
 import { Grid2 as Grid } from '@mui/material';
 import AlertMessage from '@front/components/ui/AlertMessage';
 import { useClear as useClearAlertMessage } from '@front/hooks/alertMessage';
+import Header from './Header';
 
 const useViewId = () => {
     const location = useLocation();
@@ -20,6 +21,7 @@ const Main = memo(() => {
 
     return (
         <Grid size="grow">
+            <Header />
             <AlertMessage viewId={viewId} />
             <MainContent />
         </Grid>
