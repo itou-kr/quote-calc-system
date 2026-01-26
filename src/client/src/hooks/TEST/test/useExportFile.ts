@@ -1,34 +1,40 @@
-// import { useCallback } from 'react';
-
-// import { useClear as useClearAlertMessage, useSetAlertMessage } from '@front/hooks/useAlert';
-
-// import { CalcModel } from/ '@front/models/CALC/CalcModel';
-// import { ViewIdType } from '@front/stores/TEST/test/testStore';
 
 import { exportApi } from '@front/openapi';
+import { useClear as useClearAlertMessage, useSetAlertMessage } from '@front/hooks/alertMessage';
+import { viewId } from '@front/stores/TEST/test/testStore';
 
 // 不要？
 import type { ExportApplicationRequest } from '@front/openapi/models';
 
-// const downloadFile = (file: { name: string; content: string }) => {
-//   const a = document.createElement('a');
-//   a.href = `data:text/plain;base64,${encodeURIComponent(file.content)}`;
-//   a.download = file.name;
-//   a.click();
-//   a.remove();
-// };
 
 
 export const useExportFile = () => {
-  return async (formData: ExportApplicationRequest) => {
-    const response = await exportApi.exportApplication(formData);
-    console.log(formData, 'うううううううううううううううううううううううううううう');
-    console.log(response, 'ああああああああああああああああああああああああああああ');
+  const setAlertMessage = useSetAlertMessage(viewId);
+  const clearAlertMessage = useClearAlertMessage(viewId);
 
-    const exportFile = response.data.exportFile;
-    if (!exportFile) return;
+  return async (formData: ExportApplicationRequest) => {
+    clearAlertMessage();
+    const response = await exportApi.exportApplication(formData);
+    console.log(response, 'response');
+    const exportFileData = response.data;
+
+
+    if ((exportFileData?.errorMessages?.length ?? 0) > 0) {
+      setAlertMessage({
+        severity: 'error',
+        message: (exportFileData?.errorMessages ?? [])
+          .join('\n')
+          .replaceAll('<br>', '\n'),
+      });
+      console.log('errorMessages', exportFileData?.errorMessages);
+      return;
+    }
     
-    downloadBase64File(exportFile.content!, exportFile.name!);
+    if (!exportFileData.exportFile) {
+      return;
+    }
+
+    downloadBase64File(exportFileData.exportFile.content!, exportFileData.exportFile.name!);
   };
 
 };
