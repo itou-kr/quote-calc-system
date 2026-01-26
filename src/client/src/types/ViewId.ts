@@ -1,1 +1,1 @@
-export type ViewId = 'TEST'
+export type ViewId = 'TEST' | 'CALC' | string;

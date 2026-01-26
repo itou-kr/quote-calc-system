@@ -1,0 +1,29 @@
+import { memo, useEffect, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
+import { Outlet as MainContent } from 'react-router-dom';
+import { Grid2 as Grid } from '@mui/material';
+import AlertMessage from '@front/components/ui/AlertMessage';
+import { useClear as useClearAlertMessage } from '@front/hooks/alertMessage';
+
+const useViewId = () => {
+    const location = useLocation();
+    return useMemo(() => location.pathname.split('/')[1] || 'HOME', [location]);
+}
+
+const Main = memo(() => {
+    const viewId = useViewId();
+    const clearAlertMessage = useClearAlertMessage(viewId);
+
+    useEffect(() => {
+        clearAlertMessage();
+    }, [clearAlertMessage]);
+
+    return (
+        <Grid size="grow">
+            <AlertMessage viewId={viewId} />
+            <MainContent />
+        </Grid>
+    );
+});
+
+export default Main;

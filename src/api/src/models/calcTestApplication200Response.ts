@@ -27,6 +27,7 @@ export class CalcTestApplication200Response {
     'processRatios'?: CalcTestApplicationRequestProcessRatios;
     'processManMonths'?: CalcTestApplicationRequestProcessRatios;
     'processDurations'?: CalcTestApplicationRequestProcessRatios;
+    'errorMessages'?: Array<string>;
 
     static discriminator: string | undefined = undefined;
 
@@ -80,6 +81,11 @@ export class CalcTestApplication200Response {
             "name": "processDurations",
             "baseName": "processDurations",
             "type": "CalcTestApplicationRequestProcessRatios"
+        },
+        {
+            "name": "errorMessages",
+            "baseName": "errorMessages",
+            "type": "Array<string>"
         }    ];
 
     static getAttributeTypeMap() {

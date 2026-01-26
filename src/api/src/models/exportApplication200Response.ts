@@ -19,6 +19,7 @@ import { ExportApplication200ResponseExportFile } from './exportApplication200Re
 export class ExportApplication200Response {
     'dataFunctions'?: Array<ExportApplication200ResponseDataFunctionsInner>;
     'exportFile'?: ExportApplication200ResponseExportFile;
+    'errorMessages'?: Array<string>;
 
     static discriminator: string | undefined = undefined;
 
@@ -32,6 +33,11 @@ export class ExportApplication200Response {
             "name": "exportFile",
             "baseName": "exportFile",
             "type": "ExportApplication200ResponseExportFile"
+        },
+        {
+            "name": "errorMessages",
+            "baseName": "errorMessages",
+            "type": "Array<string>"
         }    ];
 
     static getAttributeTypeMap() {

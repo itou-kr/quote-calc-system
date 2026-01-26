@@ -16,6 +16,7 @@ Name | Type | Description | Notes
 **processRatios** | [**CalcTestApplication200ResponseProcessRatios**](CalcTestApplication200ResponseProcessRatios.md) |  | [optional] [default to undefined]
 **processManMonths** | [**CalcTestApplication200ResponseProcessRatios**](CalcTestApplication200ResponseProcessRatios.md) |  | [optional] [default to undefined]
 **processDurations** | [**CalcTestApplication200ResponseProcessRatios**](CalcTestApplication200ResponseProcessRatios.md) |  | [optional] [default to undefined]
+**errorMessages** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -33,6 +34,7 @@ const instance: CalcTestApplication200Response = {
     processRatios,
     processManMonths,
     processDurations,
+    errorMessages,
 };
 ```
 
