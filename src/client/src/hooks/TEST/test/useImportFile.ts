@@ -36,13 +36,15 @@ export const useImportFile = () => {
     clearAlertMessage();
     console.log(file, 'file');
     const response = await importApi.importApplication(file);
-    const importFile = response.data;
-    if ((importFile.errorMessages ?? []).length > 0) {
-      setAlertMessage({ severity: 'error', message: (importFile.errorMessages ?? []).join('\n').replaceAll('<br>', '\n') });
-      console.log('errorMessages', importFile.errorMessages);
+    const importFileData = response.data;
+
+    if ((importFileData.errorMessages ?? []).length > 0) {
+      setAlertMessage({ severity: 'error', message: (importFileData.errorMessages ?? []).join('\n').replaceAll('<br>', '\n') });
+      console.log('errorMessages', importFileData.errorMessages);
       return;
     }
+    
     console.log('response', response);
-    return importFile;
+    return importFileData;
   }
 };
