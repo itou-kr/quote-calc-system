@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { useImportFile } from '@front/hooks/TEST/test';
+// import { useImportFile } from '@front/hooks/TEST/test';
 // import { useExportFile } from '@front/hooks/TEST/test';
 import { useFunctionValidation } from '@front/hooks/useFunctionValidation';
 import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
@@ -106,7 +106,7 @@ type Props = {
 function CalcForm(props: Props) {
     // const { viewId } = props;
     const schema = useMemo(() => setupYupScheme(), []);
-    const importFile = useImportFile();
+    // const importFile = useImportFile();
     // const exportFile = useExportFile();
     const methods = useForm<FormType>({
         mode: 'onSubmit',
@@ -405,12 +405,14 @@ function CalcForm(props: Props) {
     }, [getValues, removeTransaction]);
 
     /** ▼ インポート処理 */
-    const onImportButtonClick = async (file: File) => {
-        const result = await importFile(file);
+    const onImportButtonClick = async () => {
+    // const onImportButtonClick = async (file: File) => {
+
+        // const result = await importFile(file);
 
         try {
-            const json = JSON.parse(result.projectName!);
-            methods.reset(json);
+            // const json = JSON.parse(result.projectName!);
+            // methods.reset(json);
         } catch (e) {
             console.error('JSON parse error:', e);
         }

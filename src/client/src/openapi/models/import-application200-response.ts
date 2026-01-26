@@ -100,4 +100,10 @@ export interface ImportApplication200Response {
      * @memberof ImportApplication200Response
      */
     'transactionFunctions'?: Array<ExportApplicationRequestTransactionFunctionsInner>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ImportApplication200Response
+     */
+    'errorMessages'?: Array<string>;
 }

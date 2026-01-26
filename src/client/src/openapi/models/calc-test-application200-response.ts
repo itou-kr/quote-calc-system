@@ -85,4 +85,10 @@ export interface CalcTestApplication200Response {
      * @memberof CalcTestApplication200Response
      */
     'processDurations'?: CalcTestApplication200ResponseProcessRatios;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof CalcTestApplication200Response
+     */
+    'errorMessages'?: Array<string>;
 }
