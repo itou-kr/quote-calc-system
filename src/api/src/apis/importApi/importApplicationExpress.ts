@@ -14,7 +14,7 @@ export const importApplicationExpress = async (req: Request, res: Response) => {
         });
         }
 
-        const result = await importApplication(req.file.buffer);
+        const result = await importApplication(req.file.buffer, req.file.originalname);
 
         return res.status(200).json(result);
     } catch (err) {

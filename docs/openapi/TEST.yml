@@ -242,6 +242,10 @@ components:
               type: number
             systemTest:
               type: number
+        errorMessages:
+          type: array
+          items:
+            type: string
     ExportApplicationRequest:
       description: エクスポートリクエスト
       type: object
@@ -377,6 +381,10 @@ components:
             content:
               type: string
               description: ファイル内容
+        errorMessages:
+          type: array
+          items:
+            type: string
     ImportApplication200Response:
       description: インポートレスポンス
       type: object
@@ -466,4 +474,8 @@ components:
                 type: number
               remarks:
                 type: string
+        errorMessages:
+          type: array
+          items:
+            type: string
 
