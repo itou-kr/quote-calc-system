@@ -5,7 +5,7 @@ import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
 import { useMemo, useState, useCallback, useEffect } from 'react';
 import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Stack, Paper, Divider, Select, MenuItem } from '@mui/material';
+import { Box, Stack, Paper, Divider, Select, MenuItem, Typography } from '@mui/material';
 import SummarizeIcon from '@mui/icons-material/Summarize';
 import EditIcon from '@mui/icons-material/Edit';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
@@ -17,6 +17,7 @@ import SummaryCard from '@front/components/ui/SummaryCard';
 import FormSection from '@front/components/ui/FormSection';
 import ProductivityField from '@front/components/ui/ProductivityField';
 import TableToolbar from '@front/components/ui/TableToolbar';
+import CalculationResultsPanel from '@front/components/ui/CalculationResultsPanel';
 import ProcessBreakdownTable from '@front/components/ui/ProcessBreakdownTable';
 import FunctionTable, { ColumnDefinition } from '@front/components/ui/FunctionTable';
 import FlexBox from '@front/components/ui/FlexBox';
@@ -493,14 +494,28 @@ function TestForm(props: Props) {
                             </TabPanel>
                         </Box>
 
-                        {/* 工程別工数・工期テーブル */}
-                        <ProcessBreakdownTable
-                            processRatios={processRatios}
-                            processManMonths={processManMonths}
-                            processDurations={processDurations}
+                        {/* 計算結果 */}
+                        <CalculationResultsPanel
                             isOpen={processBreakdownOpen}
                             onToggle={useCallback(() => setProcessBreakdownOpen(prev => !prev), [])}
-                        />
+                            summaryContent={
+                                <Paper elevation={0} sx={{ p: 2, bgcolor: 'white' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, pl: 0 }}>
+                                        <AutoAwesomeIcon sx={{ fontSize: 18, mr: 0.5, color: 'text.secondary' }} />
+                                        <Typography variant="body2" sx={{ fontWeight: 'bold', fontSize: '0.95rem' }}>サマリー</Typography>
+                                    </Box>
+                                    <SummaryCard label="FP" value={totalFP} />
+                                    <SummaryCard label="工数(人月)" value={manMonths} />
+                                    <SummaryCard label="標準工期(月)" value={standardDuration} />
+                                </Paper>
+                            }
+                        >
+                            <ProcessBreakdownTable
+                                processRatios={processRatios}
+                                processManMonths={processManMonths}
+                                processDurations={processDurations}
+                            />
+                        </CalculationResultsPanel>
                     </Box>
                 </Box>
             </FormProvider>

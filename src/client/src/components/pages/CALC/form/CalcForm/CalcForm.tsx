@@ -1,6 +1,6 @@
 import * as yup from 'yup';
-// import { useImportFile } from '@front/hooks/TEST/test';
-// import { useExportFile } from '@front/hooks/TEST/test';
+// import { useCalcTest } from '@front/hooks/TEST/test';
+import { useExportFile, useImportFile } from '@front/hooks/TEST/test';
 import { useFunctionValidation } from '@front/hooks/useFunctionValidation';
 import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
 import { useMemo, useState, useCallback } from 'react';
@@ -11,7 +11,7 @@ import SummarizeIcon from '@mui/icons-material/Summarize';
 import EditIcon from '@mui/icons-material/Edit';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import ImportButton from '@front/components/ui/Button/ImportButton';
-// import ExportButton from '@front/components/ui/Button/ExportButton';
+import ExportButton from '@front/components/ui/Button/ExportButton';
 import Button from '@front/components/ui/Button';
 import TextField from '@front/components/ui/TextField';
 import SummaryCard2 from '@front/components/ui/SummaryCard2';
@@ -31,10 +31,14 @@ import { t } from 'i18next';
 
 const setupYupScheme = () => {
     return yup.object({
-        // 案件情報
+        /** 案件情報 */
+        // 案件名
         projectName: yup.string().required('案件名を入力してください'),
+        // 生産性自動入力チェック
         autoProductivity: yup.boolean(),
+        // 開発工程比率自動入力チェック
         autoProcessRatios: yup.boolean(),
+        // 生産性(FP/月)
         productivityFPPerMonth: yup
             .number()
             .rangeCheck(0.1, 9999.9)
@@ -63,6 +67,12 @@ const setupYupScheme = () => {
         projectType: yup.string(),
         // 使用するIPA代表値
         ipaValueType: yup.string(),
+        // 総FP
+        totalFP: yup.number(),
+        // 総工数(人月)
+        totalManMonths: yup.number(),
+        // 標準工期(月)
+        standardDurationMonths: yup.number(),
 
         // データファンクション情報
         dataFunctions: yup.array().of(
@@ -80,9 +90,9 @@ const setupYupScheme = () => {
             yup.object({
                 selected: yup.boolean(),
                 name: yup.string(),
-                externalInput: yup.number().rangeCheck(0, 9999).nullable().transform((value, originalValue) => originalValue === '' ? null : value).min(0, '0以上の値を入力してください'),
-                externalOutput: yup.number().rangeCheck(0, 9999).nullable().transform((value, originalValue) => originalValue === '' ? null : value).min(0, '0以上の値を入力してください'),
-                externalInquiry: yup.number().rangeCheck(0, 9999).nullable().transform((value, originalValue) => originalValue === '' ? null : value).min(0, '0以上の値を入力してください'),
+                externalInput: yup.number().rangeCheck(0, 9999),
+                externalOutput: yup.number().rangeCheck(0, 9999),
+                externalInquiry: yup.number().rangeCheck(0, 9999),
                 fpValue: yup.number().min(0, '0以上の値を入力してください'),
                 remarks: yup.string(),
             })
@@ -96,6 +106,29 @@ const setupYupScheme = () => {
             integrationTest: yup.number().rangeCheck(0.001, 1.000),
             systemTest: yup.number().rangeCheck(0.001, 1.000),
         }),
+        // .optional(),
+
+        // 工程別工数
+        processManMonths: yup
+        .object({
+            basicDesign: yup.number().min(0).required(),
+            detailedDesign: yup.number().min(0).required(),
+            implementation: yup.number().min(0).required(),
+            integrationTest: yup.number().min(0).required(),
+            systemTest: yup.number().min(0).required(),
+        }),
+        // .optional(),
+
+        // 工程別工期
+        processDurations: yup
+        .object({
+            basicDesign: yup.number().min(0).required(),
+            detailedDesign: yup.number().min(0).required(),
+            implementation: yup.number().min(0).required(),
+            integrationTest: yup.number().min(0).required(),
+            systemTest: yup.number().min(0).required(),
+        }),
+        // .optional(),
     });
 };
 
@@ -213,8 +246,9 @@ const getProductivity = (projectType: string, ipaValueType: string, totalFP: num
 function CalcForm(props: Props) {
     // const { viewId } = props;
     const schema = useMemo(() => setupYupScheme(), []);
-    // const importFile = useImportFile();
-    // const exportFile = useExportFile();
+    // const calc = useCalcTest(viewId as ViewIdType);
+    const importFile = useImportFile();
+    const exportFile = useExportFile();
     const methods = useForm<FormType>({
         mode: 'onSubmit',
         reValidateMode: 'onSubmit',
@@ -226,13 +260,30 @@ function CalcForm(props: Props) {
             productivityFPPerMonth: 10.5,
             projectType: '新規開発',
             ipaValueType: '中央値',
+            totalFP: 0,
+            totalManMonths: 0,
+            standardDurationMonths: 0,
             dataFunctions: createDataFunctions(50),
             transactionFunctions: createTransactionFunctions(50),
             processRatios: getProcessRatios('新規開発', '中央値'),
+            processManMonths: {
+                basicDesign: 0,
+                detailedDesign: 0,
+                implementation: 0,  
+                integrationTest: 0,
+                systemTest: 0,
+            },
+            processDurations: {
+                basicDesign: 0,
+                detailedDesign: 0,
+                implementation: 0,
+                integrationTest: 0,
+                systemTest: 0,
+            },
             ...props.data,
         },
     });
-    const { control, trigger, watch, setValue, getValues, clearErrors } = methods;
+    const { control, trigger, watch, setValue, getValues, handleSubmit, clearErrors } = methods;
     const { fields: dataFields, append: appendData, remove: removeData } = useFieldArray({
         control,
         name: 'dataFunctions',
@@ -526,29 +577,21 @@ function CalcForm(props: Props) {
     }, [getValues, removeTransaction]);
 
     /** ▼ インポート処理 */
-    const onImportButtonClick = async () => {
-    // const onImportButtonClick = async (file: File) => {
-
-        // const result = await importFile(file);
-
+    const onImportButtonClick = async (file: File) => {
         try {
-            // const json = JSON.parse(result.projectName!);
-            // methods.reset(json);
+            const json = await importFile(file);
+            methods.reset(json);
         } catch (e) {
-            console.error('JSON parse error:', e);
+            console.error(e);
         }
     };
 
     /** ▼ エクスポート処理 */
-    // const onExportButtonClick = async () => {
-    //     const data = methods.getValues();
-    //     await exportFile({
-    //         name: 'export.json',
-    //         content: JSON.stringify(data, null, 2),
-    //     });
-    // };
-    
-
+    const onExportButtonClick = async () => {
+        const latestValues = getValues();
+        console.log(latestValues)
+        await exportFile(latestValues);
+    };
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -588,7 +631,7 @@ function CalcForm(props: Props) {
                                 <Text variant="subsectionTitle">インポート / エクスポート(未対応)</Text>
                                 <Stack direction="row" spacing={1}>
                                     <ImportButton onFileSelect={onImportButtonClick} onClick={() => {}} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }}>インポート</ImportButton>
-                                    {/* <ExportButton onClick={onExportButtonClick} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }} /> */}
+                                    <ExportButton onClick={handleSubmit(onExportButtonClick)} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }} />
                                 </Stack>
                             </Box>
 
