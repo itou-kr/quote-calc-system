@@ -234,7 +234,6 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                             },
                             '& input[type="number"]': {
                                 paddingRight: '4px',
-                                textAlign: 'center',
                             },
                             ...(hasError && {
                                 '& .MuiOutlinedInput-notchedOutline': {

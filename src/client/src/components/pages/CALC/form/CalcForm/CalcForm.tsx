@@ -3,10 +3,10 @@ import * as yup from 'yup';
 // import { useExportFile } from '@front/hooks/TEST/test';
 import { useFunctionValidation } from '@front/hooks/useFunctionValidation';
 import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
-import { useMemo, useState, useCallback, useEffect } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Stack, Paper, Divider, Select, MenuItem } from '@mui/material';
+import { Box, Stack, Paper, Divider, Select, MenuItem, Typography } from '@mui/material';
 import SummarizeIcon from '@mui/icons-material/Summarize';
 import EditIcon from '@mui/icons-material/Edit';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
@@ -17,8 +17,10 @@ import TextField from '@front/components/ui/TextField';
 import SummaryCard2 from '@front/components/ui/SummaryCard2';
 import FormSection from '@front/components/ui/FormSection';
 import ProductivityField from '@front/components/ui/ProductivityField';
+import ProcessRatiosField from '@front/components/ui/ProcessRatiosField';
 import TableToolbar from '@front/components/ui/TableToolbar';
-import ProcessBreakdownTable, { ProcessRatios } from '@front/components/ui/ProcessBreakdownTable';
+import CalculationResultsPanel from '@front/components/ui/CalculationResultsPanel';
+import ProcessBreakdownTable, { ProcessFPs, ProcessRatios } from '@front/components/ui/ProcessBreakdownTable';
 import FunctionTable, { ColumnDefinition } from '@front/components/ui/FunctionTable';
 import FlexBox from '@front/components/ui/FlexBox';
 import TabPanel from '@front/components/ui/TabPanel';
@@ -32,6 +34,7 @@ const setupYupScheme = () => {
         // 案件情報
         projectName: yup.string().required('案件名を入力してください'),
         autoProductivity: yup.boolean(),
+        autoProcessRatios: yup.boolean(),
         productivityFPPerMonth: yup
             .number()
             .rangeCheck(0.1, 9999.9)
@@ -219,6 +222,7 @@ function CalcForm(props: Props) {
         defaultValues: {
             projectName: '',
             autoProductivity: true,
+            autoProcessRatios: true,
             productivityFPPerMonth: 10.5,
             projectType: '新規開発',
             ipaValueType: '中央値',
@@ -278,13 +282,36 @@ function CalcForm(props: Props) {
     ], []);
 
     // 工程別の比率 - フォームから取得
-    const processRatios: ProcessRatios = (watch('processRatios') ?? {
-        basicDesign: 0.205,
-        detailedDesign: 0.181,
-        implementation: 0.241,
-        integrationTest: 0.191,
-        systemTest: 0.182,
-    }) as ProcessRatios;
+    const currentProjectType = watch('projectType') || '新規開発';
+    const currentIpaValueType = watch('ipaValueType') || '中央値';
+    const rawProcessRatios = watch('processRatios');
+    const defaultProcessRatios = useMemo(() => getProcessRatios(currentProjectType, currentIpaValueType), [currentProjectType, currentIpaValueType]);
+    const parseRatio = (value: unknown, fallback: number) => {
+        const num = typeof value === 'number' ? value : Number(value);
+        return Number.isFinite(num) ? num : fallback;
+    };
+
+    const processRatios: ProcessRatios = {
+        basicDesign: parseRatio(rawProcessRatios?.basicDesign, defaultProcessRatios.basicDesign),
+        detailedDesign: parseRatio(rawProcessRatios?.detailedDesign, defaultProcessRatios.detailedDesign),
+        implementation: parseRatio(rawProcessRatios?.implementation, defaultProcessRatios.implementation),
+        integrationTest: parseRatio(rawProcessRatios?.integrationTest, defaultProcessRatios.integrationTest),
+        systemTest: parseRatio(rawProcessRatios?.systemTest, defaultProcessRatios.systemTest),
+    };
+    const { basicDesign, detailedDesign, implementation, integrationTest, systemTest } = processRatios;
+
+    // 工程別FP（総FP × 比率）
+    const processFPs: ProcessFPs | undefined = useMemo(() => {
+        if (!Number.isFinite(totalFP)) return undefined;
+        const total = Number(totalFP);
+        return {
+            basicDesign: Math.round(total * basicDesign * 100) / 100,
+            detailedDesign: Math.round(total * detailedDesign * 100) / 100,
+            implementation: Math.round(total * implementation * 100) / 100,
+            integrationTest: Math.round(total * integrationTest * 100) / 100,
+            systemTest: Math.round(total * systemTest * 100) / 100,
+        };
+    }, [totalFP, basicDesign, detailedDesign, implementation, integrationTest, systemTest]);
 
     /** ▼ FP合計を計算 */
     const calculateTotalFP = useCallback(() => {
@@ -498,14 +525,6 @@ function CalcForm(props: Props) {
         setTransactionSelectedCount(0);
     }, [getValues, removeTransaction]);
 
-    /** ▼ 工程別比率をリセット */
-    const onResetProcessRatios = useCallback(() => {
-        const currentProjectType = getValues('projectType') || '新規開発';
-        const currentIpaValueType = getValues('ipaValueType') || '中央値';
-        const defaultRatios = getProcessRatios(currentProjectType, currentIpaValueType);
-        setValue('processRatios', defaultRatios, { shouldValidate: true, shouldDirty: true });
-    }, [getValues, setValue]);
-
     /** ▼ インポート処理 */
     const onImportButtonClick = async () => {
     // const onImportButtonClick = async (file: File) => {
@@ -529,20 +548,7 @@ function CalcForm(props: Props) {
     //     });
     // };
     
-    // プルダウンの値を監視
-    const projectType = watch('projectType');
-    const ipaValueType = watch('ipaValueType');
-    
-    useEffect(() => {
-        if (!projectType || !ipaValueType) return;
 
-        const processRatios = getProcessRatios(projectType, ipaValueType);
-
-        setValue('processRatios', processRatios, {
-            // shouldDirty: true,
-            // shouldValidate: false,
-        });
-    }, [projectType, ipaValueType, setValue]);
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -575,6 +581,19 @@ function CalcForm(props: Props) {
                                 </FlexBox>
                             </FlexBox>
 
+                            <Divider sx={{ my: 2 }} />
+                            
+                            {/* インポート / エクスポート */}
+                            <Box sx={{ mb: 3 }}>
+                                <Text variant="subsectionTitle">インポート / エクスポート(未対応)</Text>
+                                <Stack direction="row" spacing={1}>
+                                    <ImportButton onFileSelect={onImportButtonClick} onClick={() => {}} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }}>インポート</ImportButton>
+                                    {/* <ExportButton onClick={onExportButtonClick} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }} /> */}
+                                </Stack>
+                            </Box>
+
+                            <Divider sx={{ my: 2 }} />
+
                             {/* 案件名 */}
                             <FormSection label="案件名" required>
                                 <TextField name="projectName" control={control} trigger={trigger} t={t} hideHelperText sx={{ '& .MuiInputBase-root': { bgcolor: 'white' } }} maxLength={100}/>
@@ -600,26 +619,16 @@ function CalcForm(props: Props) {
                                 </Select>
                             </FormSection>
 
-                            <Divider sx={{ my: 3 }} />
-
-                            {/* インポート / エクスポート */}
-                            <Box sx={{ mb: 3 }}>
-                                <Text variant="subsectionTitle">インポート / エクスポート(未対応)</Text>
-                                <Stack direction="row" spacing={1}>
-                                    <ImportButton onFileSelect={onImportButtonClick} onClick={() => {}} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }}>インポート</ImportButton>
-                                    {/* <ExportButton onClick={onExportButtonClick} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }} /> */}
-                                </Stack>
-                            </Box>
-
-                            <Divider sx={{ my: 3 }} />
-
-                            {/* 計算結果サマリー */}
-                            <Box>
-                                <Text variant="subsectionTitle" sx={{ mt: 2 }}>計算結果サマリー</Text>
-                                <SummaryCard2 label="FP" value={totalFP} colorVariant="blue" />
-                                <SummaryCard2 label="工数(人月)" value={manMonths} colorVariant="green" />
-                                <SummaryCard2 label="標準工期(月)" value={standardDuration} colorVariant="orange" />
-                            </Box>
+                            {/* 開発工程比率入力 */}
+                            <ProcessRatiosField
+                                control={control}
+                                trigger={trigger}
+                                setValue={setValue}
+                                watch={watch}
+                                clearErrors={clearErrors}
+                                t={t}
+                                getProcessRatios={getProcessRatios}
+                            />                         
                         </Box>
 
                         {/* 固定された下部ボタンエリア */}
@@ -688,18 +697,27 @@ function CalcForm(props: Props) {
                             </TabPanel>
                         </Box>
 
-                        {/* 工程別工数・工期テーブル */}
-                        <ProcessBreakdownTable
-                            processRatios={processRatios}
-                            // calculateProcessManMonths={calculateProcessManMonths}
-                            // calculateProcessDuration={calculateProcessDuration}
+                        {/* 計算結果 */}
+                        <CalculationResultsPanel
                             isOpen={processBreakdownOpen}
                             onToggle={useCallback(() => setProcessBreakdownOpen(prev => !prev), [])}
-                            onRatiosChange={(next) => {
-                                setValue('processRatios', next, { shouldValidate: false, shouldDirty: true });
-                            }}
-                            onResetRatios={onResetProcessRatios}
-                        />
+                            summaryContent={
+                                <Paper elevation={0} sx={{ p: 2, bgcolor: 'white' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, pl: 0 }}>
+                                        <AutoAwesomeIcon sx={{ fontSize: 18, mr: 0.5, color: 'text.secondary' }} />
+                                        <Typography variant="body2" sx={{ fontWeight: 'bold', fontSize: '0.95rem' }}>サマリー</Typography>
+                                    </Box>
+                                    <SummaryCard2 label="FP" value={totalFP} colorVariant="periwinkle" />
+                                    <SummaryCard2 label="工数(人月)" value={manMonths} colorVariant="green" />
+                                    <SummaryCard2 label="標準工期(月)" value={standardDuration} colorVariant="orange" />
+                                </Paper>
+                            }
+                        >
+                            <ProcessBreakdownTable
+                                processRatios={processRatios}
+                                processFPs={processFPs}
+                            />
+                        </CalculationResultsPanel>
                     </Box>
                 </Box>
             </FormProvider>

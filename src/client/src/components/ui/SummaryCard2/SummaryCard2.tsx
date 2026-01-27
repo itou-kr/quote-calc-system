@@ -1,7 +1,6 @@
 import { Box, Stack, Typography } from '@mui/material';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 
-export type ColorVariant = 'blue' | 'green' | 'orange';
+export type ColorVariant = 'blue' | 'green' | 'orange' | 'periwinkle';
 
 export type Props = {
     label: string;
@@ -20,6 +19,15 @@ const colorSchemes = {
         value: '#0d47a1',
         shadow: 'rgba(25, 118, 210, 0.15)',
         shadowHover: 'rgba(25, 118, 210, 0.25)',
+    },
+    periwinkle: {
+        gradient: 'linear-gradient(135deg, #f4f7ff 0%, #e9f0ff 100%)',
+        border: '#6f8fe6',
+        icon: '#4a5fc4',
+        label: '#3e57bf',
+        value: '#3046a4',
+        shadow: 'rgba(63, 81, 181, 0.12)',
+        shadowHover: 'rgba(63, 81, 181, 0.20)',
     },
     green: {
         gradient: 'linear-gradient(135deg, #f5faf5 0%, #e8f5e9 100%)',
@@ -83,7 +91,6 @@ function SummaryCard2(props: Props) {
                         borderRadius: borderOnly ? 1 : 0,
                         p: borderOnly ? 0.5 : 0
                     }}>
-                        <AutoAwesomeIcon sx={{ fontSize: 20 }} />
                     </Box>
                     <Typography variant="body1" sx={{ fontWeight: 'bold', color: colors.label }}>{label}</Typography>
                 </Box>

@@ -71,6 +71,16 @@ function RenderTextField<T extends FieldValues = FieldValues, N extends FieldPat
         }
     };
 
+    // 数値入力フィールドでマウスホイールによる値変更を無効化
+    const handleWheel = (e: React.WheelEvent) => {
+        if (type === 'number') {
+            const target = e.target as HTMLElement;
+            if (target.tagName === 'INPUT') {
+                (target as HTMLInputElement).blur();
+            }
+        }
+    };
+
     useEffect(() => {
         if (invalid) {
             trigger(name);
@@ -113,6 +123,7 @@ function RenderTextField<T extends FieldValues = FieldValues, N extends FieldPat
             helperText={hideHelperText ? undefined : formError?.message}
             onChange={handleChange}
             onBlur={handleBlur}
+            onWheel={handleWheel}
             inputRef={field.ref}
         />
     );
