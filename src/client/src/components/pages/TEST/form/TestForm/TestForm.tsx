@@ -6,6 +6,12 @@ import { useMemo, useState, useCallback, useEffect } from 'react';
 import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Stack, Divider, Select, MenuItem } from '@mui/material';
+<<<<<<< HEAD
+=======
+// import { Box, Stack, Paper, Divider, Select, MenuItem } from '@mui/material';
+
+// import SummarizeIcon from '@mui/icons-material/Summarize';
+>>>>>>> nagisa_0127
 import EditIcon from '@mui/icons-material/Edit';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import ImportButton from '@front/components/ui/Button/ImportButton';
@@ -130,7 +136,7 @@ const setupYupScheme = () => {
 export type FormType = yup.InferType<ReturnType<typeof setupYupScheme>>;
 
 type Props = {
-    viewId: ViewIdType | 'TESt';
+    viewId: ViewIdType | 'TEST';
     data?: FormType;
     isDirty: boolean;
 };
