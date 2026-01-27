@@ -4,7 +4,7 @@ export type ColorVariant = 'blue' | 'green' | 'orange' | 'periwinkle';
 
 export type Props = {
     label: string;
-    value: number | string;
+    value: number | string | undefined;
     colorVariant?: ColorVariant;
     borderOnly?: boolean;
     grayBackground?: boolean;
@@ -57,6 +57,9 @@ const colorSchemes = {
 function SummaryCard2(props: Props) {
     const { label, value, colorVariant = 'blue', borderOnly = false, grayBackground = false } = props;
     const colors = colorSchemes[colorVariant];
+    
+    // undefinedの場合はERRORを表示
+    const displayValue = value === undefined ? 'ERROR' : value;
 
     const getBackgroundStyle = () => {
         if (grayBackground) return '#f5f5f5';
@@ -94,7 +97,7 @@ function SummaryCard2(props: Props) {
                     </Box>
                     <Typography variant="body1" sx={{ fontWeight: 'bold', color: colors.label }}>{label}</Typography>
                 </Box>
-                <Typography variant="h4" sx={{ fontWeight: 'bold', color: colors.label, fontSize: '1.75rem' }}>{value}</Typography>
+                <Typography variant="h4" sx={{ fontWeight: 'bold', color: colors.label, fontSize: '1.75rem' }}>{displayValue}</Typography>
             </Stack>
         </Box>
     );

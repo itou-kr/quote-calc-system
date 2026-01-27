@@ -1,6 +1,48 @@
 import { CalcTestApplication200Response } from '@quote-calc-system/models';
 import * as CalcApi from './types';
 
+/** ▼ 生産性を計算する関数（案件種別、IPA代表値、総FPに基づく） */
+const getProductivity = (projectType: string, ipaValueType: string, totalFP: number): number => {
+  // 案件種別とIPA代表値の組み合わせごとに、FP範囲に応じた生産性を返す
+  if (projectType === '新規開発' && ipaValueType === '中央値') {
+    if (totalFP < 400) return 10.5;
+    if (totalFP < 1000) return 13.1;
+    if (totalFP < 3000) return 9.0;
+    return 8.4;
+  } else if (projectType === '新規開発' && ipaValueType === '平均値') {
+    if (totalFP < 400) return 11.1;
+    if (totalFP < 1000) return 21.2;
+    if (totalFP < 3000) return 19.7;
+    return 12.9;
+  } else if (projectType === '改良開発' && ipaValueType === '中央値') {
+    if (totalFP < 200) return 10.4;
+    if (totalFP < 400) return 8.9;
+    if (totalFP < 1000) return 12.3;
+    return 13.2;
+  } else if (projectType === '改良開発' && ipaValueType === '平均値') {
+    if (totalFP < 200) return 18.9;     // データ無のため、全体の平均値を採用
+    if (totalFP < 400) return 14.6;
+    if (totalFP < 1000) return 20.6;
+    return 20.7;
+  } else if (projectType === '再開発' && ipaValueType === '中央値') {
+    if (totalFP < 200) return 20.1;     // データ無のため、全体の中央値を採用
+    if (totalFP < 400) return 20.1;     // データ無のため、全体の中央値を採用
+    if (totalFP < 1000) return 51.5;
+    return 18.9;
+  } else if (projectType === '再開発' && ipaValueType === '平均値') {
+    if (totalFP < 200) return 37.8;     // データ無のため、全体の平均値を採用
+    if (totalFP < 400) return 37.8;     // データ無のため、全体の平均値を採用
+    if (totalFP < 1000) return 37.8;    // データ無のため、全体の平均値を採用
+    return 39.3;
+  } else {
+    // デフォルト値（新規開発・中央値と同じ）
+    if (totalFP < 400) return 10.5;
+    if (totalFP < 1000) return 13.1;
+    if (totalFP < 3000) return 9.0;
+    return 8.4;
+  }
+};
+
 export const calcTestApplication: CalcApi.calcTestApplication = async ({
   calcTestApplicationRequest = {},
 }) => {
@@ -74,21 +116,16 @@ response.transactionFunctions =
 
   // 生産性(FP/月)
   if (calcTestApplicationRequest.autoProductivity) {
-    if (response.totalFP < 400) {
-      response.productivityFPPerMonth = 10.5;
-    } else if (response.totalFP < 1000) {
-      response.productivityFPPerMonth = 13.1;
-    } else if (response.totalFP < 3000) {
-      response.productivityFPPerMonth = 9.0;
-    } else {
-      response.productivityFPPerMonth = 8.4;
-    }
+    // 案件種別とIPA代表値に基づいて生産性を自動計算
+    const projectType = calcTestApplicationRequest.projectType || '新規開発';
+    const ipaValueType = calcTestApplicationRequest.ipaValueType || '中央値';   
+    response.productivityFPPerMonth = getProductivity(projectType, ipaValueType, response.totalFP);
   } else {
     response.productivityFPPerMonth = calcTestApplicationRequest.productivityFPPerMonth;
   }
 
   // 総工数(人月)計算
-  response.totalManMonths = Math.ceil((response.totalFP / calcTestApplicationRequest.productivityFPPerMonth) * 100) / 100;
+  response.totalManMonths = Math.ceil((response.totalFP / (response.productivityFPPerMonth || 1)) * 100) / 100;
 
   // 標準工期計算
   //-----小山修正 ここから----- 
