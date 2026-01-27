@@ -1,7 +1,10 @@
-import { Box, Paper, Table, TableHead, TableBody, TableRow, TableCell, Collapse, IconButton, Typography } from '@mui/material';
+import { Box, Paper, Table, TableHead, TableBody, TableRow, TableCell, Collapse, IconButton, Typography, TextField, Button } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import EditIcon from '@mui/icons-material/Edit';
+import { ChangeEvent, memo, useEffect, useRef, useState } from 'react';
 
 export type ProcessRatios = {
     basicDesign: number;
@@ -33,6 +36,8 @@ export type Props = {
     processDurations?: ProcessDurations;
     isOpen: boolean;
     onToggle: () => void;
+    onRatiosChange?: (ratios: ProcessRatios) => void;
+    onResetRatios?: () => void;
 };
 
 /**
@@ -41,12 +46,36 @@ export type Props = {
  * @returns 工程別内訳テーブルコンポーネント
  */
 function ProcessBreakdownTable(props: Props) {
-    const { processRatios, processManMonths, processDurations, isOpen, onToggle } = props;
+    const { processRatios, processManMonths, processDurations, isOpen, onToggle, onRatiosChange, onResetRatios } = props;
+    const [localRatios, setLocalRatios] = useState<ProcessRatios>(
+        processRatios ?? { basicDesign: 0, detailedDesign: 0, implementation: 0, integrationTest: 0, systemTest: 0 }
+    );
+    const debounceRef = useRef<number | null>(null);
+
+    // 親からの更新を同期（リセット等）
+    useEffect(() => {
+        if (processRatios) setLocalRatios(processRatios);
+    }, [processRatios]);
+
+    const scheduleNotifyParent = (next: ProcessRatios) => {
+        if (!onRatiosChange) return;
+        if (debounceRef.current) {
+            window.clearTimeout(debounceRef.current);
+        }
+        debounceRef.current = window.setTimeout(() => {
+            onRatiosChange(next);
+        }, 120);
+    };
+
+    const handleRatioChange = (key: keyof ProcessRatios) => (e: ChangeEvent<HTMLInputElement>) => {
+        const val = Math.max(0, Math.min(1, Number(e.target.value)));
+        const next = { ...localRatios, [key]: Number.isFinite(val) ? val : 0 };
+        setLocalRatios(next);
+        scheduleNotifyParent(next);
+    };
     
     // 合計値を計算
-    const totalRatio = processRatios 
-        ? (processRatios.basicDesign || 0) + (processRatios.detailedDesign || 0) + (processRatios.implementation || 0) + (processRatios.integrationTest || 0) + (processRatios.systemTest || 0)
-        : 0;
+    const totalRatio = (localRatios.basicDesign || 0) + (localRatios.detailedDesign || 0) + (localRatios.implementation || 0) + (localRatios.integrationTest || 0) + (localRatios.systemTest || 0);
     const totalManMonths = processManMonths
         ? (processManMonths.basicDesign || 0) + (processManMonths.detailedDesign || 0) + (processManMonths.implementation || 0) + (processManMonths.integrationTest || 0) + (processManMonths.systemTest || 0)
         : 0;
@@ -92,42 +121,182 @@ function ProcessBreakdownTable(props: Props) {
                     <Table size="small" sx={{ tableLayout: 'fixed' }}>
                         <TableHead>
                             <TableRow>
-                                <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 120 }}></TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 'calc((100% - 240px) / 5)' }}>基本設計</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 'calc((100% - 240px) / 5)' }}>詳細設計</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 'calc((100% - 240px) / 5)' }}>実装</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 'calc((100% - 240px) / 5)' }}>結合テスト</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 'calc((100% - 240px) / 5)' }}>総合テスト</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#bbdefb', fontWeight: 'bold', width: 120 }}>合計</TableCell>
+                                <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 140 }}></TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 'calc((100% - 420px) / 5)' }}>基本設計</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 'calc((100% - 420px) / 5)' }}>詳細設計</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 'calc((100% - 420px) / 5)' }}>実装</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 'calc((100% - 420px) / 5)' }}>結合テスト</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 'calc((100% - 420px) / 5)' }}>総合テスト</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderLeft: 1, borderRight: 1, borderColor: 'divider', width: 150 }}></TableCell>
+                                <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 150 }}>合計</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>比率</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processRatios?.basicDesign}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processRatios?.detailedDesign}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processRatios?.implementation}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processRatios?.integrationTest}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processRatios?.systemTest}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold' }}>{totalRatio.toFixed(3)}</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold', bgcolor: 'white', borderRight: 1, borderColor: 'divider' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        <EditIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                        比率
+                                    </Box>
+                                </TableCell>
+                                <TableCell align="center" sx={{ bgcolor: 'white', borderRight: 1, borderColor: 'divider' }}>
+                                    <TextField
+                                        size="small"
+                                        type="number"
+                                        value={localRatios.basicDesign}
+                                        onChange={handleRatioChange('basicDesign')}
+                                        inputProps={{ step: 0.001, min: 0, max: 1 }}
+                                        sx={{
+                                            '& .MuiInputBase-root': { bgcolor: 'white', width: 100 },
+                                            '& input[type="number"]': { paddingRight: '4px', textAlign: 'center' },
+                                        }}
+                                    />
+                                </TableCell>
+                                <TableCell align="center" sx={{ bgcolor: 'white', borderRight: 1, borderColor: 'divider' }}>
+                                    <TextField
+                                        size="small"
+                                        type="number"
+                                        value={localRatios.detailedDesign}
+                                        onChange={handleRatioChange('detailedDesign')}
+                                        inputProps={{ step: 0.001, min: 0, max: 1 }}
+                                        sx={{
+                                            '& .MuiInputBase-root': { bgcolor: 'white', width: 100 },
+                                            '& input[type="number"]': { paddingRight: '4px', textAlign: 'center' },
+                                        }}
+                                    />
+                                </TableCell>
+                                <TableCell align="center" sx={{ bgcolor: 'white', borderRight: 1, borderColor: 'divider' }}>
+                                    <TextField
+                                        size="small"
+                                        type="number"
+                                        value={localRatios.implementation}
+                                        onChange={handleRatioChange('implementation')}
+                                        inputProps={{ step: 0.001, min: 0, max: 1 }}
+                                        sx={{
+                                            '& .MuiInputBase-root': { bgcolor: 'white', width: 100 },
+                                            '& input[type="number"]': { paddingRight: '4px', textAlign: 'center' },
+                                        }}
+                                    />
+                                </TableCell>
+                                <TableCell align="center" sx={{ bgcolor: 'white', borderRight: 1, borderColor: 'divider' }}>
+                                    <TextField
+                                        size="small"
+                                        type="number"
+                                        value={localRatios.integrationTest}
+                                        onChange={handleRatioChange('integrationTest')}
+                                        inputProps={{ step: 0.001, min: 0, max: 1 }}
+                                        sx={{
+                                            '& .MuiInputBase-root': { bgcolor: 'white', width: 100 },
+                                            '& input[type="number"]': { paddingRight: '4px', textAlign: 'center' },
+                                        }}
+                                    />
+                                </TableCell>
+                                <TableCell align="center" sx={{ bgcolor: 'white', borderRight: 1, borderColor: 'divider' }}>
+                                    <TextField
+                                        size="small"
+                                        type="number"
+                                        value={localRatios.systemTest}
+                                        onChange={handleRatioChange('systemTest')}
+                                        inputProps={{ step: 0.001, min: 0, max: 1 }}
+                                        sx={{
+                                            '& .MuiInputBase-root': { bgcolor: 'white', width: 100 },
+                                            '& input[type="number"]': { paddingRight: '4px', textAlign: 'center' },
+                                        }}
+                                    />
+                                </TableCell>
+                                <TableCell align="center" sx={{ bgcolor: 'white', borderLeft: 1, borderRight: 1, borderColor: 'divider' }}>
+                                    {onResetRatios && (
+                                        <Button
+                                            variant="outlined"
+                                            size="small"
+                                            startIcon={<RestartAltIcon />}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onResetRatios();
+                                            }}
+                                            sx={{ fontSize: '0.75rem', py: 0.5, px: 1.5 }}
+                                        >
+                                            リセット
+                                        </Button>
+                                    )}
+                                </TableCell>
+                                <TableCell align="center" sx={{ bgcolor: 'white', fontWeight: 'bold', color: '#212121' }}>
+                                    {totalRatio.toFixed(3)}
+                                </TableCell>
                             </TableRow>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>工数(人月)</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processManMonths?.basicDesign}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processManMonths?.detailedDesign}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processManMonths?.implementation}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processManMonths?.integrationTest}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processManMonths?.systemTest}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold' }}>{totalManMonths.toFixed(2)}</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold', bgcolor: 'white', borderRight: 1, borderColor: 'divider' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#212121' }}>
+                                        <AutoAwesomeIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                        工数(人月)
+                                    </Box>
+                                </TableCell>
+                                <TableCell align="center" sx={{ bgcolor: 'white', borderRight: 1, borderColor: 'divider' }}>
+                                    <Box sx={{ fontWeight: 'bold', color: '#212121', height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        {processManMonths?.basicDesign ? processManMonths.basicDesign.toFixed(2) : '0.00'}
+                                    </Box>
+                                </TableCell>
+                                <TableCell align="center" sx={{ bgcolor: 'white', borderRight: 1, borderColor: 'divider' }}>
+                                    <Box sx={{ fontWeight: 'bold', color: '#212121', height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        {processManMonths?.detailedDesign ? processManMonths.detailedDesign.toFixed(2) : '0.00'}
+                                    </Box>
+                                </TableCell>
+                                <TableCell align="center" sx={{ bgcolor: 'white', borderRight: 1, borderColor: 'divider' }}>
+                                    <Box sx={{ fontWeight: 'bold', color: '#212121', height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        {processManMonths?.implementation ? processManMonths.implementation.toFixed(2) : '0.00'}
+                                    </Box>
+                                </TableCell>
+                                <TableCell align="center" sx={{ bgcolor: 'white', borderRight: 1, borderColor: 'divider' }}>
+                                    <Box sx={{ fontWeight: 'bold', color: '#212121', height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        {processManMonths?.integrationTest ? processManMonths.integrationTest.toFixed(2) : '0.00'}
+                                    </Box>
+                                </TableCell>
+                                <TableCell align="center" sx={{ bgcolor: 'white', borderRight: 1, borderColor: 'divider' }}>
+                                    <Box sx={{ fontWeight: 'bold', color: '#212121', height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        {processManMonths?.systemTest ? processManMonths.systemTest.toFixed(2) : '0.00'}
+                                    </Box>
+                                </TableCell>
+                                <TableCell align="center" sx={{ bgcolor: 'white', borderLeft: 1, borderRight: 1, borderColor: 'divider' }}>-</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: 'white', fontWeight: 'bold', color: '#212121' }}>
+                                    {totalManMonths.toFixed(2)}
+                                </TableCell>
                             </TableRow>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>工期(月)</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processDurations?.basicDesign}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processDurations?.detailedDesign}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processDurations?.implementation}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processDurations?.integrationTest}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#f5f5f5', borderRight: 1, borderColor: 'divider' }}>{processDurations?.systemTest}</TableCell>
-                                <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold' }}>{totalDuration.toFixed(2)}</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold', bgcolor: 'white', borderRight: 1, borderColor: 'divider' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#212121' }}>
+                                        <AutoAwesomeIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                        標準工期(月)
+                                    </Box>
+                                </TableCell>
+                                <TableCell align="center" sx={{ bgcolor: 'white', borderRight: 1, borderColor: 'divider' }}>
+                                    <Box sx={{ fontWeight: 'bold', color: '#212121', height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        {processDurations?.basicDesign ? processDurations.basicDesign.toFixed(2) : '0.00'}
+                                    </Box>
+                                </TableCell>
+                                <TableCell align="center" sx={{ bgcolor: 'white', borderRight: 1, borderColor: 'divider' }}>
+                                    <Box sx={{ fontWeight: 'bold', color: '#212121', height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        {processDurations?.detailedDesign ? processDurations.detailedDesign.toFixed(2) : '0.00'}
+                                    </Box>
+                                </TableCell>
+                                <TableCell align="center" sx={{ bgcolor: 'white', borderRight: 1, borderColor: 'divider' }}>
+                                    <Box sx={{ fontWeight: 'bold', color: '#212121', height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        {processDurations?.implementation ? processDurations.implementation.toFixed(2) : '0.00'}
+                                    </Box>
+                                </TableCell>
+                                <TableCell align="center" sx={{ bgcolor: 'white', borderRight: 1, borderColor: 'divider' }}>
+                                    <Box sx={{ fontWeight: 'bold', color: '#212121', height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        {processDurations?.integrationTest ? processDurations.integrationTest.toFixed(2) : '0.00'}
+                                    </Box>
+                                </TableCell>
+                                <TableCell align="center" sx={{ bgcolor: 'white', borderRight: 1, borderColor: 'divider' }}>
+                                    <Box sx={{ fontWeight: 'bold', color: '#212121', height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        {processDurations?.systemTest ? processDurations.systemTest.toFixed(2) : '0.00'}
+                                    </Box>
+                                </TableCell>
+                                <TableCell align="center" sx={{ bgcolor: 'white', borderLeft: 1, borderRight: 1, borderColor: 'divider' }}>-</TableCell>
+                                <TableCell align="center" sx={{ bgcolor: 'white', fontWeight: 'bold', color: '#212121' }}>
+                                    {totalDuration.toFixed(2)}
+                                </TableCell>
                             </TableRow>
                         </TableBody>
                     </Table>
@@ -137,4 +306,4 @@ function ProcessBreakdownTable(props: Props) {
     );
 }
 
-export default ProcessBreakdownTable;
+export default memo(ProcessBreakdownTable);
