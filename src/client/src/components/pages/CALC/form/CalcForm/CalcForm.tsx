@@ -6,8 +6,7 @@ import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
 import { useMemo, useState, useCallback, useEffect } from 'react';
 import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Stack, Paper, Divider, Select, MenuItem } from '@mui/material';
-import SummarizeIcon from '@mui/icons-material/Summarize';
+import { Box, Stack, Divider, Select, MenuItem } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import ImportButton from '@front/components/ui/Button/ImportButton';
@@ -545,16 +544,8 @@ function CalcForm(props: Props) {
     }, [projectType, ipaValueType, setValue]);
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 72px)' }}>
             <FormProvider {...methods}>
-                {/* ヘッダー */}
-                <Paper elevation={0} sx={{ bgcolor: '#1976d2', color: 'white', p: 2, borderRadius: 0 }}>
-                    <FlexBox gap={1}>
-                        <SummarizeIcon sx={{ fontSize: 32 }} />
-                        <Text variant="pageTitle">見積作成支援ツール</Text>
-                    </FlexBox>
-                </Paper>
-
                 {/* メインコンテンツエリア */}
                 <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
                     {/* 左サイドバー - 案件情報 */}
