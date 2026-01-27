@@ -125,7 +125,7 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
 
         if (column.key === 'selected') {
             return (
-                <TableCell key={column.key} sx={{ width: column.width, minWidth: column.minWidth, flexShrink: 0, borderBottom: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px 16px' }}>
+                <TableCell key={column.key} sx={{ width: column.width, minWidth: column.minWidth, flexShrink: 0, borderLeft: 1, borderRight: 1, borderColor: 'divider', borderBottom: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px 16px' }}>
                     <Controller
                         name={fieldName}
                         control={control}
@@ -190,6 +190,24 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
 
         if (column.type === 'number') {
             const hasError = fieldErrors?.[index]?.[column.key] || false;
+            
+            // disabled の場合は通常のテキスト表示にする
+            if (column.disabled) {
+                return (
+                    <TableCell key={column.key} sx={{ width: column.width, minWidth: column.minWidth, flexShrink: 0, borderLeft: 1, borderRight: 1, borderColor: 'divider', borderBottom: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px 16px' }}>
+                        <Controller
+                            name={fieldName}
+                            control={control}
+                            render={({ field: controllerField }) => (
+                                <Box sx={{ fontWeight: 'bold', color: '#212121' }}>
+                                    {controllerField.value || 0}
+                                </Box>
+                            )}
+                        />
+                    </TableCell>
+                );
+            }
+            
             return (
                 <TableCell key={column.key} sx={{ width: column.width, minWidth: column.minWidth, flexShrink: 0, borderBottom: 'none', display: 'flex', alignItems: 'center', padding: '6px 16px' }}>
                     <TextField
@@ -216,6 +234,7 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                             },
                             '& input[type="number"]': {
                                 paddingRight: '4px',
+                                textAlign: 'center',
                             },
                             ...(hasError && {
                                 '& .MuiOutlinedInput-notchedOutline': {
@@ -230,7 +249,7 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
         }
 
         return (
-            <TableCell key={column.key} sx={{ width: column.width, minWidth: column.minWidth, flex: column.width ? '0 0 auto' : 1, borderBottom: 'none', display: 'flex', alignItems: 'center', padding: '6px 16px' }}>
+            <TableCell key={column.key} sx={{ width: column.width, minWidth: column.minWidth, flex: column.width ? '0 0 auto' : 1, borderRight: column.width ? 1 : undefined, borderColor: 'divider', borderBottom: 'none', display: 'flex', alignItems: 'center', padding: '6px 16px' }}>
                 <TextField 
                     name={fieldName}
                     control={control}
@@ -312,7 +331,7 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
         return (
             <Box style={style} sx={{ borderBottom: '1px solid rgba(224, 224, 224, 1)' }}>
                 <TableRow hover sx={{ display: 'flex', alignItems: 'stretch', width: '100%', height: ROW_HEIGHT }}>
-                    <TableCell align="center" sx={{ width: 60, flexShrink: 0, borderBottom: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px 16px' }}>{index + 1}</TableCell>
+                    <TableCell align="center" sx={{ width: 60, flexShrink: 0, borderRight: 1, borderColor: 'divider', borderBottom: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px 16px' }}>{index + 1}</TableCell>
                     {columns.map((column) => renderCell(field, index, column))}
                 </TableRow>
             </Box>
@@ -327,6 +346,7 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                 sx={{ 
                     overflowX: 'auto', 
                     overflowY: 'hidden',
+                    paddingRight: '13px', // スクロールバーの幅分の余白を確保
                     '&::-webkit-scrollbar': {
                         height: 0, // スクロールバーを非表示
                     },
@@ -336,7 +356,7 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                 <Table stickyHeader size="small">
                     <TableHead>
                         <TableRow sx={{ display: 'flex', width: '100%' }}>
-                            <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 60, flexShrink: 0, padding: '6px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }}>No</TableCell>
+                            <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 60, flexShrink: 0, borderRight: 1, borderColor: 'divider', padding: '6px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }}>No</TableCell>
                             {columns.map((column) => (
                                 <TableCell 
                                     key={column.key}
@@ -352,7 +372,9 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                                         alignItems: 'center',
                                         justifyContent: 'flex-start',
                                         whiteSpace: 'nowrap',
-                                        ...(column.key === 'selected' && { paddingLeft: '0px' })
+                                        ...(column.key === 'selected' && { paddingLeft: '0px', borderLeft: 1, borderRight: 1, borderColor: 'divider', justifyContent: 'center' }),
+                                        ...(column.type === 'number' && column.disabled && { borderLeft: 1, borderRight: 1, borderColor: 'divider', justifyContent: 'center' }),
+                                        ...(column.type === 'text' && column.width && { borderRight: 1, borderColor: 'divider' })
                                     }}
                                 >
                                     {column.key === 'selected' ? (
@@ -391,4 +413,5 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
     );
 }
 
-export default FunctionTable;
+const FunctionTableMemo = memo(FunctionTable) as <T extends FieldValues = FieldValues>(props: Props<T>) => JSX.Element;
+export default FunctionTableMemo;

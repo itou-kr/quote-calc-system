@@ -256,8 +256,8 @@ function CalcForm(props: Props) {
 
     // データファンクションテーブルのカラム定義
     const dataColumns: ColumnDefinition[] = useMemo(() => [
-        { key: 'name', label: '名称', width: 500, icon: 'edit', type: 'text', maxLength: 50 },
-        { key: 'updateType', label: 'データファンクションの種類', width: 300, icon: 'edit', type: 'select', options: [
+        { key: 'name', label: '名称', width: 400, icon: 'edit', type: 'text', maxLength: 50 },
+        { key: 'updateType', label: 'データファンクションの種類', width: 360, icon: 'edit', type: 'select', options: [
             { value: '内部論理ファイル', label: '内部論理ファイル' },
             { value: '外部インタフェースファイル', label: '外部インタフェースファイル' }
         ]},
@@ -268,10 +268,10 @@ function CalcForm(props: Props) {
 
     // トランザクションファンクションテーブルのカラム定義
     const transactionColumns: ColumnDefinition[] = useMemo(() => [
-        { key: 'name', label: '名称', width: 500, icon: 'edit', type: 'text', maxLength: 50 },
-        { key: 'externalInput', label: '外部入力', width: 100, icon: 'edit', type: 'number' },
-        { key: 'externalOutput', label: '外部出力', width: 100, icon: 'edit', type: 'number' },
-        { key: 'externalInquiry', label: '外部照会', width: 100, icon: 'edit', type: 'number' },
+        { key: 'name', label: '名称', width: 400, icon: 'edit', type: 'text', maxLength: 50 },
+        { key: 'externalInput', label: '外部入力', width: 120, icon: 'edit', type: 'number' },
+        { key: 'externalOutput', label: '外部出力', width: 120, icon: 'edit', type: 'number' },
+        { key: 'externalInquiry', label: '外部照会', width: 120, icon: 'edit', type: 'number' },
         { key: 'fpValue', label: 'FP', width: 100, icon: 'auto', type: 'number', disabled: true },
         { key: 'remarks', label: '備考', minWidth: 300, icon: 'edit', type: 'text', maxLength: 200 },
         { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
@@ -498,6 +498,14 @@ function CalcForm(props: Props) {
         setTransactionSelectedCount(0);
     }, [getValues, removeTransaction]);
 
+    /** ▼ 工程別比率をリセット */
+    const onResetProcessRatios = useCallback(() => {
+        const currentProjectType = getValues('projectType') || '新規開発';
+        const currentIpaValueType = getValues('ipaValueType') || '中央値';
+        const defaultRatios = getProcessRatios(currentProjectType, currentIpaValueType);
+        setValue('processRatios', defaultRatios, { shouldValidate: true, shouldDirty: true });
+    }, [getValues, setValue]);
+
     /** ▼ インポート処理 */
     const onImportButtonClick = async () => {
     // const onImportButtonClick = async (file: File) => {
@@ -687,6 +695,10 @@ function CalcForm(props: Props) {
                             // calculateProcessDuration={calculateProcessDuration}
                             isOpen={processBreakdownOpen}
                             onToggle={useCallback(() => setProcessBreakdownOpen(prev => !prev), [])}
+                            onRatiosChange={(next) => {
+                                setValue('processRatios', next, { shouldValidate: false, shouldDirty: true });
+                            }}
+                            onResetRatios={onResetProcessRatios}
                         />
                     </Box>
                 </Box>
