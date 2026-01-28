@@ -77,6 +77,8 @@ function SummaryCard2(props: Props) {
             borderColor: colors.border,
             boxShadow: (borderOnly || grayBackground) ? 'none' : `0 4px 12px ${colors.shadow}`,
             transition: 'all 0.3s ease',
+            minWidth: 200,
+            maxWidth: 320,
             '&:hover': {
                 transform: (borderOnly || grayBackground) ? 'none' : 'translateY(-2px)',
                 boxShadow: (borderOnly || grayBackground) ? 'none' : `0 6px 16px ${colors.shadowHover}`,

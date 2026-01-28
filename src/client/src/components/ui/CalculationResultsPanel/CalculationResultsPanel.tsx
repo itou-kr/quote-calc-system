@@ -58,14 +58,15 @@ function CalculationResultsPanel(props: Props) {
                         gridTemplateColumns: summaryContent ? { xs: '1fr', md: '320px 1fr' } : undefined, 
                         gap: summaryContent ? 1 : 0, 
                         alignItems: 'start', 
-                        p: summaryContent ? 1 : 0 
+                        p: summaryContent ? 1 : 0,
+                        overflow: 'hidden'
                     }}>
                         {summaryContent && (
                             <Box sx={{ position: 'sticky', top: 0, alignSelf: 'start', borderRight: 1, borderColor: 'divider', pr: 2 }}>
                                 {summaryContent}
                             </Box>
                         )}
-                        <Paper elevation={0} sx={{ p: 2, bgcolor: 'white' }}>
+                        <Paper elevation={0} sx={{ p: 2, bgcolor: 'white', overflow: 'auto', minWidth: 0 }}>
                             {children}
                         </Paper>
                     </Box>

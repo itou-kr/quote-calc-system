@@ -194,8 +194,15 @@ response.transactionFunctions =
     // 案件種別とIPA代表値に基づいて工程別比率を自動計算
     processRatios = getProcessRatios(projectType, ipaValueType);
   } else {
-    // 手動入力された工程別比率を使用
-    processRatios = calcTestApplicationRequest.processRatios || getProcessRatios(projectType, ipaValueType);
+    // 手動入力された工程別比率を使用（文字列の場合は数値に変換）
+    const inputRatios = calcTestApplicationRequest.processRatios || getProcessRatios(projectType, ipaValueType);
+    processRatios = {
+      basicDesign: Number(inputRatios.basicDesign) || 0,
+      detailedDesign: Number(inputRatios.detailedDesign) || 0,
+      implementation: Number(inputRatios.implementation) || 0,
+      integrationTest: Number(inputRatios.integrationTest) || 0,
+      systemTest: Number(inputRatios.systemTest) || 0,
+    };
   }
 
   // レスポンスに工程別比率を設定
@@ -211,12 +218,24 @@ response.transactionFunctions =
   //-----小山修正 ここまで----- 
 
   // 工程別FP計算
-  const basicDesignFP = Math.round((response.totalFP ?? 0) * (processRatios?.basicDesign ?? 0) * 100) / 100;
-  const detailedDesignFP = Math.round((response.totalFP ?? 0) * (processRatios?.detailedDesign ?? 0) * 100) / 100;
-  const integrationTestFP = Math.round((response.totalFP ?? 0) * (processRatios?.integrationTest ?? 0) * 100) / 100;
-  const systemTestFP = Math.round((response.totalFP ?? 0) * (processRatios?.systemTest ?? 0) * 100) / 100;
-  // 実装は、totalFPから他の工程の合計を引いた値（丸め誤差を吸収）
-  const implementationFP = Math.round(((response.totalFP ?? 0) - basicDesignFP - detailedDesignFP - integrationTestFP - systemTestFP) * 100) / 100;
+  const ratioSum = (processRatios?.basicDesign ?? 0) + (processRatios?.detailedDesign ?? 0) + (processRatios?.implementation ?? 0) + (processRatios?.integrationTest ?? 0) + (processRatios?.systemTest ?? 0);
+  const allocatableFP = (response.totalFP ?? 0) * ratioSum;
+  
+  // ratioSumが0の場合はゼロ除算を避けるため、全て0に設定
+  let basicDesignFP = 0;
+  let detailedDesignFP = 0;
+  let integrationTestFP = 0;
+  let systemTestFP = 0;
+  let implementationFP = 0;
+  
+  if (ratioSum > 0) {
+    basicDesignFP = Math.round((response.totalFP ?? 0) * (processRatios?.basicDesign ?? 0) * 100) / 100;
+    detailedDesignFP = Math.round((response.totalFP ?? 0) * (processRatios?.detailedDesign ?? 0) * 100) / 100;
+    integrationTestFP = Math.round((response.totalFP ?? 0) * (processRatios?.integrationTest ?? 0) * 100) / 100;
+    systemTestFP = Math.round((response.totalFP ?? 0) * (processRatios?.systemTest ?? 0) * 100) / 100;
+    // 実装工程で丸め誤差を吸収
+    implementationFP = Math.round((allocatableFP - basicDesignFP - detailedDesignFP - integrationTestFP - systemTestFP) * 100) / 100;
+  }
   
 
   response.processFPs = {
@@ -228,12 +247,22 @@ response.transactionFunctions =
   };
 
   // 工程別工数計算
-  const basicDesignManMonths = Math.round((response.totalManMonths ?? 0) * (processRatios?.basicDesign ?? 0) * 100) / 100;
-  const detailedDesignManMonths = Math.round((response.totalManMonths ?? 0) * (processRatios?.detailedDesign ?? 0) * 100) / 100;
-  const integrationTestManMonths = Math.round((response.totalManMonths ?? 0) * (processRatios?.integrationTest ?? 0) * 100) / 100;
-  const systemTestManMonths = Math.round((response.totalManMonths ?? 0) * (processRatios?.systemTest ?? 0) * 100) / 100;
-  // 実装は、totalManMonthsから他の工程の合計を引いた値（丸め誤差を吸収）
-  const implementationManMonths = Math.round(((response.totalManMonths ?? 0) - basicDesignManMonths - detailedDesignManMonths - integrationTestManMonths - systemTestManMonths) * 100) / 100;
+  const allocatableManMonths = (response.totalManMonths ?? 0) * ratioSum;
+  
+  let basicDesignManMonths = 0;
+  let detailedDesignManMonths = 0;
+  let integrationTestManMonths = 0;
+  let systemTestManMonths = 0;
+  let implementationManMonths = 0;
+  
+  if (ratioSum > 0) {
+    basicDesignManMonths = Math.round((response.totalManMonths ?? 0) * (processRatios?.basicDesign ?? 0) * 100) / 100;
+    detailedDesignManMonths = Math.round((response.totalManMonths ?? 0) * (processRatios?.detailedDesign ?? 0) * 100) / 100;
+    integrationTestManMonths = Math.round((response.totalManMonths ?? 0) * (processRatios?.integrationTest ?? 0) * 100) / 100;
+    systemTestManMonths = Math.round((response.totalManMonths ?? 0) * (processRatios?.systemTest ?? 0) * 100) / 100;
+    // 実装工程で丸め誤差を吸収
+    implementationManMonths = Math.round((allocatableManMonths - basicDesignManMonths - detailedDesignManMonths - integrationTestManMonths - systemTestManMonths) * 100) / 100;
+  }
 
   response.processManMonths = {
     basicDesign: basicDesignManMonths,
@@ -244,12 +273,22 @@ response.transactionFunctions =
   };
 
   // 工程別工期計算
-  const basicDesignDuration = Math.round((response.standardDurationMonths ?? 0) * (processRatios?.basicDesign ?? 0) * 100) / 100;
-  const detailedDesignDuration = Math.round((response.standardDurationMonths ?? 0) * (processRatios?.detailedDesign ?? 0) * 100) / 100;
-  const integrationTestDuration = Math.round((response.standardDurationMonths ?? 0) * (processRatios?.integrationTest ?? 0) * 100) / 100;
-  const systemTestDuration = Math.round((response.standardDurationMonths ?? 0) * (processRatios?.systemTest ?? 0) * 100) / 100;
-  // 実装は、standardDurationMonthsから他の工程の合計を引いた値（丸め誤差を吸収）
-  const implementationDuration = Math.round(((response.standardDurationMonths ?? 0) - basicDesignDuration - detailedDesignDuration - integrationTestDuration - systemTestDuration) * 100) / 100;
+  const allocatableDuration = (response.standardDurationMonths ?? 0) * ratioSum;
+  
+  let basicDesignDuration = 0;
+  let detailedDesignDuration = 0;
+  let integrationTestDuration = 0;
+  let systemTestDuration = 0;
+  let implementationDuration = 0;
+  
+  if (ratioSum > 0) {
+    basicDesignDuration = Math.round((response.standardDurationMonths ?? 0) * (processRatios?.basicDesign ?? 0) * 100) / 100;
+    detailedDesignDuration = Math.round((response.standardDurationMonths ?? 0) * (processRatios?.detailedDesign ?? 0) * 100) / 100;
+    integrationTestDuration = Math.round((response.standardDurationMonths ?? 0) * (processRatios?.integrationTest ?? 0) * 100) / 100;
+    systemTestDuration = Math.round((response.standardDurationMonths ?? 0) * (processRatios?.systemTest ?? 0) * 100) / 100;
+    // 実装工程で丸め誤差を吸収
+    implementationDuration = Math.round((allocatableDuration - basicDesignDuration - detailedDesignDuration - integrationTestDuration - systemTestDuration) * 100) / 100;
+  }
 
   response.processDurations = {
     basicDesign: basicDesignDuration,

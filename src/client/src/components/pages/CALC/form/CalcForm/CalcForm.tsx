@@ -99,11 +99,11 @@ const setupYupScheme = () => {
 
         // 工程別比率
         processRatios: yup.object({
-            basicDesign: yup.number().rangeCheck(0.001, 1.000),
-            detailedDesign: yup.number().rangeCheck(0.001, 1.000),
-            implementation: yup.number().rangeCheck(0.001, 1.000),
-            integrationTest: yup.number().rangeCheck(0.001, 1.000),
-            systemTest: yup.number().rangeCheck(0.001, 1.000),
+            basicDesign: yup.number().rangeCheck(0.000, 1.000),
+            detailedDesign: yup.number().rangeCheck(0.000, 1.000),
+            implementation: yup.number().rangeCheck(0.000, 1.000),
+            integrationTest: yup.number().rangeCheck(0.000, 1.000),
+            systemTest: yup.number().rangeCheck(0.000, 1.000),
         }),
 
         // 工程別FP
@@ -287,24 +287,24 @@ function CalcForm(props: Props) {
 
     // データファンクションテーブルのカラム定義
     const dataColumns: ColumnDefinition[] = useMemo(() => [
-        { key: 'name', label: '名称', width: 400, icon: 'edit', type: 'text', maxLength: 50 },
+        { key: 'name', label: '名称', minWidth: 200, maxWidth: 400, icon: 'edit', type: 'text', maxLength: 50 },
         { key: 'updateType', label: 'データファンクションの種類', width: 360, icon: 'edit', type: 'select', options: [
             { value: '内部論理ファイル', label: '内部論理ファイル' },
             { value: '外部インタフェースファイル', label: '外部インタフェースファイル' }
         ]},
-        { key: 'fpValue', label: 'FP', width: 100, icon: 'auto', type: 'number', disabled: true },
-        { key: 'remarks', label: '備考', minWidth: 300, icon: 'edit', type: 'text' , maxLength: 200},
+        { key: 'fpValue', label: 'FP', minWidth: 80, maxWidth: 100, icon: 'auto', type: 'number', disabled: true },
+        { key: 'remarks', label: '備考', minWidth: 200, maxWidth: 300, icon: 'edit', type: 'text' , maxLength: 200},
         { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
     ], []);
 
     // トランザクションファンクションテーブルのカラム定義
     const transactionColumns: ColumnDefinition[] = useMemo(() => [
-        { key: 'name', label: '名称', width: 400, icon: 'edit', type: 'text', maxLength: 50 },
+        { key: 'name', label: '名称', minWidth: 200, maxWidth: 400, icon: 'edit', type: 'text', maxLength: 50 },
         { key: 'externalInput', label: '外部入力', width: 120, icon: 'edit', type: 'number' },
         { key: 'externalOutput', label: '外部出力', width: 120, icon: 'edit', type: 'number' },
         { key: 'externalInquiry', label: '外部照会', width: 120, icon: 'edit', type: 'number' },
-        { key: 'fpValue', label: 'FP', width: 100, icon: 'auto', type: 'number', disabled: true },
-        { key: 'remarks', label: '備考', minWidth: 300, icon: 'edit', type: 'text', maxLength: 200 },
+        { key: 'fpValue', label: 'FP', minWidth: 80, maxWidth: 100, icon: 'auto', type: 'number', disabled: true },
+        { key: 'remarks', label: '備考', minWidth: 200, maxWidth: 300, icon: 'edit', type: 'text', maxLength: 200 },
         { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
     ], []);
 
@@ -448,7 +448,7 @@ function CalcForm(props: Props) {
 
                             {/* インポート / エクスポート */}
                             <Box sx={{ mb: 3 }}>
-                                <Text variant="subsectionTitle">インポート / エクスポート(未対応)</Text>
+                                <Text variant="subsectionTitle">インポート / エクスポート</Text>
                                 <Stack direction="row" spacing={1}>
                                     <ImportButton onFileSelect={onImportButtonClick} onClick={() => {}} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }}>インポート</ImportButton>
                                     <ExportButton onClick={handleSubmit(onExportButtonClick)} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }} />
@@ -464,7 +464,7 @@ function CalcForm(props: Props) {
                             <ProductivityField control={control} trigger={trigger} setValue={setValue} watch={watch} clearErrors={clearErrors} t={t} />
 
                             {/* 案件種別 */}
-                            <FormSection label="案件種別(未対応)">
+                            <FormSection label="案件種別">
                                 <Select value={watch('projectType') || '新規開発'} onChange={(e) => setValue('projectType', e.target.value)} fullWidth size="small" sx={{ bgcolor: 'white' }}>
                                     <MenuItem value="新規開発">新規開発</MenuItem>
                                     <MenuItem value="改良開発">改良開発</MenuItem>
@@ -473,7 +473,7 @@ function CalcForm(props: Props) {
                             </FormSection>
 
                             {/* 使用するIPA代表値 */}
-                            <FormSection label="使用するIPA代表値(未対応)" mb={3}>
+                            <FormSection label="使用するIPA代表値" mb={3}>
                                 <Select value={watch('ipaValueType') || '中央値'} onChange={(e) => setValue('ipaValueType', e.target.value)} size="small" fullWidth sx={{ bgcolor: 'white' }}>
                                     <MenuItem value="中央値">中央値</MenuItem>
                                     <MenuItem value="平均値">平均値</MenuItem>

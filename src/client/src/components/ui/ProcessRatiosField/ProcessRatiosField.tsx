@@ -75,6 +75,16 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
         setValue('processRatios' as any, defaultRatios as any, { shouldValidate: true, shouldDirty: true });
     }, [setValue, getProcessRatios, projectType, ipaValueType]);
 
+    // フィールドがブランクの場合に0を設定するハンドラー
+    const handleBlur = useCallback((fieldName: 'basicDesign' | 'detailedDesign' | 'implementation' | 'integrationTest' | 'systemTest') => {
+        return () => {
+            const currentValue = watch(`processRatios.${fieldName}` as any);
+            if (currentValue === '' || currentValue === null || currentValue === undefined) {
+                setValue(`processRatios.${fieldName}` as any, 0 as any);
+            }
+        };
+    }, [watch, setValue]);
+
     // スタイルをメモ化
     const fieldSx = useMemo(() => ({
         '& .MuiInputBase-root': { bgcolor: autoProcessRatios ? '#f5f5f5' : 'white' }
@@ -122,6 +132,7 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
                     disabled={autoProcessRatios}
                     sx={fieldSx}
                     slotProps={slotProps}
+                    onBlur={handleBlur('basicDesign')}
                 />
                 <TextField
                     name={"processRatios.detailedDesign" as any}
@@ -133,6 +144,7 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
                     disabled={autoProcessRatios}
                     sx={fieldSx}
                     slotProps={slotProps}
+                    onBlur={handleBlur('detailedDesign')}
                 />
                 <TextField
                     name={"processRatios.implementation" as any}
@@ -144,6 +156,7 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
                     disabled={autoProcessRatios}
                     sx={fieldSx}
                     slotProps={slotProps}
+                    onBlur={handleBlur('implementation')}
                 />
                 <TextField
                     name={"processRatios.integrationTest" as any}
@@ -155,6 +168,7 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
                     disabled={autoProcessRatios}
                     sx={fieldSx}
                     slotProps={slotProps}
+                    onBlur={handleBlur('integrationTest')}
                 />
                 <Box sx={{ display: 'flex', gap: 1 }}>
                     <TextField
@@ -167,6 +181,7 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
                         disabled={autoProcessRatios}
                         sx={{ ...fieldSx, flex: 1 }}
                         slotProps={slotProps}
+                        onBlur={handleBlur('systemTest')}
                     />
                 </Box>
                 <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-end' }}>
@@ -186,13 +201,13 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
             <Box sx={{ 
                 mt: 1.5, 
                 p: 1.5, 
-                bgcolor: total === 1 ? '#e8f5e9' : '#fff3e0',
+                bgcolor: total === 1 ? '#e8f5e9' : '#ffebee',
                 border: 1,
-                borderColor: total === 1 ? '#4caf50' : '#ff9800',
+                borderColor: total === 1 ? '#4caf50' : '#ef5350',
                 borderRadius: 1,
                 textAlign: 'center'
             }}>
-                <Text variant="body2" sx={{ fontWeight: 'bold', color: total === 1 ? '#2e7d32' : '#e65100' }}>
+                <Text variant="body2" sx={{ fontWeight: 'bold', color: total === 1 ? '#2e7d32' : '#c62828' }}>
                     合計: {total.toFixed(3)}
                 </Text>
             </Box>
