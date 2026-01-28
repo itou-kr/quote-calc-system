@@ -98,7 +98,7 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
     return (
         <FormSection 
             label="開発工程比率" 
-            mb={3}
+            mb={1}
             rightElement={
                 <FlexBox>
                     <Checkbox 

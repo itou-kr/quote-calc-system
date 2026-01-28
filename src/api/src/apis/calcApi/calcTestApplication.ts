@@ -1,6 +1,68 @@
 import { CalcTestApplication200Response } from '@quote-calc-system/models';
 import * as CalcApi from './types';
 
+/** ▼ 工程別比率を計算する関数（案件種別、IPA代表値に基づく） */
+const getProcessRatios = (projectType: string, ipaValueType: string) => {
+  if (projectType === '新規開発' && ipaValueType === '中央値') {
+    return {
+      basicDesign: 0.205,
+      detailedDesign: 0.181,
+      implementation: 0.241,
+      integrationTest: 0.191,
+      systemTest: 0.182,
+    };
+  } else if (projectType === '新規開発' && ipaValueType === '平均値') {
+    return {
+      basicDesign: 0.207,
+      detailedDesign: 0.175,
+      implementation: 0.249,
+      integrationTest: 0.193,
+      systemTest: 0.176,
+    };
+  } else if (projectType === '改良開発' && ipaValueType === '中央値') {
+    return {
+      basicDesign: 0.216,
+      detailedDesign: 0.185,
+      implementation: 0.243,
+      integrationTest: 0.193,
+      systemTest: 0.163,
+    };
+  } else if (projectType === '改良開発' && ipaValueType === '平均値') {
+    return {
+      basicDesign: 0.216,
+      detailedDesign: 0.176,
+      implementation: 0.244,
+      integrationTest: 0.190,
+      systemTest: 0.174,
+    };
+  } else if (projectType === '再開発' && ipaValueType === '中央値') {
+    return {
+      basicDesign: 0.195,
+      detailedDesign: 0.161,
+      implementation: 0.277,
+      integrationTest: 0.193,
+      systemTest: 0.174,
+    };
+  } else if (projectType === '再開発' && ipaValueType === '平均値') {
+    return {
+      basicDesign: 0.188,
+      detailedDesign: 0.158,
+      implementation: 0.271,
+      integrationTest: 0.208,
+      systemTest: 0.175,
+    };
+  } else {
+    // デフォルト値（新規開発・中央値と同じ）
+    return {
+      basicDesign: 0.205,
+      detailedDesign: 0.181,
+      implementation: 0.241,
+      integrationTest: 0.191,
+      systemTest: 0.182,
+    };
+  }
+};
+
 /** ▼ 生産性を計算する関数（案件種別、IPA代表値、総FPに基づく） */
 const getProductivity = (projectType: string, ipaValueType: string, totalFP: number): number => {
   // 案件種別とIPA代表値の組み合わせごとに、FP範囲に応じた生産性を返す
@@ -114,15 +176,30 @@ response.transactionFunctions =
 
   response.totalFP = dataFunctionsFP + transactionFunctionsFP;
 
+  // 案件種別とIPA代表値の取得
+  const projectType = calcTestApplicationRequest.projectType || '新規開発';
+  const ipaValueType = calcTestApplicationRequest.ipaValueType || '中央値';
+
   // 生産性(FP/月)
   if (calcTestApplicationRequest.autoProductivity) {
     // 案件種別とIPA代表値に基づいて生産性を自動計算
-    const projectType = calcTestApplicationRequest.projectType || '新規開発';
-    const ipaValueType = calcTestApplicationRequest.ipaValueType || '中央値';   
     response.productivityFPPerMonth = getProductivity(projectType, ipaValueType, response.totalFP);
   } else {
     response.productivityFPPerMonth = calcTestApplicationRequest.productivityFPPerMonth;
   }
+
+  // 工程別比率の決定
+  let processRatios;
+  if (calcTestApplicationRequest.autoProcessRatios) {
+    // 案件種別とIPA代表値に基づいて工程別比率を自動計算
+    processRatios = getProcessRatios(projectType, ipaValueType);
+  } else {
+    // 手動入力された工程別比率を使用
+    processRatios = calcTestApplicationRequest.processRatios || getProcessRatios(projectType, ipaValueType);
+  }
+
+  // レスポンスに工程別比率を設定
+  response.processRatios = processRatios;
 
   // 総工数(人月)計算
   response.totalManMonths = Math.ceil((response.totalFP / (response.productivityFPPerMonth || 1)) * 100) / 100;
@@ -133,47 +210,53 @@ response.transactionFunctions =
   response.standardDurationMonths = Math.round(FORMLA * Math.pow(response.totalManMonths, 1/3) * 100) / 100;
   //-----小山修正 ここまで----- 
 
+  // 工程別FP計算
+  const basicDesignFP = Math.round((response.totalFP ?? 0) * (processRatios?.basicDesign ?? 0) * 100) / 100;
+  const detailedDesignFP = Math.round((response.totalFP ?? 0) * (processRatios?.detailedDesign ?? 0) * 100) / 100;
+  const integrationTestFP = Math.round((response.totalFP ?? 0) * (processRatios?.integrationTest ?? 0) * 100) / 100;
+  const systemTestFP = Math.round((response.totalFP ?? 0) * (processRatios?.systemTest ?? 0) * 100) / 100;
+  // 実装は、totalFPから他の工程の合計を引いた値（丸め誤差を吸収）
+  const implementationFP = Math.round(((response.totalFP ?? 0) - basicDesignFP - detailedDesignFP - integrationTestFP - systemTestFP) * 100) / 100;
+  
+
+  response.processFPs = {
+    basicDesign: basicDesignFP,
+    detailedDesign: detailedDesignFP,
+    implementation: implementationFP,
+    integrationTest: integrationTestFP,
+    systemTest: systemTestFP,
+  };
+
   // 工程別工数計算
+  const basicDesignManMonths = Math.round((response.totalManMonths ?? 0) * (processRatios?.basicDesign ?? 0) * 100) / 100;
+  const detailedDesignManMonths = Math.round((response.totalManMonths ?? 0) * (processRatios?.detailedDesign ?? 0) * 100) / 100;
+  const integrationTestManMonths = Math.round((response.totalManMonths ?? 0) * (processRatios?.integrationTest ?? 0) * 100) / 100;
+  const systemTestManMonths = Math.round((response.totalManMonths ?? 0) * (processRatios?.systemTest ?? 0) * 100) / 100;
+  // 実装は、totalManMonthsから他の工程の合計を引いた値（丸め誤差を吸収）
+  const implementationManMonths = Math.round(((response.totalManMonths ?? 0) - basicDesignManMonths - detailedDesignManMonths - integrationTestManMonths - systemTestManMonths) * 100) / 100;
+
   response.processManMonths = {
-    basicDesign:
-      (response.totalManMonths ?? 0) *
-      (calcTestApplicationRequest.processRatios?.basicDesign ?? 0),
-
-    detailedDesign:
-      (response.totalManMonths ?? 0) *
-      (calcTestApplicationRequest.processRatios?.detailedDesign ?? 0),
-
-    implementation:
-      (response.totalManMonths ?? 0) *
-      (calcTestApplicationRequest.processRatios?.implementation ?? 0),
-
-    integrationTest:
-      (response.totalManMonths ?? 0) *
-      (calcTestApplicationRequest.processRatios?.integrationTest ?? 0),
-
-    systemTest:
-      (response.totalManMonths ?? 0) *
-      (calcTestApplicationRequest.processRatios?.systemTest ?? 0),
+    basicDesign: basicDesignManMonths,
+    detailedDesign: detailedDesignManMonths,
+    implementation: implementationManMonths,
+    integrationTest: integrationTestManMonths,
+    systemTest: systemTestManMonths,
   };
 
   // 工程別工期計算
+  const basicDesignDuration = Math.round((response.standardDurationMonths ?? 0) * (processRatios?.basicDesign ?? 0) * 100) / 100;
+  const detailedDesignDuration = Math.round((response.standardDurationMonths ?? 0) * (processRatios?.detailedDesign ?? 0) * 100) / 100;
+  const integrationTestDuration = Math.round((response.standardDurationMonths ?? 0) * (processRatios?.integrationTest ?? 0) * 100) / 100;
+  const systemTestDuration = Math.round((response.standardDurationMonths ?? 0) * (processRatios?.systemTest ?? 0) * 100) / 100;
+  // 実装は、standardDurationMonthsから他の工程の合計を引いた値（丸め誤差を吸収）
+  const implementationDuration = Math.round(((response.standardDurationMonths ?? 0) - basicDesignDuration - detailedDesignDuration - integrationTestDuration - systemTestDuration) * 100) / 100;
+
   response.processDurations = {
-    basicDesign:
-    //-----小山修正 ここから----- 
-      FORMLA * Math.pow((response.processManMonths.basicDesign ?? 0),1/3),
-
-    detailedDesign:
-      FORMLA * Math.pow((response.processManMonths.detailedDesign ?? 0),1/3),
-
-    implementation:
-      FORMLA * Math.pow((response.processManMonths.implementation ?? 0),1/3),
-
-    integrationTest:
-      FORMLA * Math.pow((response.processManMonths.integrationTest ?? 0),1/3),
-
-    systemTest:
-      FORMLA * Math.pow((response.processManMonths.systemTest ?? 0),1/3),
-      //-----小山修正 ここまで----- 
+    basicDesign: basicDesignDuration,
+    detailedDesign: detailedDesignDuration,
+    implementation: implementationDuration,
+    integrationTest: integrationTestDuration,
+    systemTest: systemTestDuration,
   };
 
   return response;

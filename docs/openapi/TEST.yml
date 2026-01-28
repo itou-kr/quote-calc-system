@@ -135,6 +135,8 @@ components:
           type: string
         autoProductivity:
           type: boolean
+        autoProcessRatios:
+          type: boolean
         productivityFPPerMonth:
           type: number
         projectType:
@@ -216,6 +218,19 @@ components:
               type: number
             systemTest:
               type: number        
+        processFPs:
+          type: object
+          properties:
+            basicDesign:
+              type: number
+            detailedDesign:
+              type: number
+            implementation:
+              type: number
+            integrationTest:
+              type: number
+            systemTest:
+              type: number
         processManMonths:
           type: object
           properties:

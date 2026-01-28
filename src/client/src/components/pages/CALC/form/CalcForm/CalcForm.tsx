@@ -5,7 +5,7 @@ import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
 import { useMemo, useState, useCallback } from 'react';
 import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Stack, Paper, Divider, Select, MenuItem, Typography } from '@mui/material';
+import { Box, Stack, Paper, Select, MenuItem, Typography } from '@mui/material';
 import SummarizeIcon from '@mui/icons-material/Summarize';
 import EditIcon from '@mui/icons-material/Edit';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
@@ -19,7 +19,7 @@ import ProductivityField from '@front/components/ui/ProductivityField';
 import ProcessRatiosField from '@front/components/ui/ProcessRatiosField';
 import TableToolbar from '@front/components/ui/TableToolbar';
 import CalculationResultsPanel from '@front/components/ui/CalculationResultsPanel';
-import ProcessBreakdownTable, { ProcessFPs, ProcessRatios } from '@front/components/ui/ProcessBreakdownTable';
+import ProcessBreakdownTable, { ProcessRatios } from '@front/components/ui/ProcessBreakdownTable';
 import FunctionTable, { ColumnDefinition } from '@front/components/ui/FunctionTable';
 import FlexBox from '@front/components/ui/FlexBox';
 import TabPanel from '@front/components/ui/TabPanel';
@@ -105,11 +105,18 @@ const setupYupScheme = () => {
             integrationTest: yup.number().rangeCheck(0.001, 1.000),
             systemTest: yup.number().rangeCheck(0.001, 1.000),
         }),
-        // .optional(),
+
+        // 工程別FP
+        processFPs: yup.object({
+            basicDesign: yup.number().min(0).required(),
+            detailedDesign: yup.number().min(0).required(),
+            implementation: yup.number().min(0).required(),
+            integrationTest: yup.number().min(0).required(),
+            systemTest: yup.number().min(0).required(),
+        }),
 
         // 工程別工数
-        processManMonths: yup
-        .object({
+        processManMonths: yup.object({
             basicDesign: yup.number().min(0).required(),
             detailedDesign: yup.number().min(0).required(),
             implementation: yup.number().min(0).required(),
@@ -119,8 +126,7 @@ const setupYupScheme = () => {
         // .optional(),
 
         // 工程別工期
-        processDurations: yup
-        .object({
+        processDurations: yup.object({
             basicDesign: yup.number().min(0).required(),
             detailedDesign: yup.number().min(0).required(),
             implementation: yup.number().min(0).required(),
@@ -223,6 +229,13 @@ function CalcForm(props: Props) {
             dataFunctions: createDataFunctions(50),
             transactionFunctions: createTransactionFunctions(50),
             processRatios: getProcessRatios('新規開発', '中央値'),
+            processFPs: {
+                basicDesign: 0,
+                detailedDesign: 0,
+                implementation: 0,
+                integrationTest: 0,
+                systemTest: 0,
+            },
             processManMonths: {
                 basicDesign: 0,
                 detailedDesign: 0,
@@ -292,6 +305,9 @@ function CalcForm(props: Props) {
     const manMonths = watch('totalManMonths');
     const standardDuration = watch('standardDurationMonths');
     const rawProcessRatios = watch('processRatios');
+    const processFPs = watch('processFPs');
+    const processManMonths = watch('processManMonths');
+    const processDurations = watch('processDurations');
 
     const defaultProcessRatios = useMemo(() => getProcessRatios(currentProjectType, currentIpaValueType), [currentProjectType, currentIpaValueType]);
     const parseRatio = (value: unknown, fallback: number) => {
@@ -306,56 +322,6 @@ function CalcForm(props: Props) {
         integrationTest: parseRatio(rawProcessRatios?.integrationTest, defaultProcessRatios.integrationTest),
         systemTest: parseRatio(rawProcessRatios?.systemTest, defaultProcessRatios.systemTest),
     };
-    const { basicDesign, detailedDesign, implementation, integrationTest, systemTest } = processRatios;
-
-    // 工程別FP（総FP × 比率）
-    const processFPs: ProcessFPs | undefined = useMemo(() => {
-        if (totalFP === undefined || !Number.isFinite(totalFP)) return undefined;
-        const total = Number(totalFP);
-        return {
-            basicDesign: Math.round(total * basicDesign * 100) / 100,
-            detailedDesign: Math.round(total * detailedDesign * 100) / 100,
-            implementation: Math.round(total * implementation * 100) / 100,
-            integrationTest: Math.round(total * integrationTest * 100) / 100,
-            systemTest: Math.round(total * systemTest * 100) / 100,
-        };
-    }, [totalFP, basicDesign, detailedDesign, implementation, integrationTest, systemTest]);
-
-    /** ▼ 工程別の工数を計算 */
-    // const calculateProcessManMonths = useCallback((ratio: number, isLast: boolean = false) => {
-    //     const totalManMonths = calculateManMonths();
-        
-    //     if (isLast) {
-    //         // 実装（比率が最大の工程）は、総工数から他の工程の合計を引いた値にする
-    //         const basicDesign = Math.round(processRatios.basicDesign * totalManMonths * 100) / 100;
-    //         const detailedDesign = Math.round(processRatios.detailedDesign * totalManMonths * 100) / 100;
-    //         const integrationTest = Math.round(processRatios.integrationTest * totalManMonths * 100) / 100;
-    //         const systemTest = Math.round(processRatios.systemTest * totalManMonths * 100) / 100;
-    //         const sumOthers = basicDesign + detailedDesign + integrationTest + systemTest;
-    //         return Math.round((totalManMonths - sumOthers) * 100) / 100;
-    //     }
-        
-    //     // 通常の工程は四捨五入
-    //     return Math.round(ratio * totalManMonths * 100) / 100;
-    // }, [calculateManMonths, processRatios]);
-
-    /** ▼ 工程別の工期を計算 */
-    // const calculateProcessDuration = useCallback((ratio: number, isLast: boolean = false) => {
-    //     const standardDuration = calculateStandardDuration();
-        
-    //     if (isLast) {
-    //         // 実装（比率が最大の工程）は、標準工期から他の工程の合計を引いた値にする
-    //         const basicDesign = Math.round(processRatios.basicDesign * standardDuration * 100) / 100;
-    //         const detailedDesign = Math.round(processRatios.detailedDesign * standardDuration * 100) / 100;
-    //         const integrationTest = Math.round(processRatios.integrationTest * standardDuration * 100) / 100;
-    //         const systemTest = Math.round(processRatios.systemTest * standardDuration * 100) / 100;
-    //         const sumOthers = basicDesign + detailedDesign + integrationTest + systemTest;
-    //         return Math.round((standardDuration - sumOthers) * 100) / 100;
-    //     }
-        
-    //     // 通常の工程は四捨五入
-    //     return Math.round(ratio * standardDuration * 100) / 100;
-    // }, [calculateStandardDuration, processRatios]);
 
     /** ▼ 工数計算実行 */
     const onExecuteCalculation = async () => {
@@ -477,8 +443,6 @@ function CalcForm(props: Props) {
                                 </FlexBox>
                             </FlexBox>
 
-                            <Divider sx={{ my: 2 }} />
-                            
                             {/* インポート / エクスポート */}
                             <Box sx={{ mb: 3 }}>
                                 <Text variant="subsectionTitle">インポート / エクスポート(未対応)</Text>
@@ -487,8 +451,6 @@ function CalcForm(props: Props) {
                                     <ExportButton onClick={handleSubmit(onExportButtonClick)} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }} />
                                 </Stack>
                             </Box>
-
-                            <Divider sx={{ my: 2 }} />
 
                             {/* 案件名 */}
                             <FormSection label="案件名" required>
@@ -612,6 +574,8 @@ function CalcForm(props: Props) {
                             <ProcessBreakdownTable
                                 processRatios={processRatios}
                                 processFPs={processFPs}
+                                processManMonths={processManMonths}
+                                processDurations={processDurations}
                             />
                         </CalculationResultsPanel>
                     </Box>

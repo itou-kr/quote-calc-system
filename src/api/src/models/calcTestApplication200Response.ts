@@ -25,6 +25,7 @@ export class CalcTestApplication200Response {
     'dataFunctions'?: Array<CalcTestApplication200ResponseDataFunctionsInner>;
     'transactionFunctions'?: Array<CalcTestApplication200ResponseDataFunctionsInner>;
     'processRatios'?: CalcTestApplicationRequestProcessRatios;
+    'processFPs'?: CalcTestApplicationRequestProcessRatios;
     'processManMonths'?: CalcTestApplicationRequestProcessRatios;
     'processDurations'?: CalcTestApplicationRequestProcessRatios;
     'errorMessages'?: Array<string>;
@@ -70,6 +71,11 @@ export class CalcTestApplication200Response {
         {
             "name": "processRatios",
             "baseName": "processRatios",
+            "type": "CalcTestApplicationRequestProcessRatios"
+        },
+        {
+            "name": "processFPs",
+            "baseName": "processFPs",
             "type": "CalcTestApplicationRequestProcessRatios"
         },
         {
