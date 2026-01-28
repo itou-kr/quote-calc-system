@@ -268,6 +268,15 @@ function CalcForm(props: Props) {
     const [transactionSelectedCount, setTransactionSelectedCount] = useState(0);
     const [dataFunctionErrors, setDataFunctionErrors] = useState<Record<number, { name: boolean; updateType: boolean }>>({});
     const [transactionFunctionErrors, setTransactionFunctionErrors] = useState<Record<number, { name: boolean; externalInput: boolean; externalOutput: boolean; externalInquiry: boolean }>>({});
+    
+    // 工程別内訳表に表示する計算結果（計算実行時のみ更新）
+    const [calculatedProcessRatios, setCalculatedProcessRatios] = useState<ProcessRatios>({
+        basicDesign: 0,
+        detailedDesign: 0,
+        implementation: 0,
+        integrationTest: 0,
+        systemTest: 0,
+    });
 
     // カスタムフックでバリデーション関数を取得
     const { validateDataFunctions, validateTransactionFunctions } = useFunctionValidation(
@@ -299,29 +308,12 @@ function CalcForm(props: Props) {
         { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
     ], []);
 
-    const currentProjectType = watch('projectType') || '新規開発';
-    const currentIpaValueType = watch('ipaValueType') || '中央値';
     const totalFP = watch('totalFP');
     const manMonths = watch('totalManMonths');
     const standardDuration = watch('standardDurationMonths');
-    const rawProcessRatios = watch('processRatios');
     const processFPs = watch('processFPs');
     const processManMonths = watch('processManMonths');
     const processDurations = watch('processDurations');
-
-    const defaultProcessRatios = useMemo(() => getProcessRatios(currentProjectType, currentIpaValueType), [currentProjectType, currentIpaValueType]);
-    const parseRatio = (value: unknown, fallback: number) => {
-        const num = typeof value === 'number' ? value : Number(value);
-        return Number.isFinite(num) ? num : fallback;
-    };
-
-    const processRatios: ProcessRatios = {
-        basicDesign: parseRatio(rawProcessRatios?.basicDesign, defaultProcessRatios.basicDesign),
-        detailedDesign: parseRatio(rawProcessRatios?.detailedDesign, defaultProcessRatios.detailedDesign),
-        implementation: parseRatio(rawProcessRatios?.implementation, defaultProcessRatios.implementation),
-        integrationTest: parseRatio(rawProcessRatios?.integrationTest, defaultProcessRatios.integrationTest),
-        systemTest: parseRatio(rawProcessRatios?.systemTest, defaultProcessRatios.systemTest),
-    };
 
     /** ▼ 工数計算実行 */
     const onExecuteCalculation = async () => {
@@ -351,6 +343,17 @@ function CalcForm(props: Props) {
         const result = await calc(currentValues, methods.setError);
         
         if (!result) return;
+        
+        // 計算結果の工程別比率を状態に保存（工程別内訳表用）
+        if (result.processRatios) {
+            setCalculatedProcessRatios({
+                basicDesign: result.processRatios.basicDesign ?? 0,
+                detailedDesign: result.processRatios.detailedDesign ?? 0,
+                implementation: result.processRatios.implementation ?? 0,
+                integrationTest: result.processRatios.integrationTest ?? 0,
+                systemTest: result.processRatios.systemTest ?? 0,
+            });
+        }
         
         // 計算結果をフォームに反映
         methods.reset({
@@ -458,7 +461,7 @@ function CalcForm(props: Props) {
                             </FormSection>
 
                             {/* 生産性 */}
-                            <ProductivityField control={control} trigger={trigger} setValue={setValue} clearErrors={clearErrors} t={t} />
+                            <ProductivityField control={control} trigger={trigger} setValue={setValue} watch={watch} clearErrors={clearErrors} t={t} />
 
                             {/* 案件種別 */}
                             <FormSection label="案件種別(未対応)">
@@ -572,7 +575,7 @@ function CalcForm(props: Props) {
                             }
                         >
                             <ProcessBreakdownTable
-                                processRatios={processRatios}
+                                processRatios={calculatedProcessRatios}
                                 processFPs={processFPs}
                                 processManMonths={processManMonths}
                                 processDurations={processDurations}
