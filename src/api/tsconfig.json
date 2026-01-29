@@ -8,7 +8,6 @@
     ],
     "declaration": true,
     "outDir": "dist",
-    "rootDir": "src",
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -30,10 +29,14 @@
     "paths": {
         "@quote-calc-system/*": [
             "./src/*"
+        ],
+        "@common/*": [
+            "../common/*"
         ]
     }
   },
   "include": [
-    "./src"
+    "./src",
+    "../common"
   ]
 }

@@ -1,67 +1,6 @@
 import { CalcTestApplication200Response } from '@quote-calc-system/models';
 import * as CalcApi from './types';
-
-/** ▼ 工程別比率を計算する関数（案件種別、IPA代表値に基づく） */
-const getProcessRatios = (projectType: string, ipaValueType: string) => {
-  if (projectType === '新規開発' && ipaValueType === '中央値') {
-    return {
-      basicDesign: 0.205,
-      detailedDesign: 0.181,
-      implementation: 0.241,
-      integrationTest: 0.191,
-      systemTest: 0.182,
-    };
-  } else if (projectType === '新規開発' && ipaValueType === '平均値') {
-    return {
-      basicDesign: 0.207,
-      detailedDesign: 0.175,
-      implementation: 0.249,
-      integrationTest: 0.193,
-      systemTest: 0.176,
-    };
-  } else if (projectType === '改良開発' && ipaValueType === '中央値') {
-    return {
-      basicDesign: 0.216,
-      detailedDesign: 0.185,
-      implementation: 0.243,
-      integrationTest: 0.193,
-      systemTest: 0.163,
-    };
-  } else if (projectType === '改良開発' && ipaValueType === '平均値') {
-    return {
-      basicDesign: 0.216,
-      detailedDesign: 0.176,
-      implementation: 0.244,
-      integrationTest: 0.190,
-      systemTest: 0.174,
-    };
-  } else if (projectType === '再開発' && ipaValueType === '中央値') {
-    return {
-      basicDesign: 0.195,
-      detailedDesign: 0.161,
-      implementation: 0.277,
-      integrationTest: 0.193,
-      systemTest: 0.174,
-    };
-  } else if (projectType === '再開発' && ipaValueType === '平均値') {
-    return {
-      basicDesign: 0.188,
-      detailedDesign: 0.158,
-      implementation: 0.271,
-      integrationTest: 0.208,
-      systemTest: 0.175,
-    };
-  } else {
-    // デフォルト値（新規開発・中央値と同じ）
-    return {
-      basicDesign: 0.205,
-      detailedDesign: 0.181,
-      implementation: 0.241,
-      integrationTest: 0.191,
-      systemTest: 0.182,
-    };
-  }
-};
+import { getProcessRatios } from '@common/constants/processRatios';
 
 /** ▼ 生産性を計算する関数（案件種別、IPA代表値、総FPに基づく） */
 const getProductivity = (projectType: string, ipaValueType: string, totalFP: number): number => {

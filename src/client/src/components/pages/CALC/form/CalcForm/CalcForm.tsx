@@ -26,6 +26,7 @@ import Text from '@front/components/ui/Text';
 import { createEmptyDataFunction, createEmptyTransactionFunction, createDataFunctions, createTransactionFunctions } from '@front/types/functionTypes';
 import { createAddRowAction, createDeleteSelectedAction } from '@front/components/ui/TableToolbar/actions/tableActions';
 import { t } from 'i18next';
+import { getProcessRatios } from '@common/constants/processRatios';
 
 const setupYupScheme = () => {
     return yup.object({
@@ -144,67 +145,6 @@ type Props = {
     isDirty: boolean;
 };
 
-/** ▼ 工程別比率を計算する関数 */
-const getProcessRatios = (projectType: string, ipaValueType: string) => {
-    if (projectType === '新規開発' && ipaValueType === '中央値') {
-        return {
-            basicDesign: 0.205,
-            detailedDesign: 0.181,
-            implementation: 0.241,
-            integrationTest: 0.191,
-            systemTest: 0.182,
-        };
-    } else if (projectType === '新規開発' && ipaValueType === '平均値') {
-        return {
-            basicDesign: 0.207,
-            detailedDesign: 0.175,
-            implementation: 0.249,
-            integrationTest: 0.193,
-            systemTest: 0.176,
-        };
-    } else if (projectType === '改良開発' && ipaValueType === '中央値') {
-        return {
-            basicDesign: 0.216,
-            detailedDesign: 0.185,
-            implementation: 0.243,
-            integrationTest: 0.193,
-            systemTest: 0.163,
-        };
-    } else if (projectType === '改良開発' && ipaValueType === '平均値') {
-        return {
-            basicDesign: 0.216,
-            detailedDesign: 0.176,
-            implementation: 0.244,
-            integrationTest: 0.190,
-            systemTest: 0.174,
-        };
-    } else if (projectType === '再開発' && ipaValueType === '中央値') {
-        return {
-            basicDesign: 0.195,
-            detailedDesign: 0.161,
-            implementation: 0.277,
-            integrationTest: 0.193,
-            systemTest: 0.174,
-        };
-    } else if (projectType === '再開発' && ipaValueType === '平均値') {
-        return {
-            basicDesign: 0.188,
-            detailedDesign: 0.158,
-            implementation: 0.271,
-            integrationTest: 0.208,
-            systemTest: 0.175,
-        };
-    } else {
-        return {
-            basicDesign: 0.205,
-            detailedDesign: 0.181,
-            implementation: 0.241,
-            integrationTest: 0.191,
-            systemTest: 0.182,
-        };
-    }
-};
-
 function CalcForm(props: Props) {
     const { viewId } = props;
     const schema = useMemo(() => setupYupScheme(), []);
@@ -307,13 +247,6 @@ function CalcForm(props: Props) {
         { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
     ], []);
 
-    const totalFP = watch('totalFP');
-    const manMonths = watch('totalManMonths');
-    const standardDuration = watch('standardDurationMonths');
-    const processFPs = watch('processFPs');
-    const processManMonths = watch('processManMonths');
-    const processDurations = watch('processDurations');
-
     /** ▼ 工数計算実行 */
     const onExecuteCalculation = async () => {
         // バリデーション実行
@@ -363,6 +296,13 @@ function CalcForm(props: Props) {
         // 工程別比率の表を自動で表示
         setProcessBreakdownOpen(true);
     };
+
+    const totalFP = watch('totalFP');
+    const manMonths = watch('totalManMonths');
+    const standardDuration = watch('standardDurationMonths');
+    const processFPs = watch('processFPs');
+    const processManMonths = watch('processManMonths');
+    const processDurations = watch('processDurations');
 
     /** ▼ データファンクション行追加 */
     const onAddDataRow = useCallback(() => {
@@ -479,8 +419,7 @@ function CalcForm(props: Props) {
                                 watch={watch}
                                 clearErrors={clearErrors}
                                 t={t}
-                                getProcessRatios={getProcessRatios}
-                            />                         
+                            />
                         </Box>
 
                         {/* 固定された下部ボタンエリア */}

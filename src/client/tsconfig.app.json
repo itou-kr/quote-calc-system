@@ -29,6 +29,7 @@
         "baseUrl": ".",
         "paths": {
             "@front/*": ["./src/*"],
+            "@common/*": ["../common/*"],
         },
     },
     "include": [

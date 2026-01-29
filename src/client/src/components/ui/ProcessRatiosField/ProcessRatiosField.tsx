@@ -8,6 +8,7 @@ import TextField from '@front/components/ui/TextField';
 import FlexBox from '@front/components/ui/FlexBox';
 import Text from '@front/components/ui/Text';
 import Button from '@front/components/ui/Button';
+import { getProcessRatios } from '@common/constants/processRatios';
 
 export type Props<T extends FieldValues = any> = {
     control: Control<T>;
@@ -16,20 +17,13 @@ export type Props<T extends FieldValues = any> = {
     watch: UseFormWatch<T>;
     clearErrors?: UseFormClearErrors<T>;
     t: TFunction<'translation', undefined>;
-    getProcessRatios: (projectType: string, ipaValueType: string) => {
-        basicDesign: number;
-        detailedDesign: number;
-        implementation: number;
-        integrationTest: number;
-        systemTest: number;
-    };
 };
 
 /**
  * 開発工程比率入力フィールド（自動入力切り替え機能付き）
  */
 function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
-    const { control, trigger, setValue, watch, clearErrors, t, getProcessRatios } = props;
+    const { control, trigger, setValue, watch, clearErrors, t } = props;
 
     const [autoProcessRatios, setAutoProcessRatios] = useState(true);
     
@@ -50,7 +44,7 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
             const defaultRatios = getProcessRatios(projectType, ipaValueType);
             setValue('processRatios' as any, defaultRatios as any);
         }
-    }, [autoProcessRatios, projectType, ipaValueType, getProcessRatios, setValue]);
+    }, [autoProcessRatios, projectType, ipaValueType, setValue]);
 
     const handleCheckboxChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const checked = e.target.checked;
@@ -68,12 +62,12 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
             clearErrors?.('processRatios.integrationTest' as any);
             clearErrors?.('processRatios.systemTest' as any);
         }
-    }, [setValue, clearErrors, getProcessRatios, projectType, ipaValueType]);
+    }, [setValue, clearErrors, projectType, ipaValueType]);
 
     const handleResetClick = useCallback(() => {
         const defaultRatios = getProcessRatios(projectType, ipaValueType);
         setValue('processRatios' as any, defaultRatios as any, { shouldValidate: true, shouldDirty: true });
-    }, [setValue, getProcessRatios, projectType, ipaValueType]);
+    }, [setValue, projectType, ipaValueType]);
 
     // フィールドがブランクの場合に0を設定するハンドラー
     const handleBlur = useCallback((fieldName: 'basicDesign' | 'detailedDesign' | 'implementation' | 'integrationTest' | 'systemTest') => {
