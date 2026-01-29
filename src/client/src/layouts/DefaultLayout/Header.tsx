@@ -1,16 +1,19 @@
-// import { useParams } from "react-router-dom";
-// import MenuIcon from '@mui/icons-material/Menu';
-// import { AppBar, Link as MuiLink, Toobar, Typography } from '@mui/material';
-// import Cookies from 'js-cookie';
 
-// import IconButton from '@front/components/ui/Button/IconButton';
-// import Link from '@front/components/ui/Link';
-// import { useChangeDrawer } from '@front/hooks/ui/drawer';
+import { Paper } from '@mui/material';
+import FlexBox from '@front/components/ui/FlexBox';
+import SummarizeIcon from '@mui/icons-material/Summarize';
+import Text from '@front/components/ui/Text';
 
-// export default function Header() {
-//     const changeDrawer = useChangeDrawer();
 
-//     return (
-//         <AppBar position="static">
-//             <Toobar variant="dense" sx={{ ml: -1 }}>
-//     )
+
+export default function Header() {
+
+    return (
+        <Paper elevation={0} sx={{ bgcolor: '#1976d2', color: 'white', p: 2, borderRadius: 0 }}>
+            <FlexBox gap={1}>
+                <SummarizeIcon sx={{ fontSize: 32 }} />
+                <Text variant="pageTitle">見積作成支援ツール</Text>
+            </FlexBox>
+        </Paper>
+    )
+}

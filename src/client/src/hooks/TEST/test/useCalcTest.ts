@@ -21,11 +21,18 @@ export function useCalcTest(viewId: ViewIdType) {
         async (data: CalcTestApplicationRequest, _: UseFormSetError<FormType>) => {
             clearAlertMessage();
             const response = await calcApi.calcTestApplication(data);
-            console.log('response', response);
-            setAlertMessage({ severity: 'error', message:'aaaaa' });
-            dispatch(calcStore.actions.setCalc(response.data));
+            const calcResultData = response.data;
 
-            return response.data;
+            if ((calcResultData.errorMessages ?? []).length > 0) {
+            setAlertMessage({ severity: 'error', message: (calcResultData.errorMessages ?? []).join('\n').replaceAll('<br>', '\n') });
+            console.log('errorMessages', calcResultData.errorMessages);
+            return;
+            }            
+
+            console.log('response', response);
+            dispatch(calcStore.actions.setCalc(calcResultData));
+
+            return calcResultData;
         },
         [clearAlertMessage, setAlertMessage]
     );
