@@ -42,6 +42,12 @@ export interface CalcTestApplicationRequest {
     'autoProductivity'?: boolean;
     /**
      * 
+     * @type {boolean}
+     * @memberof CalcTestApplicationRequest
+     */
+    'autoProcessRatios'?: boolean;
+    /**
+     * 
      * @type {number}
      * @memberof CalcTestApplicationRequest
      */

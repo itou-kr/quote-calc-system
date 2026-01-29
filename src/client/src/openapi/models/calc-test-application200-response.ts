@@ -78,6 +78,12 @@ export interface CalcTestApplication200Response {
      * @type {CalcTestApplication200ResponseProcessRatios}
      * @memberof CalcTestApplication200Response
      */
+    'processFPs'?: CalcTestApplication200ResponseProcessRatios;
+    /**
+     * 
+     * @type {CalcTestApplication200ResponseProcessRatios}
+     * @memberof CalcTestApplication200Response
+     */
     'processManMonths'?: CalcTestApplication200ResponseProcessRatios;
     /**
      * 

@@ -64,6 +64,27 @@ function RenderTextField<T extends FieldValues = FieldValues, N extends FieldPat
             await onChange(e);
         }
     };
+
+    // IME変換開始を防ぐ
+    const handleCompositionStart = (e: React.CompositionEvent<HTMLDivElement>) => {
+        if (type === 'number') {
+            e.preventDefault();
+        }
+    };
+
+    // IME変換確定を防ぐ
+    const handleCompositionEnd = (e: React.CompositionEvent<HTMLDivElement>) => {
+        if (type === 'number') {
+            e.preventDefault();
+            const target = e.target as HTMLInputElement;
+            if (target) {
+                // IME入力をクリア
+                target.value = '';
+                field.onChange({ target: { value: '' } } as any);
+            }
+        }
+    };
+
     const handleBlur = async (e: React.FocusEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         field.onBlur();
         if (onBlur) {
@@ -124,6 +145,8 @@ function RenderTextField<T extends FieldValues = FieldValues, N extends FieldPat
             onChange={handleChange}
             onBlur={handleBlur}
             onWheel={handleWheel}
+            onCompositionStart={handleCompositionStart}
+            onCompositionEnd={handleCompositionEnd}
             inputRef={field.ref}
         />
     );
