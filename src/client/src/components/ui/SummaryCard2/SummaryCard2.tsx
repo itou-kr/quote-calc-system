@@ -59,7 +59,12 @@ function SummaryCard2(props: Props) {
     const colors = colorSchemes[colorVariant];
     
     // undefinedの場合はERRORを表示
-    const displayValue = value === undefined ? 'ERROR' : value;
+    // 数値の場合は小数点第2位まで表示
+    const displayValue = value === undefined 
+        ? 'ERROR' 
+        : typeof value === 'number' 
+            ? value.toFixed(2)
+            : value;
 
     const getBackgroundStyle = () => {
         if (grayBackground) return '#f5f5f5';
