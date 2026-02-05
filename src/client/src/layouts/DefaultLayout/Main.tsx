@@ -8,7 +8,7 @@ import Header from './Header';
 
 const useViewId = () => {
     const location = useLocation();
-    return useMemo(() => location.pathname.split('/')[1] || 'HOME', [location]);
+    return useMemo(() => (location.pathname.split('/')[1] || 'HOME').toUpperCase(), [location]);
 }
 
 const Main = memo(() => {
