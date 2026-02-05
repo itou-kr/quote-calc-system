@@ -1,47 +1,70 @@
-import { CalcTestApplication200Response } from '@quote-calc-system/models';
+import { CalcTestApplication200Response, CalcTestApplicationRequest } from '@quote-calc-system/models';
 import * as CalcApi from './types';
 import { getProcessRatios } from '@common/constants/processRatios';
+import { getProductivity } from '@common/constants/productivity';
+import * as path from 'path';
+import * as Excel from 'exceljs';
 
-/** ▼ 生産性を計算する関数（案件種別、IPA代表値、総FPに基づく） */
-const getProductivity = (projectType: string, ipaValueType: string, totalFP: number): number => {
-  // 案件種別とIPA代表値の組み合わせごとに、FP範囲に応じた生産性を返す
-  if (projectType === '新規開発' && ipaValueType === '中央値') {
-    if (totalFP < 400) return 10.5;
-    if (totalFP < 1000) return 13.1;
-    if (totalFP < 3000) return 9.0;
-    return 8.4;
-  } else if (projectType === '新規開発' && ipaValueType === '平均値') {
-    if (totalFP < 400) return 11.1;
-    if (totalFP < 1000) return 21.2;
-    if (totalFP < 3000) return 19.7;
-    return 12.9;
-  } else if (projectType === '改良開発' && ipaValueType === '中央値') {
-    if (totalFP < 200) return 10.4;
-    if (totalFP < 400) return 8.9;
-    if (totalFP < 1000) return 12.3;
-    return 13.2;
-  } else if (projectType === '改良開発' && ipaValueType === '平均値') {
-    if (totalFP < 200) return 18.9;     // データ無のため、全体の平均値を採用
-    if (totalFP < 400) return 14.6;
-    if (totalFP < 1000) return 20.6;
-    return 20.7;
-  } else if (projectType === '再開発' && ipaValueType === '中央値') {
-    if (totalFP < 200) return 20.1;     // データ無のため、全体の中央値を採用
-    if (totalFP < 400) return 20.1;     // データ無のため、全体の中央値を採用
-    if (totalFP < 1000) return 51.5;
-    return 18.9;
-  } else if (projectType === '再開発' && ipaValueType === '平均値') {
-    if (totalFP < 200) return 37.8;     // データ無のため、全体の平均値を採用
-    if (totalFP < 400) return 37.8;     // データ無のため、全体の平均値を採用
-    if (totalFP < 1000) return 37.8;    // データ無のため、全体の平均値を採用
-    return 39.3;
-  } else {
-    // デフォルト値（新規開発・中央値と同じ）
-    if (totalFP < 400) return 10.5;
-    if (totalFP < 1000) return 13.1;
-    if (totalFP < 3000) return 9.0;
-    return 8.4;
+// エラーメッセージを格納する配列
+let errorMessage: string[] = [];
+
+/**
+ * 数値の小数点以下の桁数をチェックする関数
+ * @param value チェック対象の数値
+ * @param maxDecimalPlaces 許容する最大の小数点以下桁数
+ * @returns 小数点以下の桁数
+ */
+const getDecimalPlaces = (value: number | undefined | null): number => {
+  if (value === undefined || value === null || isNaN(value)) return 0;
+  const valueStr = value.toString();
+  const decimalIndex = valueStr.indexOf('.');
+  if (decimalIndex === -1) return 0;
+  return valueStr.length - decimalIndex - 1;
+};
+
+/**
+ * 入力データのバリデーションを行う関数
+ * @param calcTestApplicationRequest リクエストデータ
+ */
+const validateInputData = (calcTestApplicationRequest: CalcTestApplicationRequest) => {
+  // 生産性のチェック（整数かつ4桁以下かつ0以上）
+  // クライアント側の以下の箇所でチェックしているため不要
+  // 1. ProductivityField.tsxで小数点を入力できないように制御
+  // 2. CalcForm.tsxのsetupYupScheme()で4桁以下かつ0以上のバリデーションを実施している
+
+  // 工程別比率のチェック（整数部1桁+小数部3桁まで、合計1.0）
+  if (calcTestApplicationRequest.processRatios && calcTestApplicationRequest.autoProcessRatios !== true) {
+    const ratios = calcTestApplicationRequest.processRatios;
+    const ratioFields: Array<{ key: keyof typeof ratios; label: string }> = [
+      { key: 'basicDesign', label: '基本設計' },
+      { key: 'detailedDesign', label: '詳細設計' },
+      { key: 'implementation', label: '実装' },
+      { key: 'integrationTest', label: '結合テスト' },
+      { key: 'systemTest', label: 'システムテスト' },
+    ];
+
+    let ratioSum = 0;
+    ratioFields.forEach(field => {
+      const value = ratios[field.key];
+      if (value !== undefined && value !== null) {
+        const decimalPlaces = getDecimalPlaces(value);
+        if (decimalPlaces > 3) {
+          errorMessage.push(`工程別比率（${field.label}）は小数点第三位までの値を入力してください`);
+        }
+        ratioSum += value;
+      }
+    });
+
+    // 合計が1.0（100%）であることをチェック（浮動小数点の誤差を考慮して0.001の範囲で許容）
+    if (Math.abs(ratioSum - 1.0) > 0.001) {
+      errorMessage.push(`工程別比率の合計は1.0（100%）である必要があります（現在の合計: ${ratioSum.toFixed(3)}）`);
+    }
   }
+
+  // トランザクションファンクションのチェック（整数かつ4桁以下）
+  // クライアント側の以下の箇所でチェックしているため不要
+  // 1. FunctionTable.tsxで小数点を入力できないように制御
+  // 2. CalcForm.tsxのsetupYupScheme()で4桁以下のバリデーションを実施している
 };
 
 export const calcTestApplication: CalcApi.calcTestApplication = async ({
@@ -49,6 +72,18 @@ export const calcTestApplication: CalcApi.calcTestApplication = async ({
 }) => {
   
   const response = new CalcTestApplication200Response();
+
+  // エラーメッセージ配列の初期化
+  errorMessage = [];
+
+  // 入力データのバリデーション実行
+  validateInputData(calcTestApplicationRequest);
+  
+  // エラーがある場合は処理を中断してエラーを返す
+  if (errorMessage.length > 0) {
+    response.errorMessages = errorMessage;
+    return response;
+  }
   
   if(!calcTestApplicationRequest.productivityFPPerMonth) {
     throw new Error('生産性(FP/月)が指定されていません');
@@ -114,6 +149,13 @@ response.transactionFunctions =
     ) ?? 0;
 
   response.totalFP = dataFunctionsFP + transactionFunctionsFP;
+
+  // 総FPのバリデーション（整数かつ4桁以下）
+  if (response.totalFP > 9999) {
+    errorMessage.push('総FPが4桁を超えています。データファンクションまたはトランザクションファンクションの値を調整してください');
+    response.errorMessages = errorMessage;
+    return response;
+  }
 
   // 案件種別とIPA代表値の取得
   const projectType = calcTestApplicationRequest.projectType || '新規開発';
@@ -239,6 +281,30 @@ response.transactionFunctions =
 
   return response;
 };
+
+// インポート機能用のバリデーション関数（未使用だが将来のために残す）
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function validateConsistencyDetail(
+  fileBuffer: Buffer,
+  fileName: string,
+) {
+  // ===== 拡張子チェック =====
+  const ext = path.extname(fileName).toLowerCase();
+
+  if (ext !== '.xlsx') {
+    errorMessage.push('Excelファイル（.xlsx）を選択してください');
+    return;
+  }
+  const wb = new Excel.Workbook();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await wb.xlsx.load(fileBuffer as any);
+  /** ===== 1シート目（共通項目） ===== */
+  const ws1 = wb.getWorksheet(1);
+  if (!ws1) {
+    errorMessage.push('シート1が見つかりません');
+    return;
+  }
+}
 
 
 

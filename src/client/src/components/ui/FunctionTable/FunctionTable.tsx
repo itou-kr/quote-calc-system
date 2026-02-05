@@ -223,7 +223,7 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                             htmlInput: { 
                                 min: 0, 
                                 onKeyDown: (e: React.KeyboardEvent) => { 
-                                    if (e.key === '-' || e.key === 'e' || e.key === '+') e.preventDefault(); 
+                                    if (e.key === '-' || e.key === 'e' || e.key === '+' || e.key === '.') e.preventDefault(); 
                                 } 
                             } 
                         }}

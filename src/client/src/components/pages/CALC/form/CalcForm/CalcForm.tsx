@@ -1,6 +1,6 @@
 import * as yup from 'yup';
-import { useCalcTest, useExportFile, useImportFile } from '@front/hooks/TEST/test';
-import { useFunctionValidation } from '@front/hooks/useFunctionValidation';
+import { useCalcTest } from '@front/hooks/TEST/test';
+import { useImportFile, useExportFile } from '@front/hooks/CALC/calc';
 import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
 import { useMemo, useState, useCallback } from 'react';
 import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
@@ -40,19 +40,14 @@ const setupYupScheme = () => {
         // 生産性(FP/月)
         productivityFPPerMonth: yup
             .number()
-            .rangeCheck(0.1, 9999.9)
-            .test('min-when-manual', '0.1以上の値を入力してください', function(value) {
+            .rangeCheck(1, 9999)
+            .test('min-when-manual', '1以上の値を入力してください', function(value) {
                 const autoProductivity = this.parent.autoProductivity;
                 // 自動入力がOFFの場合のみminチェック
                 if (autoProductivity === false && value !== undefined && value !== null) {
-                    return value >= 0.1;
+                    return value >= 1;
                 }
                 return true;
-            })
-            .test('decimal-places', '小数点第二位までの値を入力してください', (value) => {
-                if (value === undefined || value === null) return true;
-                const decimalPart = value.toString().split('.')[1];
-                return !decimalPart || decimalPart.length <= 2;
             })
             .test('required-when-manual', '生産性を入力してください', function(value) {
                 const autoProductivity = this.parent.autoProductivity;
@@ -159,7 +154,7 @@ function CalcForm(props: Props) {
             projectName: '',
             autoProductivity: true,
             autoProcessRatios: true,
-            productivityFPPerMonth: 10.5,
+            productivityFPPerMonth: 10,
             projectType: '新規開発',
             ipaValueType: '中央値',
             totalFP: 0,
@@ -205,24 +200,6 @@ function CalcForm(props: Props) {
     const [processBreakdownOpen, setProcessBreakdownOpen] = useState(false);
     const [dataSelectedCount, setDataSelectedCount] = useState(0);
     const [transactionSelectedCount, setTransactionSelectedCount] = useState(0);
-    const [dataFunctionErrors, setDataFunctionErrors] = useState<Record<number, { name: boolean; updateType: boolean }>>({});
-    const [transactionFunctionErrors, setTransactionFunctionErrors] = useState<Record<number, { name: boolean; externalInput: boolean; externalOutput: boolean; externalInquiry: boolean }>>({});
-    
-    // 工程別内訳表に表示する計算結果（計算実行時のみ更新）
-    const [calculatedProcessRatios, setCalculatedProcessRatios] = useState<ProcessRatios>({
-        basicDesign: 0,
-        detailedDesign: 0,
-        implementation: 0,
-        integrationTest: 0,
-        systemTest: 0,
-    });
-
-    // カスタムフックでバリデーション関数を取得
-    const { validateDataFunctions, validateTransactionFunctions } = useFunctionValidation(
-        getValues,
-        setDataFunctionErrors,
-        setTransactionFunctionErrors
-    );
 
     // データファンクションテーブルのカラム定義
     const dataColumns: ColumnDefinition[] = useMemo(() => [
@@ -247,49 +224,14 @@ function CalcForm(props: Props) {
         { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
     ], []);
 
-    /** ▼ 工数計算実行 */
-    const onExecuteCalculation = async () => {
-        // バリデーション実行
-        // フォーム全体のバリデーション（案件名など）
-        const isFormValid = await trigger();
-        
-        // データファンクションのバリデーション
-        const isDataFunctionsValid = validateDataFunctions();
-        
-        // トランザクションファンクションのバリデーション
-        const isTransactionFunctionsValid = validateTransactionFunctions();
-        
-        // バリデーションエラーがある場合は処理を中断
-        if (!isFormValid || !isDataFunctionsValid || !isTransactionFunctionsValid) {
-            // エラー時は結果をundefinedに設定
-            setValue('totalFP', undefined);
-            setValue('totalManMonths', undefined);
-            setValue('standardDurationMonths', undefined);
-            return;
-        }
-        
-        // 現在のフォーム値を取得
-        const currentValues = getValues();
-        
-        // API呼び出しで計算実行
-        const result = await calc(currentValues, methods.setError);
-        
-        if (!result) return;
-        
-        // 計算結果の工程別比率を状態に保存（工程別内訳表用）
-        if (result.processRatios) {
-            setCalculatedProcessRatios({
-                basicDesign: result.processRatios.basicDesign ?? 0,
-                detailedDesign: result.processRatios.detailedDesign ?? 0,
-                implementation: result.processRatios.implementation ?? 0,
-                integrationTest: result.processRatios.integrationTest ?? 0,
-                systemTest: result.processRatios.systemTest ?? 0,
-            });
-        }
-        
-        // 計算結果をフォームに反映
+    // /** ▼ 工数計算実行（バリデーショントリガー） */
+    const handleCalcClick = async (onValid: FormType) => {
+        const result = await calc(onValid, methods.setError);
+
+        if(!result) return;
+
         methods.reset({
-            ...currentValues,
+            ...onValid,
             ...result,
         });
         
@@ -303,6 +245,16 @@ function CalcForm(props: Props) {
     const processFPs = watch('processFPs');
     const processManMonths = watch('processManMonths');
     const processDurations = watch('processDurations');
+    const processRatios = watch('processRatios');
+    
+    // 工程別内訳表に表示する計算結果
+    const calculatedProcessRatios: ProcessRatios = {
+        basicDesign: processRatios?.basicDesign ?? 0,
+        detailedDesign: processRatios?.detailedDesign ?? 0,
+        implementation: processRatios?.implementation ?? 0,
+        integrationTest: processRatios?.integrationTest ?? 0,
+        systemTest: processRatios?.systemTest ?? 0,
+    };
 
     /** ▼ データファンクション行追加 */
     const onAddDataRow = useCallback(() => {
@@ -423,9 +375,9 @@ function CalcForm(props: Props) {
                         </Box>
 
                         {/* 固定された下部ボタンエリア */}
-                        <Box sx={{ borderTop: 1, borderColor: 'divider', p: 3, bgcolor: 'white' }}>
+                        <Box sx={{ borderTop: 1, borderColor: 'divider', p: 2, bgcolor: 'white' }}>
                             {/* 工数計算実行ボタン */}
-                            <Button variant="contained" onClick={onExecuteCalculation} sx={{ width: '100%', bgcolor: '#00d02aff', '&:hover': { bgcolor: '#00a708ff' } }}>工数計算を実行</Button>
+                            <Button variant="contained" onClick={methods.handleSubmit(handleCalcClick)} sx={{ width: '100%', bgcolor: '#00d02aff', '&:hover': { bgcolor: '#00a708ff' } }}>工数計算を実行</Button>
                         </Box>
                     </Box>
 
@@ -467,7 +419,6 @@ function CalcForm(props: Props) {
                                     selectedCount={dataSelectedCount}
                                     onSelectedCountChange={setDataSelectedCount}
                                     maxHeight="100%"
-                                    fieldErrors={dataFunctionErrors}
                                 />
                             </TabPanel>
                             <TabPanel value={tableTabValue} index={1}>
@@ -483,7 +434,6 @@ function CalcForm(props: Props) {
                                     selectedCount={transactionSelectedCount}
                                     onSelectedCountChange={setTransactionSelectedCount}
                                     maxHeight="100%"
-                                    fieldErrors={transactionFunctionErrors}
                                 />
                             </TabPanel>
                         </Box>
