@@ -40,6 +40,9 @@ const calcStore = createSlice({
     setCalc: (draftState: CalcState, action: PayloadAction<CalcState['data']>) => {
       draftState.data = action.payload;
     },
+    setDirty: (draftState: CalcState, action: PayloadAction<boolean>) => {
+      draftState.isDirty = action.payload;
+    },
   },
 });
 
