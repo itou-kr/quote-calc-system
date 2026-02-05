@@ -9,20 +9,6 @@ import * as Excel from 'exceljs';
 let errorMessage: string[] = [];
 
 /**
- * 数値の小数点以下の桁数をチェックする関数
- * @param value チェック対象の数値
- * @param maxDecimalPlaces 許容する最大の小数点以下桁数
- * @returns 小数点以下の桁数
- */
-const getDecimalPlaces = (value: number | undefined | null): number => {
-  if (value === undefined || value === null || isNaN(value)) return 0;
-  const valueStr = value.toString();
-  const decimalIndex = valueStr.indexOf('.');
-  if (decimalIndex === -1) return 0;
-  return valueStr.length - decimalIndex - 1;
-};
-
-/**
  * 入力データのバリデーションを行う関数
  * @param calcTestApplicationRequest リクエストデータ
  */
@@ -47,17 +33,20 @@ const validateInputData = (calcTestApplicationRequest: CalcTestApplicationReques
     ratioFields.forEach(field => {
       const value = ratios[field.key];
       if (value !== undefined && value !== null) {
-        const decimalPlaces = getDecimalPlaces(value);
-        if (decimalPlaces > 3) {
-          errorMessage.push(`工程別比率（${field.label}）は小数点第三位までの値を入力してください`);
-        }
+        // 小数点第3位までのチェック
+        // クライアント側：ProcessRatiosField.tsxのhandleInputで小数点第3位までに入力制限
+
+        // 0〜1の範囲チェック
+        // クライアント側：CalcForm.tsxのyupで.rangeCheck(0.000, 1.000)実施済み
         ratioSum += value;
       }
     });
 
     // 合計が1.0（100%）であることをチェック（浮動小数点の誤差を考慮して0.001の範囲で許容）
+    // クライアント側：ProcessRatiosField.tsxで視覚表示のみ（バリデーションなし）
+    // このチェックはAPI側でのみ実施
     if (Math.abs(ratioSum - 1.0) > 0.001) {
-      errorMessage.push(`工程別比率の合計は1.0（100%）である必要があります（現在の合計: ${ratioSum.toFixed(3)}）`);
+      // TODO: エラーメッセージではなく警告メッセージを表示
     }
   }
 

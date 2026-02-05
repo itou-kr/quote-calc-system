@@ -79,14 +79,32 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
         };
     }, [watch, setValue]);
 
+    // 小数点第3位までに制限する入力ハンドラー
+    const handleInput = useCallback((e: React.FormEvent<HTMLInputElement>) => {
+        const input = e.currentTarget.value;
+        const decimalIndex = input.indexOf('.');
+        
+        // 小数点がある場合、小数点以下の桁数をチェック
+        if (decimalIndex !== -1) {
+            const decimalPart = input.substring(decimalIndex + 1);
+            // 小数点第3位を超える場合は、入力を制限
+            if (decimalPart.length > 3) {
+                e.currentTarget.value = input.substring(0, decimalIndex + 4);
+            }
+        }
+    }, []);
+
     // スタイルをメモ化
     const fieldSx = useMemo(() => ({
         '& .MuiInputBase-root': { bgcolor: autoProcessRatios ? '#f5f5f5' : 'white' }
     }), [autoProcessRatios]);
 
     const slotProps = useMemo(() => ({
-        htmlInput: { step: 0.001 }
-    }), []);
+        htmlInput: { 
+            step: 0.001,
+            onInput: handleInput
+        }
+    }), [handleInput]);
 
     // 合計値を計算（個別フィールドの変更を検知）
     const total = useMemo(() => {
