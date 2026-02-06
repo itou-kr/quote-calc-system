@@ -12,26 +12,39 @@ export const useExportFile = () => {
 
   return async (formData: ExportApplicationRequest) => {
     clearAlertMessage();
-    const response = await exportApi.exportApplication(formData);
-    console.log(response, 'response');
-    const exportFileData = response.data;
+    
+    try {
+      const response = await exportApi.exportApplication(formData);
+      console.log(response, 'response');
+      const exportFileData = response.data;
 
-    if ((exportFileData?.errorMessages?.length ?? 0) > 0) {
+      if ((exportFileData?.errorMessages?.length ?? 0) > 0) {
+        setAlertMessage({
+          severity: 'error',
+          message: (exportFileData?.errorMessages ?? [])
+            .join('\n')
+            .replaceAll('<br>', '\n'),
+        });
+        console.log('errorMessages', exportFileData?.errorMessages);
+        return;
+      }
+      
+      if (!exportFileData.exportFile) {
+        setAlertMessage({
+          severity: 'error',
+          message: 'エクスポートファイルの生成に失敗しました',
+        });
+        return;
+      }
+
+      downloadBase64File(exportFileData.exportFile.content!, exportFileData.exportFile.name!);
+    } catch (error) {
       setAlertMessage({
         severity: 'error',
-        message: (exportFileData?.errorMessages ?? [])
-          .join('\n')
-          .replaceAll('<br>', '\n'),
+        message: 'ファイルの出力に失敗しました',
       });
-      console.log('errorMessages', exportFileData?.errorMessages);
-      return;
+      console.error('Export error:', error);
     }
-    
-    if (!exportFileData.exportFile) {
-      return;
-    }
-
-    downloadBase64File(exportFileData.exportFile.content!, exportFileData.exportFile.name!);
   };
 };
 
