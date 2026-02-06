@@ -200,6 +200,14 @@ function CalcForm(props: Props) {
     const [processBreakdownOpen, setProcessBreakdownOpen] = useState(false);
     const [dataSelectedCount, setDataSelectedCount] = useState(0);
     const [transactionSelectedCount, setTransactionSelectedCount] = useState(0);
+    // 工程別内訳表に表示する比率（計算ボタン押下時のみ更新）
+    const [displayedProcessRatios, setDisplayedProcessRatios] = useState<ProcessRatios>({
+        basicDesign: 0,
+        detailedDesign: 0,
+        implementation: 0,
+        integrationTest: 0,
+        systemTest: 0,
+    });
 
     // データファンクションテーブルのカラム定義
     const dataColumns: ColumnDefinition[] = useMemo(() => [
@@ -235,6 +243,17 @@ function CalcForm(props: Props) {
             ...result,
         });
         
+        // 工程別内訳表に表示する比率を更新
+        if (result.processRatios) {
+            setDisplayedProcessRatios({
+                basicDesign: result.processRatios.basicDesign ?? 0,
+                detailedDesign: result.processRatios.detailedDesign ?? 0,
+                implementation: result.processRatios.implementation ?? 0,
+                integrationTest: result.processRatios.integrationTest ?? 0,
+                systemTest: result.processRatios.systemTest ?? 0,
+            });
+        }
+        
         // 工程別比率の表を自動で表示
         setProcessBreakdownOpen(true);
     };
@@ -245,16 +264,6 @@ function CalcForm(props: Props) {
     const processFPs = watch('processFPs');
     const processManMonths = watch('processManMonths');
     const processDurations = watch('processDurations');
-    const processRatios = watch('processRatios');
-    
-    // 工程別内訳表に表示する計算結果
-    const calculatedProcessRatios: ProcessRatios = {
-        basicDesign: processRatios?.basicDesign ?? 0,
-        detailedDesign: processRatios?.detailedDesign ?? 0,
-        implementation: processRatios?.implementation ?? 0,
-        integrationTest: processRatios?.integrationTest ?? 0,
-        systemTest: processRatios?.systemTest ?? 0,
-    };
 
     /** ▼ データファンクション行追加 */
     const onAddDataRow = useCallback(() => {
@@ -455,7 +464,7 @@ function CalcForm(props: Props) {
                             }
                         >
                             <ProcessBreakdownTable
-                                processRatios={calculatedProcessRatios}
+                                processRatios={displayedProcessRatios}
                                 processFPs={processFPs}
                                 processManMonths={processManMonths}
                                 processDurations={processDurations}

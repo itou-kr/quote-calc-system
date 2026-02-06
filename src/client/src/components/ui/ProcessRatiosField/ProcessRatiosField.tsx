@@ -101,6 +101,8 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
 
     const slotProps = useMemo(() => ({
         htmlInput: { 
+            min: 0.000,
+            max: 1.000,
             step: 0.001,
             onInput: handleInput
         }

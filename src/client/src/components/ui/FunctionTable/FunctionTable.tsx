@@ -51,6 +51,17 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const headerContainerRef = useRef<HTMLDivElement>(null);
     const [listHeight, setListHeight] = useState(0);
+    const [scrollbarWidth, setScrollbarWidth] = useState(15); // 一般的なスクロールバー幅で初期化
+
+    // スクロールバーの幅を計算（LayoutEffect で同期的に実行）
+    useEffect(() => {
+        if (scrollContainerRef.current) {
+            const width = scrollContainerRef.current.offsetWidth - scrollContainerRef.current.clientWidth;
+            if (width !== scrollbarWidth) {
+                setScrollbarWidth(width);
+            }
+        }
+    }, []); // 初回のみ実行
 
     // リストコンテナの高さを監視（debounceでカクつき軽減）
     useEffect(() => {
@@ -222,6 +233,7 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                         slotProps={{ 
                             htmlInput: { 
                                 min: 0, 
+                                max: 9999,
                                 onKeyDown: (e: React.KeyboardEvent) => { 
                                     if (e.key === '-' || e.key === 'e' || e.key === '+' || e.key === '.') e.preventDefault(); 
                                 } 
@@ -345,7 +357,7 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                 sx={{ 
                     overflowX: 'auto', 
                     overflowY: 'hidden',
-                    paddingRight: '13px', // スクロールバーの幅分の余白を確保
+                    paddingRight: `${scrollbarWidth}px`, // スクロールバーの幅分の余白を確保
                     '&::-webkit-scrollbar': {
                         height: 0, // スクロールバーを非表示
                     },

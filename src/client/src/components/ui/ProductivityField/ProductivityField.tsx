@@ -65,6 +65,7 @@ function ProductivityField<T extends FieldValues = any>(props: Props<T>) {
     const productivitySlotProps = useMemo(() => ({
         htmlInput: {
             min: 1,
+            max: 9999,
             step: 1,
             onKeyDown: handleProductivityKeyDown
         }
