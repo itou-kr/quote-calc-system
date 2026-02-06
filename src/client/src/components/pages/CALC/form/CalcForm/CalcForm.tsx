@@ -292,7 +292,7 @@ function CalcForm(props: Props) {
     };
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 72px)' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
             <FormProvider {...methods}>
                 {/* メインコンテンツエリア */}
                 <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>

@@ -20,7 +20,7 @@ const Main = memo(() => {
     }, [clearAlertMessage]);
 
     return (
-        <Grid size="grow">
+        <Grid size="grow" sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
             <Header />
             <AlertMessage viewId={viewId} />
             <MainContent />
