@@ -10,10 +10,10 @@
  * Do not edit the class manually.
  */
 
+import { CalcTestApplicationRequestDataFunctionsInner } from './calcTestApplicationRequestDataFunctionsInner';
 import { CalcTestApplicationRequestProcessRatios } from './calcTestApplicationRequestProcessRatios';
-import { ExportApplicationRequestDataFunctionsInner } from './exportApplicationRequestDataFunctionsInner';
+import { CalcTestApplicationRequestTransactionFunctionsInner } from './calcTestApplicationRequestTransactionFunctionsInner';
 import { ExportApplicationRequestImportFile } from './exportApplicationRequestImportFile';
-import { ExportApplicationRequestTransactionFunctionsInner } from './exportApplicationRequestTransactionFunctionsInner';
 
 /**
 * エクスポートリクエスト
@@ -31,8 +31,8 @@ export class ExportApplicationRequest {
     'processDurations'?: CalcTestApplicationRequestProcessRatios;
     'importFile'?: ExportApplicationRequestImportFile;
     'exportFile'?: ExportApplicationRequestImportFile;
-    'dataFunctions'?: Array<ExportApplicationRequestDataFunctionsInner>;
-    'transactionFunctions'?: Array<ExportApplicationRequestTransactionFunctionsInner>;
+    'dataFunctions'?: Array<CalcTestApplicationRequestDataFunctionsInner>;
+    'transactionFunctions'?: Array<CalcTestApplicationRequestTransactionFunctionsInner>;
 
     static discriminator: string | undefined = undefined;
 
@@ -100,12 +100,12 @@ export class ExportApplicationRequest {
         {
             "name": "dataFunctions",
             "baseName": "dataFunctions",
-            "type": "Array<ExportApplicationRequestDataFunctionsInner>"
+            "type": "Array<CalcTestApplicationRequestDataFunctionsInner>"
         },
         {
             "name": "transactionFunctions",
             "baseName": "transactionFunctions",
-            "type": "Array<ExportApplicationRequestTransactionFunctionsInner>"
+            "type": "Array<CalcTestApplicationRequestTransactionFunctionsInner>"
         }    ];
 
     static getAttributeTypeMap() {

@@ -60,15 +60,14 @@ const setupYupScheme = () => {
                 remarks: yup.string(),
             })
         ),
-        
         // トランザクションファンクション情報
         transactionFunctions: yup.array().of(
             yup.object({
                 selected: yup.boolean(),
                 name: yup.string(),
-                externalInput: yup.number().rangeCheck(0, 9999),
-                externalOutput: yup.number().rangeCheck(0, 9999),
-                externalInquiry: yup.number().rangeCheck(0, 9999),
+                externalInput: yup.number().transform((value, originalValue) => originalValue === "" ? undefined : value).rangeCheck(0, 9999),      // 入力欄が空の場合はundefinedに変換
+                externalOutput: yup.number().transform((value, originalValue) => originalValue === "" ? undefined : value).rangeCheck(0, 9999),     // 入力欄が空の場合はundefinedに変換
+                externalInquiry: yup.number().transform((value, originalValue) => originalValue === "" ? undefined : value).rangeCheck(0, 9999),    // 入力欄が空の場合はundefinedに変換
                 fpValue: yup.number().rangeCheck(0, 9999),
                 remarks: yup.string(),
             })
@@ -82,7 +81,6 @@ const setupYupScheme = () => {
             integrationTest: yup.number().rangeCheck(0.000, 1.000),
             systemTest: yup.number().rangeCheck(0.000, 1.000),
         }),
-
         // 工程別FP
         processFPs: yup.object({
             basicDesign: yup.number().rangeCheck(0, 9999).required(),
@@ -91,7 +89,6 @@ const setupYupScheme = () => {
             integrationTest: yup.number().rangeCheck(0, 9999).required(),
             systemTest: yup.number().rangeCheck(0, 9999).required(),
         }),
-
         // 工程別工数
         processManMonths: yup.object({
             basicDesign: yup.number().rangeCheck(0, 9999).required(),
@@ -100,8 +97,6 @@ const setupYupScheme = () => {
             integrationTest: yup.number().rangeCheck(0, 9999).required(),
             systemTest: yup.number().rangeCheck(0, 9999).required(),
         }),
-        // .optional(),
-
         // 工程別工期
         processDurations: yup.object({
             basicDesign: yup.number().rangeCheck(0, 9999).required(),
@@ -110,7 +105,6 @@ const setupYupScheme = () => {
             integrationTest: yup.number().rangeCheck(0, 9999).required(),
             systemTest: yup.number().rangeCheck(0, 9999).required(),
         }),
-        // .optional(),
     });
 };
 

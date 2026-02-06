@@ -50,10 +50,42 @@ const validateInputData = (calcTestApplicationRequest: CalcTestApplicationReques
     }
   }
 
-  // トランザクションファンクションのチェック（整数かつ4桁以下）
-  // クライアント側の以下の箇所でチェックしているため不要
-  // 1. FunctionTable.tsxで小数点を入力できないように制御
-  // 2. CalcForm.tsxのsetupYupScheme()で4桁以下のバリデーションを実施している
+  // データファンクションのチェック
+  if (calcTestApplicationRequest.dataFunctions) {
+    const errorRows: number[] = [];
+    calcTestApplicationRequest.dataFunctions.forEach((df, index) => {
+      const hasName = df.name && df.name.trim() !== '';
+      const hasUpdateType = df.updateType && df.updateType !== '';
+      // 名称と種類の組み合わせが不正（片方だけ入力されている）
+      if ((hasName && !hasUpdateType) || (!hasName && hasUpdateType)) {
+        errorRows.push(index + 1);
+      }
+    });
+    
+    if (errorRows.length > 0) {
+      errorMessage.push(`データファンクションの名称もしくはデータファンクションの種類が不足しています。(No.${errorRows.join(', ')})`);
+    }
+  }
+
+  // トランザクションファンクションのチェック
+  if (calcTestApplicationRequest.transactionFunctions) {
+    const errorRows: number[] = [];
+    calcTestApplicationRequest.transactionFunctions.forEach((tf, index) => {
+      const hasName = tf.name && tf.name.trim() !== '';
+      const total = (tf.externalInput ?? 0) + (tf.externalOutput ?? 0) + (tf.externalInquiry ?? 0);
+      
+      // 名称が入力されているが外部入力・出力・参照の合計が0
+      // または名称が空で外部入力・出力・参照の合計が0より大きい
+      if ((hasName && total === 0) || (!hasName && total > 0)) {
+        errorRows.push(index + 1);
+      }
+    });
+    
+    if (errorRows.length > 0) {
+      errorMessage.push(`トランザクションファンクションの名称もしくは外部入力・外部出力・外部参照の入力が不足しています。(No.${errorRows.join(', ')})`);
+    }
+  }
+
 };
 
 export const calcTestApplication: CalcApi.calcTestApplication = async ({

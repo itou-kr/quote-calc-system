@@ -12,14 +12,38 @@
 
 
 export class CalcTestApplicationRequestDataFunctionsInner {
+    'selected'?: boolean;
+    'name'?: string;
     'updateType'?: string;
+    'fpValue'?: number;
+    'remarks'?: string;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
+            "name": "selected",
+            "baseName": "selected",
+            "type": "boolean"
+        },
+        {
+            "name": "name",
+            "baseName": "name",
+            "type": "string"
+        },
+        {
             "name": "updateType",
             "baseName": "updateType",
+            "type": "string"
+        },
+        {
+            "name": "fpValue",
+            "baseName": "fpValue",
+            "type": "number"
+        },
+        {
+            "name": "remarks",
+            "baseName": "remarks",
             "type": "string"
         }    ];
 
