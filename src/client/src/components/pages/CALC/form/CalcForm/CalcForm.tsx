@@ -35,28 +35,10 @@ const setupYupScheme = () => {
         projectName: yup.string().required('案件名を入力してください'),
         // 生産性自動入力チェック
         autoProductivity: yup.boolean(),
+        // 生産性(FP/月)
+        productivityFPPerMonth: yup.number().rangeCheck(1, 9999),
         // 開発工程比率自動入力チェック
         autoProcessRatios: yup.boolean(),
-        // 生産性(FP/月)
-        productivityFPPerMonth: yup
-            .number()
-            .rangeCheck(1, 9999)
-            .test('min-when-manual', '1以上の値を入力してください', function(value) {
-                const autoProductivity = this.parent.autoProductivity;
-                // 自動入力がOFFの場合のみminチェック
-                if (autoProductivity === false && value !== undefined && value !== null) {
-                    return value >= 1;
-                }
-                return true;
-            })
-            .test('required-when-manual', '生産性を入力してください', function(value) {
-                const autoProductivity = this.parent.autoProductivity;
-                // 自動入力がOFFの場合のみ必須チェック
-                if (autoProductivity === false) {
-                    return value !== undefined && value !== null;
-                }
-                return true;
-            }),
         // 案件種別
         projectType: yup.string(),
         // 使用するIPA代表値
@@ -74,7 +56,7 @@ const setupYupScheme = () => {
                 selected: yup.boolean(),
                 name: yup.string(),
                 updateType: yup.string(),
-                fpValue: yup.number().min(0, '0以上の値を入力してください'),
+                fpValue: yup.number().rangeCheck(0, 9999),
                 remarks: yup.string(),
             })
         ),
@@ -87,7 +69,7 @@ const setupYupScheme = () => {
                 externalInput: yup.number().rangeCheck(0, 9999),
                 externalOutput: yup.number().rangeCheck(0, 9999),
                 externalInquiry: yup.number().rangeCheck(0, 9999),
-                fpValue: yup.number().min(0, '0以上の値を入力してください'),
+                fpValue: yup.number().rangeCheck(0, 9999),
                 remarks: yup.string(),
             })
         ),
@@ -103,30 +85,30 @@ const setupYupScheme = () => {
 
         // 工程別FP
         processFPs: yup.object({
-            basicDesign: yup.number().min(0).required(),
-            detailedDesign: yup.number().min(0).required(),
-            implementation: yup.number().min(0).required(),
-            integrationTest: yup.number().min(0).required(),
-            systemTest: yup.number().min(0).required(),
+            basicDesign: yup.number().rangeCheck(0, 9999).required(),
+            detailedDesign: yup.number().rangeCheck(0, 9999).required(),
+            implementation: yup.number().rangeCheck(0, 9999).required(),
+            integrationTest: yup.number().rangeCheck(0, 9999).required(),
+            systemTest: yup.number().rangeCheck(0, 9999).required(),
         }),
 
         // 工程別工数
         processManMonths: yup.object({
-            basicDesign: yup.number().min(0).required(),
-            detailedDesign: yup.number().min(0).required(),
-            implementation: yup.number().min(0).required(),
-            integrationTest: yup.number().min(0).required(),
-            systemTest: yup.number().min(0).required(),
+            basicDesign: yup.number().rangeCheck(0, 9999).required(),
+            detailedDesign: yup.number().rangeCheck(0, 9999).required(),
+            implementation: yup.number().rangeCheck(0, 9999).required(),
+            integrationTest: yup.number().rangeCheck(0, 9999).required(),
+            systemTest: yup.number().rangeCheck(0, 9999).required(),
         }),
         // .optional(),
 
         // 工程別工期
         processDurations: yup.object({
-            basicDesign: yup.number().min(0).required(),
-            detailedDesign: yup.number().min(0).required(),
-            implementation: yup.number().min(0).required(),
-            integrationTest: yup.number().min(0).required(),
-            systemTest: yup.number().min(0).required(),
+            basicDesign: yup.number().rangeCheck(0, 9999).required(),
+            detailedDesign: yup.number().rangeCheck(0, 9999).required(),
+            implementation: yup.number().rangeCheck(0, 9999).required(),
+            integrationTest: yup.number().rangeCheck(0, 9999).required(),
+            systemTest: yup.number().rangeCheck(0, 9999).required(),
         }),
         // .optional(),
     });
@@ -224,9 +206,9 @@ function CalcForm(props: Props) {
     // トランザクションファンクションテーブルのカラム定義
     const transactionColumns: ColumnDefinition[] = useMemo(() => [
         { key: 'name', label: '名称', minWidth: 200, maxWidth: 400, icon: 'edit', type: 'text', maxLength: 50 },
-        { key: 'externalInput', label: '外部入力', width: 120, icon: 'edit', type: 'number' },
-        { key: 'externalOutput', label: '外部出力', width: 120, icon: 'edit', type: 'number' },
-        { key: 'externalInquiry', label: '外部照会', width: 120, icon: 'edit', type: 'number' },
+        { key: 'externalInput', label: '外部入力', width: 120, icon: 'edit', type: 'number', min: 0, max: 9999 },
+        { key: 'externalOutput', label: '外部出力', width: 120, icon: 'edit', type: 'number', min: 0, max: 9999 },
+        { key: 'externalInquiry', label: '外部照会', width: 120, icon: 'edit', type: 'number', min: 0, max: 9999 },
         { key: 'fpValue', label: 'FP', minWidth: 80, maxWidth: 100, icon: 'auto', type: 'number', disabled: true },
         { key: 'remarks', label: '備考', minWidth: 200, maxWidth: 300, icon: 'edit', type: 'text', maxLength: 200 },
         { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },

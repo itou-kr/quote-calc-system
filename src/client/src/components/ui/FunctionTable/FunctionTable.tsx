@@ -21,6 +21,8 @@ export type ColumnDefinition = {
     options?: { value: string; label: string }[];
     disabled?: boolean;
     maxLength?: number;
+    min?: number;
+    max?: number;
 };
 
 export type Props<T extends FieldValues = FieldValues> = {
@@ -230,10 +232,10 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                         notFullWidth
                         disabled={column.disabled}
                         error={hasError}
+                        min={column.min}
+                        max={column.max}
                         slotProps={{ 
                             htmlInput: { 
-                                min: 0, 
-                                max: 9999,
                                 onKeyDown: (e: React.KeyboardEvent) => { 
                                     if (e.key === '-' || e.key === 'e' || e.key === '+' || e.key === '.') e.preventDefault(); 
                                 } 
