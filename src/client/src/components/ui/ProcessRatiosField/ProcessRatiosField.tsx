@@ -42,7 +42,12 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
     useEffect(() => {
         if (autoProcessRatios) {
             const defaultRatios = getProcessRatios(projectType, ipaValueType);
-            setValue('processRatios' as any, defaultRatios as any);
+            // 個別フィールドに設定することで、watchによる合計値の自動更新をトリガー
+            setValue('processRatios.basicDesign' as any, defaultRatios.basicDesign as any);
+            setValue('processRatios.detailedDesign' as any, defaultRatios.detailedDesign as any);
+            setValue('processRatios.implementation' as any, defaultRatios.implementation as any);
+            setValue('processRatios.integrationTest' as any, defaultRatios.integrationTest as any);
+            setValue('processRatios.systemTest' as any, defaultRatios.systemTest as any);
         }
     }, [autoProcessRatios, projectType, ipaValueType, setValue]);
 
@@ -54,7 +59,12 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
         // チェックをONにしたタイミングで自動的にデフォルト値を設定
         if (checked) {
             const defaultRatios = getProcessRatios(projectType, ipaValueType);
-            setValue('processRatios' as any, defaultRatios as any, { shouldValidate: true });
+            // 個別フィールドに設定することで、watchによる合計値の自動更新をトリガー
+            setValue('processRatios.basicDesign' as any, defaultRatios.basicDesign as any, { shouldValidate: true });
+            setValue('processRatios.detailedDesign' as any, defaultRatios.detailedDesign as any, { shouldValidate: true });
+            setValue('processRatios.implementation' as any, defaultRatios.implementation as any, { shouldValidate: true });
+            setValue('processRatios.integrationTest' as any, defaultRatios.integrationTest as any, { shouldValidate: true });
+            setValue('processRatios.systemTest' as any, defaultRatios.systemTest as any, { shouldValidate: true });
             // エラーを解除
             clearErrors?.('processRatios.basicDesign' as any);
             clearErrors?.('processRatios.detailedDesign' as any);
@@ -66,7 +76,12 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
 
     const handleResetClick = useCallback(() => {
         const defaultRatios = getProcessRatios(projectType, ipaValueType);
-        setValue('processRatios' as any, defaultRatios as any, { shouldValidate: true, shouldDirty: true });
+        // 個別フィールドに設定することで、watchによる合計値の自動更新をトリガー
+        setValue('processRatios.basicDesign' as any, defaultRatios.basicDesign as any, { shouldValidate: true, shouldDirty: true });
+        setValue('processRatios.detailedDesign' as any, defaultRatios.detailedDesign as any, { shouldValidate: true, shouldDirty: true });
+        setValue('processRatios.implementation' as any, defaultRatios.implementation as any, { shouldValidate: true, shouldDirty: true });
+        setValue('processRatios.integrationTest' as any, defaultRatios.integrationTest as any, { shouldValidate: true, shouldDirty: true });
+        setValue('processRatios.systemTest' as any, defaultRatios.systemTest as any, { shouldValidate: true, shouldDirty: true });
     }, [setValue, projectType, ipaValueType]);
 
     // フィールドがブランクの場合に0を設定するハンドラー
