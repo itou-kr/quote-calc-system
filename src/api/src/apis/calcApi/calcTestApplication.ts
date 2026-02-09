@@ -24,7 +24,7 @@ const validateInputData = (calcTestApplicationRequest: CalcTestApplicationReques
     const ratioFields: Array<{ key: keyof typeof ratios; label: string }> = [
       { key: 'basicDesign', label: '基本設計' },
       { key: 'detailedDesign', label: '詳細設計' },
-      { key: 'implementation', label: '実装' },
+      { key: 'implementation', label: '製造' },
       { key: 'integrationTest', label: '結合テスト' },
       { key: 'systemTest', label: 'システムテスト' },
     ];
@@ -235,7 +235,7 @@ response.transactionFunctions =
     detailedDesignFP = Math.round((response.totalFP ?? 0) * (processRatios?.detailedDesign ?? 0) * 100) / 100;
     integrationTestFP = Math.round((response.totalFP ?? 0) * (processRatios?.integrationTest ?? 0) * 100) / 100;
     systemTestFP = Math.round((response.totalFP ?? 0) * (processRatios?.systemTest ?? 0) * 100) / 100;
-    // 実装工程で丸め誤差を吸収
+    // 製造工程で丸め誤差を吸収
     implementationFP = Math.round((allocatableFP - basicDesignFP - detailedDesignFP - integrationTestFP - systemTestFP) * 100) / 100;
   }
   
@@ -262,7 +262,7 @@ response.transactionFunctions =
     detailedDesignManMonths = Math.round((response.totalManMonths ?? 0) * (processRatios?.detailedDesign ?? 0) * 100) / 100;
     integrationTestManMonths = Math.round((response.totalManMonths ?? 0) * (processRatios?.integrationTest ?? 0) * 100) / 100;
     systemTestManMonths = Math.round((response.totalManMonths ?? 0) * (processRatios?.systemTest ?? 0) * 100) / 100;
-    // 実装工程で丸め誤差を吸収
+    // 製造工程で丸め誤差を吸収
     implementationManMonths = Math.round((allocatableManMonths - basicDesignManMonths - detailedDesignManMonths - integrationTestManMonths - systemTestManMonths) * 100) / 100;
   }
 
@@ -288,7 +288,7 @@ response.transactionFunctions =
     detailedDesignDuration = Math.round((response.standardDurationMonths ?? 0) * (processRatios?.detailedDesign ?? 0) * 100) / 100;
     integrationTestDuration = Math.round((response.standardDurationMonths ?? 0) * (processRatios?.integrationTest ?? 0) * 100) / 100;
     systemTestDuration = Math.round((response.standardDurationMonths ?? 0) * (processRatios?.systemTest ?? 0) * 100) / 100;
-    // 実装工程で丸め誤差を吸収
+    // 製造工程で丸め誤差を吸収
     implementationDuration = Math.round((allocatableDuration - basicDesignDuration - detailedDesignDuration - integrationTestDuration - systemTestDuration) * 100) / 100;
   }
 
