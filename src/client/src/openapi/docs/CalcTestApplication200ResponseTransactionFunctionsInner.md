@@ -1,4 +1,4 @@
-# CalcTestApplication200ResponseDataFunctionsInner
+# CalcTestApplication200ResponseTransactionFunctionsInner
 
 
 ## Properties
@@ -7,19 +7,23 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **selected** | **boolean** |  | [optional] [default to undefined]
 **name** | **string** |  | [optional] [default to undefined]
-**updateType** | **string** |  | [optional] [default to undefined]
+**externalInput** | **number** |  | [optional] [default to undefined]
+**externalOutput** | **number** |  | [optional] [default to undefined]
+**externalInquiry** | **number** |  | [optional] [default to undefined]
 **fpValue** | **number** |  | [optional] [default to undefined]
 **remarks** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { CalcTestApplication200ResponseDataFunctionsInner } from './api';
+import { CalcTestApplication200ResponseTransactionFunctionsInner } from './api';
 
-const instance: CalcTestApplication200ResponseDataFunctionsInner = {
+const instance: CalcTestApplication200ResponseTransactionFunctionsInner = {
     selected,
     name,
-    updateType,
+    externalInput,
+    externalOutput,
+    externalInquiry,
     fpValue,
     remarks,
 };

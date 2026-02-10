@@ -18,6 +18,9 @@ import type { CalcTestApplication200ResponseDataFunctionsInner } from './calc-te
 // May contain unused imports in some cases
 // @ts-ignore
 import type { CalcTestApplication200ResponseProcessRatios } from './calc-test-application200-response-process-ratios';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { CalcTestApplication200ResponseTransactionFunctionsInner } from './calc-test-application200-response-transaction-functions-inner';
 
 /**
  * 工数計算レスポンス
@@ -63,10 +66,10 @@ export interface CalcTestApplication200Response {
     'dataFunctions'?: Array<CalcTestApplication200ResponseDataFunctionsInner>;
     /**
      * 
-     * @type {Array<CalcTestApplication200ResponseDataFunctionsInner>}
+     * @type {Array<CalcTestApplication200ResponseTransactionFunctionsInner>}
      * @memberof CalcTestApplication200Response
      */
-    'transactionFunctions'?: Array<CalcTestApplication200ResponseDataFunctionsInner>;
+    'transactionFunctions'?: Array<CalcTestApplication200ResponseTransactionFunctionsInner>;
     /**
      * 
      * @type {CalcTestApplication200ResponseProcessRatios}
