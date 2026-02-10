@@ -2,9 +2,10 @@ import * as yup from 'yup';
 import { useCalcTest } from '@front/hooks/TEST/test';
 import { useImportFile, useExportFile } from '@front/hooks/CALC/calc';
 import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
-import { useMemo, useState, useCallback, useEffect } from 'react';
-// import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
-import { useForm, useFieldArray } from 'react-hook-form';
+// import { useMemo, useState, useCallback, useEffect } from 'react';
+import { useMemo, useState, useCallback } from 'react';
+import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
+// import { useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Stack, Paper, Select, MenuItem, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
@@ -28,7 +29,7 @@ import { createEmptyDataFunction, createEmptyTransactionFunction, createDataFunc
 import { createAddRowAction, createDeleteSelectedAction } from '@front/components/ui/TableToolbar/actions/tableActions';
 import { t } from 'i18next';
 import { getProcessRatios } from '@common/constants/processRatios';
-import { useSetDirty } from '@front/hooks/TEST/test';
+// import { useSetDirty } from '@front/hooks/TEST/test';
 import FormPaperProvider from '@front/components/ui/Layout/Form/FormPaperProvider';
 
 
@@ -126,7 +127,7 @@ function CalcForm(props: Props) {
     const calc = useCalcTest(viewId as ViewIdType);
     const importFile = useImportFile();
     const exportFile = useExportFile();
-    const setDirty = useSetDirty();
+    // const setDirty = useSetDirty();
     const methods = useForm<FormType>({
         mode: 'onSubmit',
         reValidateMode: 'onSubmit',
@@ -168,7 +169,8 @@ function CalcForm(props: Props) {
             ...props.data,
         },
     });
-    const { control, trigger, watch, setValue, getValues, handleSubmit, clearErrors, formState: { isDirty: formIsDirty },
+    // const { control, trigger, watch, setValue, getValues, handleSubmit, clearErrors, formState: { isDirty: formIsDirty },
+    const { control, trigger, watch, setValue, getValues, handleSubmit, clearErrors,
  } = methods;
     const { fields: dataFields, append: appendData, remove: removeData } = useFieldArray({
         control,
@@ -297,13 +299,14 @@ function CalcForm(props: Props) {
         await exportFile(latestValues);
     };
 
-    useEffect(() => {
-        setDirty(formIsDirty);
-    }, [setDirty, formIsDirty]);
+    // useEffect(() => {
+    //     setDirty(formIsDirty);
+    // }, [setDirty, formIsDirty]);
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-            <FormPaperProvider {...methods} blockNavigation={methods.formState.isDirty}>
+            {/* <FormProvider {...methods} blockNavigation={methods.formState.isDirty}> */}
+            <FormProvider {...methods}>
                 {/* メインコンテンツエリア */}
                 <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
                     {/* 左サイドバー - 案件情報 */}
@@ -458,7 +461,7 @@ function CalcForm(props: Props) {
                         </CalculationResultsPanel>
                     </Box>
                 </Box>
-            </FormPaperProvider>
+            </FormProvider>
         </Box>
     );
 }
