@@ -32,7 +32,7 @@ const setupYupScheme = () => {
     return yup.object({
         /** 案件情報 */
         // 案件名
-        projectName: yup.string().required(),
+        projectName: yup.string().label('案件名').required(),
         // 生産性自動入力チェック
         autoProductivity: yup.boolean(),
         // 生産性(FP/月)

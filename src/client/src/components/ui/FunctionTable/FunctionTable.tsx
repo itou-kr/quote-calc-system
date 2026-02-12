@@ -237,7 +237,8 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                         slotProps={{ 
                             htmlInput: { 
                                 onKeyDown: (e: React.KeyboardEvent) => { 
-                                    if (e.key === '-' || e.key === 'e' || e.key === '+' || e.key === '.') e.preventDefault(); 
+                                    // 整数のみなので小数点も禁止
+                                    if (e.key === '.') e.preventDefault(); 
                                 } 
                             } 
                         }}

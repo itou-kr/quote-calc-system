@@ -136,6 +136,42 @@ function RenderTextField<T extends FieldValues = FieldValues, N extends FieldPat
         }
     };
 
+    // 数値入力フィールドで不正なキー入力を防ぐ
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (type === 'number') {
+            // e（指数表記）、+（プラス）は常に禁止
+            if (e.key === 'e' || e.key === 'E' || e.key === '+') {
+                e.preventDefault();
+                return;
+            }
+            // min >= 0 の場合はマイナスも禁止
+            if (e.key === '-' && min !== undefined && min >= 0) {
+                e.preventDefault();
+                return;
+            }
+        }
+        
+        // ユーザーから渡されたonKeyDownも実行
+        const userOnKeyDown = (userSlotProps?.htmlInput as any)?.onKeyDown;
+        if (userOnKeyDown && typeof userOnKeyDown === 'function') {
+            userOnKeyDown(e);
+        }
+    };
+
+    // 数値入力フィールドのonInputハンドラー（TextField側とユーザー側の両方を実行）
+    const handleInputWrapper = (e: React.FormEvent<HTMLInputElement>) => {
+        // TextField側のmin/maxチェック
+        if (type === 'number' && (min !== undefined || max !== undefined)) {
+            handleInput(e);
+        }
+        
+        // ユーザーから渡されたonInputも実行
+        const userOnInput = (userSlotProps?.htmlInput as any)?.onInput;
+        if (userOnInput && typeof userOnInput === 'function') {
+            userOnInput(e);
+        }
+    };
+
     useEffect(() => {
         if (invalid) {
             trigger(name);
@@ -153,8 +189,12 @@ function RenderTextField<T extends FieldValues = FieldValues, N extends FieldPat
             maxLength,
             min,
             max,
-            ...(type === 'number' && (min !== undefined || max !== undefined) && { onInput: handleInput }),
-            ...userSlotProps?.htmlInput,
+            ...(type === 'number' && (min !== undefined || max !== undefined || (userSlotProps?.htmlInput as any)?.onInput) && { onInput: handleInputWrapper }),
+            ...(type === 'number' && { onKeyDown: handleKeyDown }),
+            // ユーザー指定の他のプロパティをマージ（onKeyDown, onInputは除外、ラッパー関数内で呼び出す）
+            ...(userSlotProps?.htmlInput ? Object.fromEntries(
+                Object.entries(userSlotProps.htmlInput as any).filter(([key]) => key !== 'onKeyDown' && key !== 'onInput')
+            ) : {}),
         },
     };
 

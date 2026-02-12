@@ -94,49 +94,6 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
         };
     }, [watch, setValue]);
 
-    // 0以上1以下かつ小数点第3位までに制限する入力ハンドラー
-    const handleInput = useCallback((e: React.FormEvent<HTMLInputElement>) => {
-        const input = e.currentTarget.value;
-        
-        // 空文字、マイナス記号、小数点のみの場合は許可（入力途中）
-        if (input === '' || input === '-' || input === '.') {
-            return;
-        }
-        
-        const numValue = parseFloat(input);
-        
-        // 1より大きい値を防ぐ（整数部分が2以上の場合）
-        const decimalIndex = input.indexOf('.');
-        const integerPart = decimalIndex === -1 ? input : input.substring(0, decimalIndex);
-        
-        if (integerPart && parseInt(integerPart) > 1) {
-            // 1を超える整数は1に制限
-            e.currentTarget.value = '1';
-            return;
-        }
-        
-        // 数値として1を超える場合（例: 1.5）を防ぐ
-        if (!isNaN(numValue) && numValue > 1) {
-            e.currentTarget.value = '1';
-            return;
-        }
-        
-        // 負の値を防ぐ
-        if (!isNaN(numValue) && numValue < 0) {
-            e.currentTarget.value = '';
-            return;
-        }
-        
-        // 小数点がある場合、小数点以下の桁数をチェック
-        if (decimalIndex !== -1) {
-            const decimalPart = input.substring(decimalIndex + 1);
-            // 小数点第3位を超える場合は、入力を制限
-            if (decimalPart.length > 3) {
-                e.currentTarget.value = input.substring(0, decimalIndex + 4);
-            }
-        }
-    }, []);
-
     // スタイルをメモ化
     const fieldSx = useMemo(() => ({
         '& .MuiInputBase-root': { bgcolor: autoProcessRatios ? '#f5f5f5' : 'white' }
@@ -144,12 +101,21 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
 
     const slotProps = useMemo(() => ({
         htmlInput: { 
-            min: 0.000,
-            max: 1.000,
             step: 0.001,
-            onInput: handleInput
+            onInput: (e: React.FormEvent<HTMLInputElement>) => {
+                const input = e.currentTarget.value;
+                const decimalIndex = input.indexOf('.');
+                
+                // 小数点第3位までに制限（ProcessRatiosField独自の制御）
+                if (decimalIndex !== -1) {
+                    const decimalPart = input.substring(decimalIndex + 1);
+                    if (decimalPart.length > 3) {
+                        e.currentTarget.value = input.substring(0, decimalIndex + 4);
+                    }
+                }
+            }
         }
-    }), [handleInput]);
+    }), []);
 
     // 合計値を計算（個別フィールドの変更を検知）
     const total = useMemo(() => {
@@ -187,6 +153,8 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
                     type="number"
                     label="基本設計"
                     disabled={autoProcessRatios}
+                    min={0}
+                    max={1}
                     sx={fieldSx}
                     slotProps={slotProps}
                     onBlur={handleBlur('basicDesign')}
@@ -199,6 +167,8 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
                     type="number"
                     label="詳細設計"
                     disabled={autoProcessRatios}
+                    min={0}
+                    max={1}
                     sx={fieldSx}
                     slotProps={slotProps}
                     onBlur={handleBlur('detailedDesign')}
@@ -211,6 +181,8 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
                     type="number"
                     label="製造"
                     disabled={autoProcessRatios}
+                    min={0}
+                    max={1}
                     sx={fieldSx}
                     slotProps={slotProps}
                     onBlur={handleBlur('implementation')}
@@ -223,6 +195,8 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
                     type="number"
                     label="結合テスト"
                     disabled={autoProcessRatios}
+                    min={0}
+                    max={1}
                     sx={fieldSx}
                     slotProps={slotProps}
                     onBlur={handleBlur('integrationTest')}
@@ -236,6 +210,8 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
                         type="number"
                         label="総合テスト"
                         disabled={autoProcessRatios}
+                        min={0}
+                        max={1}
                         sx={{ ...fieldSx, flex: 1 }}
                         slotProps={slotProps}
                         onBlur={handleBlur('systemTest')}
