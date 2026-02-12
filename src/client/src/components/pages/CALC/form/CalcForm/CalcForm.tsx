@@ -213,7 +213,7 @@ function CalcForm(props: Props) {
             { value: '内部論理ファイル', label: '内部論理ファイル' },
             { value: '外部インタフェースファイル', label: '外部インタフェースファイル' }
         ]},
-        { key: 'fpValue', label: 'FP', minWidth: 80, maxWidth: 100, icon: 'auto', type: 'number', disabled: true },
+        { key: 'fpValue', label: 'FP', minWidth: 90, maxWidth: 100, icon: 'auto', type: 'number', disabled: true },
         { key: 'remarks', label: '備考', minWidth: 200, maxWidth: 300, icon: 'edit', type: 'text' , maxLength: 200},
         { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
     ], []);
@@ -224,7 +224,7 @@ function CalcForm(props: Props) {
         { key: 'externalInput', label: '外部入力', width: 120, icon: 'edit', type: 'number', min: 0, max: 9999 },
         { key: 'externalOutput', label: '外部出力', width: 120, icon: 'edit', type: 'number', min: 0, max: 9999 },
         { key: 'externalInquiry', label: '外部照会', width: 120, icon: 'edit', type: 'number', min: 0, max: 9999 },
-        { key: 'fpValue', label: 'FP', minWidth: 80, maxWidth: 100, icon: 'auto', type: 'number', disabled: true },
+        { key: 'fpValue', label: 'FP', minWidth: 90, maxWidth: 100, icon: 'auto', type: 'number', disabled: true },
         { key: 'remarks', label: '備考', minWidth: 200, maxWidth: 300, icon: 'edit', type: 'text', maxLength: 200 },
         { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
     ], []);
