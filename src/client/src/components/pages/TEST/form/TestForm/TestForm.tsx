@@ -30,14 +30,17 @@ import { createAddRowAction, createDeleteSelectedAction } from '@front/component
 import { t } from 'i18next';
 import { getProcessRatios } from '@common/constants/processRatios';
 // import { useSetDirty } from '@front/hooks/TEST/test';
-import FormPaperProvider from '@front/components/ui/Layout/Form/FormPaperProvider';
+// import FormPaperProvider from '@front/components/ui/Layout/Form/FormPaperProvider';
+import { FieldErrors } from 'react-hook-form';
+import { useSetAlertMessage } from '@front/hooks/alertMessage/useSetAlertMessage';
+
 
 
 const setupYupScheme = () => {
     return yup.object({
         /** 案件情報 */
         // 案件名
-        projectName: yup.string().required('案件名を入力してください'),
+        projectName: yup.string().required(),
         // 生産性自動入力チェック
         autoProductivity: yup.boolean(),
         // 生産性(FP/月)
@@ -127,6 +130,7 @@ function CalcForm(props: Props) {
     const calc = useCalcTest(viewId as ViewIdType);
     const importFile = useImportFile();
     const exportFile = useExportFile();
+    const setAlertMessage = useSetAlertMessage('TEST');
     // const setDirty = useSetDirty();
     const methods = useForm<FormType>({
         mode: 'onSubmit',
@@ -299,6 +303,25 @@ function CalcForm(props: Props) {
         await exportFile(latestValues);
     };
 
+    /** ▼ バリデーションエラー時処理 */
+    const handleInvalid = (errors: FieldErrors<FormType>) => {
+        const messages = flattenErrors(errors);
+        setAlertMessage({
+            severity: 'error',
+            message: messages.join('\n')
+        });
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const flattenErrors = (errors: any): string[] => {
+        return Object.values(errors).flatMap((error: any) => {
+            if (error?.message) return [error.message];
+            if (typeof error === 'object') return flattenErrors(error);
+            return [];
+        });
+    };
+
     // useEffect(() => {
     //     setDirty(formIsDirty);
     // }, [setDirty, formIsDirty]);
@@ -375,7 +398,7 @@ function CalcForm(props: Props) {
                         {/* 固定された下部ボタンエリア */}
                         <Box sx={{ borderTop: 1, borderColor: 'divider', p: 2, bgcolor: 'white' }}>
                             {/* 工数計算実行ボタン */}
-                            <Button variant="contained" onClick={methods.handleSubmit(handleCalcClick)} sx={{ width: '100%', bgcolor: '#00d02aff', '&:hover': { bgcolor: '#00a708ff' } }}>工数計算を実行</Button>
+                            <Button variant="contained" onClick={methods.handleSubmit(handleCalcClick, handleInvalid)} sx={{ width: '100%', bgcolor: '#00d02aff', '&:hover': { bgcolor: '#00a708ff' } }}>工数計算を実行</Button>
                         </Box>
                     </Box>
 
