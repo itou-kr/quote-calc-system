@@ -171,9 +171,9 @@ response.transactionFunctions =
 
   response.totalFP = dataFunctionsFP + transactionFunctionsFP;
 
-  // 総FPのバリデーション（整数かつ4桁以下）
-  if (response.totalFP > 9999) {
-    errorMessage.push('総FPが4桁を超えています。データファンクションまたはトランザクションファンクションの値を調整してください');
+  // 総FPのバリデーション
+  if (response.totalFP == null || typeof response.totalFP !== 'number' || isNaN(response.totalFP) || response.totalFP < 0) {
+    errorMessage.push('工数計算に失敗しました。');
     response.errorMessages = errorMessage;
     return response;
   }

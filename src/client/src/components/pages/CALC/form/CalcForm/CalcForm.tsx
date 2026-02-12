@@ -32,7 +32,7 @@ const setupYupScheme = () => {
     return yup.object({
         /** 案件情報 */
         // 案件名
-        projectName: yup.string().required('案件名を入力してください'),
+        projectName: yup.string().required(),
         // 生産性自動入力チェック
         autoProductivity: yup.boolean(),
         // 生産性(FP/月)
@@ -43,12 +43,6 @@ const setupYupScheme = () => {
         projectType: yup.string(),
         // 使用するIPA代表値
         ipaValueType: yup.string(),
-        // 総FP
-        totalFP: yup.number(),
-        // 総工数(人月)
-        totalManMonths: yup.number(),
-        // 標準工期(月)
-        standardDurationMonths: yup.number(),
 
         // データファンクション情報
         dataFunctions: yup.array().of(
@@ -56,7 +50,7 @@ const setupYupScheme = () => {
                 selected: yup.boolean(),
                 name: yup.string(),
                 updateType: yup.string(),
-                fpValue: yup.number().rangeCheck(0, 9999),
+                fpValue: yup.number().default(0),
                 remarks: yup.string(),
             })
         ),
@@ -68,42 +62,48 @@ const setupYupScheme = () => {
                 externalInput: yup.number().transform((value, originalValue) => originalValue === "" ? undefined : value).rangeCheck(0, 9999),      // 入力欄が空の場合はundefinedに変換
                 externalOutput: yup.number().transform((value, originalValue) => originalValue === "" ? undefined : value).rangeCheck(0, 9999),     // 入力欄が空の場合はundefinedに変換
                 externalInquiry: yup.number().transform((value, originalValue) => originalValue === "" ? undefined : value).rangeCheck(0, 9999),    // 入力欄が空の場合はundefinedに変換
-                fpValue: yup.number().rangeCheck(0, 9999),
+                fpValue: yup.number().default(0),
                 remarks: yup.string(),
             })
         ),
 
+        // 総FP
+        totalFP: yup.number().default(0),
+        // 総工数(人月)
+        totalManMonths: yup.number().default(0),
+        // 標準工期(月)
+        standardDurationMonths: yup.number().default(0),
         // 工程別比率
         processRatios: yup.object({
-            basicDesign: yup.number().rangeCheck(0.000, 1.000),
-            detailedDesign: yup.number().rangeCheck(0.000, 1.000),
-            implementation: yup.number().rangeCheck(0.000, 1.000),
-            integrationTest: yup.number().rangeCheck(0.000, 1.000),
-            systemTest: yup.number().rangeCheck(0.000, 1.000),
+            basicDesign: yup.number().default(0),
+            detailedDesign: yup.number().default(0),
+            implementation: yup.number().default(0),
+            integrationTest: yup.number().default(0),
+            systemTest: yup.number().default(0),
         }),
         // 工程別FP
         processFPs: yup.object({
-            basicDesign: yup.number().rangeCheck(0, 9999).required(),
-            detailedDesign: yup.number().rangeCheck(0, 9999).required(),
-            implementation: yup.number().rangeCheck(0, 9999).required(),
-            integrationTest: yup.number().rangeCheck(0, 9999).required(),
-            systemTest: yup.number().rangeCheck(0, 9999).required(),
+            basicDesign: yup.number().default(0),
+            detailedDesign: yup.number().default(0),
+            implementation: yup.number().default(0),
+            integrationTest: yup.number().default(0),
+            systemTest: yup.number().default(0),
         }),
         // 工程別工数
         processManMonths: yup.object({
-            basicDesign: yup.number().rangeCheck(0, 9999).required(),
-            detailedDesign: yup.number().rangeCheck(0, 9999).required(),
-            implementation: yup.number().rangeCheck(0, 9999).required(),
-            integrationTest: yup.number().rangeCheck(0, 9999).required(),
-            systemTest: yup.number().rangeCheck(0, 9999).required(),
+            basicDesign: yup.number().default(0),
+            detailedDesign: yup.number().default(0),
+            implementation: yup.number().default(0),
+            integrationTest: yup.number().default(0),
+            systemTest: yup.number().default(0),
         }),
         // 工程別工期
         processDurations: yup.object({
-            basicDesign: yup.number().rangeCheck(0, 9999).required(),
-            detailedDesign: yup.number().rangeCheck(0, 9999).required(),
-            implementation: yup.number().rangeCheck(0, 9999).required(),
-            integrationTest: yup.number().rangeCheck(0, 9999).required(),
-            systemTest: yup.number().rangeCheck(0, 9999).required(),
+            basicDesign: yup.number().default(0),
+            detailedDesign: yup.number().default(0),
+            implementation: yup.number().default(0),
+            integrationTest: yup.number().default(0),
+            systemTest: yup.number().default(0),
         }),
     });
 };
