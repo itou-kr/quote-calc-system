@@ -27,6 +27,8 @@ import { createEmptyDataFunction, createEmptyTransactionFunction, createDataFunc
 import { createAddRowAction, createDeleteSelectedAction } from '@front/components/ui/TableToolbar/actions/tableActions';
 import { t } from 'i18next';
 import { getProcessRatios } from '@common/constants/processRatios';
+import { FieldErrors } from 'react-hook-form';
+import { useSetAlertMessage } from '@front/hooks/alertMessage/useSetAlertMessage';
 
 const setupYupScheme = () => {
     return yup.object({
@@ -36,10 +38,7 @@ const setupYupScheme = () => {
         // 生産性自動入力チェック
         autoProductivity: yup.boolean().label('生産性自動入力'),
         // 生産性(FP/月)
-        productivityFPPerMonth: yup
-            .number()
-            .label('生産性(FP/月)')
-            .rangeCheck(1, 9999),
+        productivityFPPerMonth: yup.number().label('生産性(FP/月)').transform((value, originalValue) => originalValue === '' ? undefined : value).rangeCheck(1, 9999).required(),
         // 開発工程比率自動入力チェック
         autoProcessRatios: yup.boolean().label('開発工程比率自動入力'),
         // 案件種別
@@ -143,6 +142,7 @@ function CalcForm(props: Props) {
     const calc = useCalcTest(viewId as ViewIdType);
     const importFile = useImportFile();
     const exportFile = useExportFile();
+    const setAlertMessage = useSetAlertMessage('CALC');
     const methods = useForm<FormType>({
         mode: 'onSubmit',
         reValidateMode: 'onSubmit',
@@ -312,6 +312,25 @@ function CalcForm(props: Props) {
         await exportFile(latestValues);
     };
 
+    /** ▼ バリデーションエラー時処理 */
+    const handleInvalid = (errors: FieldErrors<FormType>) => {
+        const messages = flattenErrors(errors);
+        setAlertMessage({
+            severity: 'error',
+            message: messages.join('\n')
+        });
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const flattenErrors = (errors: any): string[] => {
+        return Object.values(errors).flatMap((error: any) => {
+            if (error?.message) return [error.message];
+            if (typeof error === 'object') return flattenErrors(error);
+            return [];
+        });
+    };
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
             <FormProvider {...methods}>
@@ -383,7 +402,7 @@ function CalcForm(props: Props) {
                         {/* 固定された下部ボタンエリア */}
                         <Box sx={{ borderTop: 1, borderColor: 'divider', p: 2, bgcolor: 'white' }}>
                             {/* 工数計算実行ボタン */}
-                            <Button variant="contained" onClick={methods.handleSubmit(handleCalcClick)} sx={{ width: '100%', bgcolor: '#00d02aff', '&:hover': { bgcolor: '#00a708ff' } }}>工数計算を実行</Button>
+                            <Button variant="contained" onClick={methods.handleSubmit(handleCalcClick, handleInvalid)} sx={{ width: '100%', bgcolor: '#00d02aff', '&:hover': { bgcolor: '#00a708ff' } }}>工数計算を実行</Button>
                         </Box>
                     </Box>
 
