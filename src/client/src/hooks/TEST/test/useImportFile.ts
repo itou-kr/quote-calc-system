@@ -45,7 +45,6 @@ export const useImportFile = () => {
     }
 
     // 正常メッセージの表示
-    console.log('成功')
     setAlertMessage({ severity: 'success', message: 'インポートが完了しました。' });    
 
     console.log('response', response);
