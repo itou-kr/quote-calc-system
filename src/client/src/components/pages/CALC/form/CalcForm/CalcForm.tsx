@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { useCalcTest } from '@front/hooks/TEST/test';
+import { useCalc } from '@front/hooks/CALC/calc';
 import { useImportFile, useExportFile } from '@front/hooks/CALC/calc';
 import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
 import { useMemo, useState, useCallback } from 'react';
@@ -138,9 +138,8 @@ type Props = {
 };
 
 function CalcForm(props: Props) {
-    const { viewId } = props;
     const schema = useMemo(() => setupYupScheme(), []);
-    const calc = useCalcTest(viewId as ViewIdType);
+    const calc = useCalc();
     const importFile = useImportFile();
     const exportFile = useExportFile();
     const setAlertMessage = useSetAlertMessage('CALC');
