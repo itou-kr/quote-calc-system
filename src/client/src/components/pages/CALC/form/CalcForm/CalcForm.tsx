@@ -29,6 +29,7 @@ import { t } from 'i18next';
 import { getProcessRatios } from '@common/constants/processRatios';
 import { FieldErrors } from 'react-hook-form';
 import { useSetAlertMessage } from '@front/hooks/alertMessage/useSetAlertMessage';
+import { useClear } from '@front/hooks/alertMessage/useClear';
 
 const setupYupScheme = () => {
     return yup.object({
@@ -143,6 +144,7 @@ function CalcForm(props: Props) {
     const importFile = useImportFile();
     const exportFile = useExportFile();
     const setAlertMessage = useSetAlertMessage('CALC');
+    const clearAlertMessage = useClear('CALC');
     const methods = useForm<FormType>({
         mode: 'onSubmit',
         reValidateMode: 'onSubmit',
@@ -314,6 +316,7 @@ function CalcForm(props: Props) {
 
     /** ▼ バリデーションエラー時処理 */
     const handleInvalid = (errors: FieldErrors<FormType>) => {
+        clearAlertMessage();
         const messages = flattenErrors(errors);
         setAlertMessage({
             severity: 'error',
