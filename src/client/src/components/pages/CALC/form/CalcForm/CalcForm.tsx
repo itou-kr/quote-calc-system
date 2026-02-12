@@ -34,76 +34,97 @@ const setupYupScheme = () => {
         // 案件名
         projectName: yup.string().label('案件名').required(),
         // 生産性自動入力チェック
-        autoProductivity: yup.boolean(),
+        autoProductivity: yup.boolean().label('生産性自動入力'),
         // 生産性(FP/月)
-        productivityFPPerMonth: yup.number().rangeCheck(1, 9999),
+        productivityFPPerMonth: yup
+            .number()
+            .label('生産性(FP/月)')
+            .rangeCheck(1, 9999)
         // 開発工程比率自動入力チェック
-        autoProcessRatios: yup.boolean(),
+        autoProcessRatios: yup.boolean().label('開発工程比率自動入力'),
         // 案件種別
-        projectType: yup.string(),
+        projectType: yup.string().label('案件種別'),
         // 使用するIPA代表値
-        ipaValueType: yup.string(),
+        ipaValueType: yup.string().label('使用するIPA代表値'),
 
         // データファンクション情報
         dataFunctions: yup.array().of(
             yup.object({
-                selected: yup.boolean(),
-                name: yup.string(),
-                updateType: yup.string(),
-                fpValue: yup.number().default(0),
-                remarks: yup.string(),
+                selected: yup.boolean().label('選択行'),
+                name: yup
+                    .string()
+                    .label('名称')
+                updateType: yup
+                    .string()
+                    .label('データファンクションの種類')
+                fpValue: yup.number().label('FP').default(0),
+                remarks: yup.string().label('備考'),
             })
         ),
         // トランザクションファンクション情報
         transactionFunctions: yup.array().of(
             yup.object({
-                selected: yup.boolean(),
-                name: yup.string(),
-                externalInput: yup.number().transform((value, originalValue) => originalValue === "" ? undefined : value).rangeCheck(0, 9999),      // 入力欄が空の場合はundefinedに変換
-                externalOutput: yup.number().transform((value, originalValue) => originalValue === "" ? undefined : value).rangeCheck(0, 9999),     // 入力欄が空の場合はundefinedに変換
-                externalInquiry: yup.number().transform((value, originalValue) => originalValue === "" ? undefined : value).rangeCheck(0, 9999),    // 入力欄が空の場合はundefinedに変換
-                fpValue: yup.number().default(0),
-                remarks: yup.string(),
+                selected: yup.boolean().label('選択行'),
+                name: yup
+                    .string()
+                    .label('トランザクションファンクションテーブルの名称')
+                externalInput: yup
+                    .number()
+                    .label('外部入力')
+                    .transform((value, originalValue) => originalValue === "" ? undefined : value)   // 入力欄が空の場合はundefinedに変換
+                    .rangeCheck(0, 9999)
+                externalOutput: yup
+                    .number()
+                    .label('外部出力')
+                    .transform((value, originalValue) => originalValue === "" ? undefined : value)   // 入力欄が空の場合はundefinedに変換
+                    .rangeCheck(0, 9999)
+                externalInquiry: yup
+                    .number()
+                    .label('外部照会')
+                    .transform((value, originalValue) => originalValue === "" ? undefined : value)   // 入力欄が空の場合はundefinedに変換
+                    .rangeCheck(0, 9999)
+                fpValue: yup.number().label('FP').default(0),
+                remarks: yup.string().label('備考'),
             })
         ),
 
         // 総FP
-        totalFP: yup.number().default(0),
+        totalFP: yup.number().label('総FP').default(0),
         // 総工数(人月)
-        totalManMonths: yup.number().default(0),
+        totalManMonths: yup.number().label('総工数(人月)').default(0),
         // 標準工期(月)
-        standardDurationMonths: yup.number().default(0),
+        standardDurationMonths: yup.number().label('標準工期(月)').default(0),
         // 工程別比率
         processRatios: yup.object({
-            basicDesign: yup.number().default(0),
-            detailedDesign: yup.number().default(0),
-            implementation: yup.number().default(0),
-            integrationTest: yup.number().default(0),
-            systemTest: yup.number().default(0),
+            basicDesign: yup.number().label('基本設計比率').default(0),
+            detailedDesign: yup.number().label('詳細設計比率').default(0),
+            implementation: yup.number().label('製造比率').default(0),
+            integrationTest: yup.number().label('統合テスト比率').default(0),
+            systemTest: yup.number().label('システムテスト比率').default(0),
         }),
         // 工程別FP
         processFPs: yup.object({
-            basicDesign: yup.number().default(0),
-            detailedDesign: yup.number().default(0),
-            implementation: yup.number().default(0),
-            integrationTest: yup.number().default(0),
-            systemTest: yup.number().default(0),
+            basicDesign: yup.number().label('基本設計FP').default(0),
+            detailedDesign: yup.number().label('詳細設計FP').default(0),
+            implementation: yup.number().label('製造FP').default(0),
+            integrationTest: yup.number().label('統合テストFP').default(0),
+            systemTest: yup.number().label('システムテストFP').default(0),
         }),
         // 工程別工数
         processManMonths: yup.object({
-            basicDesign: yup.number().default(0),
-            detailedDesign: yup.number().default(0),
-            implementation: yup.number().default(0),
-            integrationTest: yup.number().default(0),
-            systemTest: yup.number().default(0),
+            basicDesign: yup.number().label('基本設計工数').default(0),
+            detailedDesign: yup.number().label('詳細設計工数').default(0),
+            implementation: yup.number().label('製造工数').default(0),
+            integrationTest: yup.number().label('統合テスト工数').default(0),
+            systemTest: yup.number().label('システムテスト工数').default(0),
         }),
         // 工程別工期
         processDurations: yup.object({
-            basicDesign: yup.number().default(0),
-            detailedDesign: yup.number().default(0),
-            implementation: yup.number().default(0),
-            integrationTest: yup.number().default(0),
-            systemTest: yup.number().default(0),
+            basicDesign: yup.number().label('基本設計工期').default(0),
+            detailedDesign: yup.number().label('詳細設計工期').default(0),
+            implementation: yup.number().label('製造工期').default(0),
+            integrationTest: yup.number().label('統合テスト工期').default(0),
+            systemTest: yup.number().label('システムテスト工期').default(0),
         }),
     });
 };

@@ -41,7 +41,7 @@ export const useExportFile = () => {
     } catch (error) {
       setAlertMessage({
         severity: 'error',
-        message: 'ファイルの出力に失敗しました',
+        message: 'エクスポートに失敗しました。',
       });
       console.error('Export error:', error);
     }
