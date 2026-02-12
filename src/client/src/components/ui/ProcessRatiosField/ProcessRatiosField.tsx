@@ -94,10 +94,38 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
         };
     }, [watch, setValue]);
 
-    // 小数点第3位までに制限する入力ハンドラー
+    // 0以上1以下かつ小数点第3位までに制限する入力ハンドラー
     const handleInput = useCallback((e: React.FormEvent<HTMLInputElement>) => {
         const input = e.currentTarget.value;
+        
+        // 空文字、マイナス記号、小数点のみの場合は許可（入力途中）
+        if (input === '' || input === '-' || input === '.') {
+            return;
+        }
+        
+        const numValue = parseFloat(input);
+        
+        // 1より大きい値を防ぐ（整数部分が2以上の場合）
         const decimalIndex = input.indexOf('.');
+        const integerPart = decimalIndex === -1 ? input : input.substring(0, decimalIndex);
+        
+        if (integerPart && parseInt(integerPart) > 1) {
+            // 1を超える整数は1に制限
+            e.currentTarget.value = '1';
+            return;
+        }
+        
+        // 数値として1を超える場合（例: 1.5）を防ぐ
+        if (!isNaN(numValue) && numValue > 1) {
+            e.currentTarget.value = '1';
+            return;
+        }
+        
+        // 負の値を防ぐ
+        if (!isNaN(numValue) && numValue < 0) {
+            e.currentTarget.value = '';
+            return;
+        }
         
         // 小数点がある場合、小数点以下の桁数をチェック
         if (decimalIndex !== -1) {
