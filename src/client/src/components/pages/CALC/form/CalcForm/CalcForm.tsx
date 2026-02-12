@@ -39,7 +39,7 @@ const setupYupScheme = () => {
         productivityFPPerMonth: yup
             .number()
             .label('生産性(FP/月)')
-            .rangeCheck(1, 9999)
+            .rangeCheck(1, 9999),
         // 開発工程比率自動入力チェック
         autoProcessRatios: yup.boolean().label('開発工程比率自動入力'),
         // 案件種別
@@ -53,10 +53,10 @@ const setupYupScheme = () => {
                 selected: yup.boolean().label('選択行'),
                 name: yup
                     .string()
-                    .label('名称')
+                    .label('名称'),
                 updateType: yup
                     .string()
-                    .label('データファンクションの種類')
+                    .label('データファンクションの種類'),
                 fpValue: yup.number().label('FP').default(0),
                 remarks: yup.string().label('備考'),
             })
@@ -67,22 +67,22 @@ const setupYupScheme = () => {
                 selected: yup.boolean().label('選択行'),
                 name: yup
                     .string()
-                    .label('トランザクションファンクションテーブルの名称')
+                    .label('トランザクションファンクションテーブルの名称'),
                 externalInput: yup
                     .number()
                     .label('外部入力')
                     .transform((value, originalValue) => originalValue === "" ? undefined : value)   // 入力欄が空の場合はundefinedに変換
-                    .rangeCheck(0, 9999)
+                    .rangeCheck(0, 9999),
                 externalOutput: yup
                     .number()
                     .label('外部出力')
                     .transform((value, originalValue) => originalValue === "" ? undefined : value)   // 入力欄が空の場合はundefinedに変換
-                    .rangeCheck(0, 9999)
+                    .rangeCheck(0, 9999),
                 externalInquiry: yup
                     .number()
                     .label('外部照会')
                     .transform((value, originalValue) => originalValue === "" ? undefined : value)   // 入力欄が空の場合はundefinedに変換
-                    .rangeCheck(0, 9999)
+                    .rangeCheck(0, 9999),
                 fpValue: yup.number().label('FP').default(0),
                 remarks: yup.string().label('備考'),
             })
