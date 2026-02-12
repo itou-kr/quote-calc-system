@@ -43,7 +43,11 @@ export const useImportFile = () => {
       console.log('errorMessages', importFileData.errorMessages);
       return;
     }
-    
+
+    // 正常メッセージの表示
+    console.log('成功')
+    setAlertMessage({ severity: 'success', message: 'インポートが完了しました。' });    
+
     console.log('response', response);
     return importFileData;
   }

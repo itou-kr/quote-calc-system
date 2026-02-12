@@ -1,9 +1,9 @@
 import * as yup from 'yup';
 import { useCalcTest } from '@front/hooks/TEST/test';
-import { useImportFile, useExportFile } from '@front/hooks/CALC/calc';
+import { useImportFile, useExportFile } from '@front/hooks/TEST/test';
 import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
-import { useMemo, useState, useCallback, useEffect } from 'react';
-// import { useMemo, useState, useCallback } from 'react';
+// import { useMemo, useState, useCallback, useEffect } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 // import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -29,7 +29,7 @@ import { createEmptyDataFunction, createEmptyTransactionFunction, createDataFunc
 import { createAddRowAction, createDeleteSelectedAction } from '@front/components/ui/TableToolbar/actions/tableActions';
 import { t } from 'i18next';
 import { getProcessRatios } from '@common/constants/processRatios';
-import { useSetDirty } from '@front/hooks/TEST/test';
+// import { useSetDirty } from '@front/hooks/TEST/test';
 // import FormPaperProvider from '@front/components/ui/Layout/Form/FormPaperProvider';
 import { FieldErrors } from 'react-hook-form';
 import { useSetAlertMessage } from '@front/hooks/alertMessage/useSetAlertMessage';
@@ -134,13 +134,14 @@ type Props = {
 };
 
 function CalcForm(props: Props) {
-    const { viewId, isDirty } = props;
+    // const { viewId, isDirty } = props;
+    const { viewId } = props;
     const schema = useMemo(() => setupYupScheme(), []);
     const calc = useCalcTest(viewId as ViewIdType);
     const importFile = useImportFile();
     const exportFile = useExportFile();
     const setAlertMessage = useSetAlertMessage('TEST');
-    const setDirty = useSetDirty();
+    // const setDirty = useSetDirty();
     const methods = useForm<FormType>({
         mode: 'onSubmit',
         reValidateMode: 'onSubmit',
