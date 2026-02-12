@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useBlocker, BlockerFunction } from "react-router-dom";
 import { FormProvider, FormProviderProps, FieldValues } from 'react-hook-form';
 // import { useTranslation } from "react-i18next";
@@ -26,11 +26,28 @@ function FormContainerProvider<TF extends FieldValues, TC = unknown, TTV extends
                 const result = await confirm({ icon: 'help', message: ('確認ダイアログ'), yes: true, cancel: true, close: true });
                 if (result === 'yes') {
                     blocker.proceed();
+                } else {
+                    blocker.reset();
                 }
             }
             // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [blocker, confirm]) // ロケール変更でのEffectは発生させない
     );
+
+    useEffect(() => {
+        if (!blockNavigation) return;
+
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+        e.preventDefault();
+        e.returnValue = ''; // ★よくわからない
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [blockNavigation]);
 
     return (
         <FormProvider {...methods}>
