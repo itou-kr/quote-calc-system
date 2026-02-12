@@ -149,13 +149,8 @@ async function validateConsistencyDetail(
   const minPercent = 0;
   const maxPercent = 1;
   // ===== 2シート目のラベル定義 =====
-<<<<<<< HEAD
-  const write = "更新あり";
-  const readOnly = "参照のみ";
-=======
   const write = "内部論理ファイル";
   const readOnly = "外部インターフェースファイル";
->>>>>>> inportMessage
   const dataFunctionName = "データファンクション名";
   const dataFunctionType = "データファンクションの種類";
   const sheet2 = 'データファンクションシート 列';
