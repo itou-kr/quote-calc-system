@@ -13,27 +13,30 @@ import * as yup from 'yup';
 export function yupSetting(_: unknown) {
     const locale: yup.LocaleObject = {
         mixed: {
-            required: (params: { label: string} ) => format('は必須です', params.label),
+        required: ({ label, path }) =>
+            `${label ?? path}は必須です`,
         },
     };
     yup.setLocale(locale);
 
-    yup.addMethod(yup.number, 'rangeCheck', function rangeCheck(minField: number, maxField: number) {
-        return this.test(
-            'rangeCheck',
-            function (params) {
-                return format('は必須です', params.label, minField, maxField);
-            },
-            function (value) {
-                const min = minField;
-                const max = maxField;
-                if (typeof min === 'number' && typeof max === 'number' && typeof value === 'number') {
-                    if (value < min || value > max) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        );
-    });
+yup.addMethod(yup.number, 'rangeCheck', function rangeCheck(min: number, max: number) {
+    return this.test(
+        'rangeCheck',
+        function (value) {
+        const { path, schema } = this;
+
+        const label = (schema as any)?.spec?.label ?? path;
+
+        if (typeof value === 'number' && (value < min || value > max)) {
+            return this.createError({
+            message: `${label}は${min}〜${max}の間で入力してください`,
+            });
+        }
+
+        return true;
+        }
+    );
+});
+
+
 }

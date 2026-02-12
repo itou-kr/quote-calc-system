@@ -40,7 +40,7 @@ const setupYupScheme = () => {
     return yup.object({
         /** 案件情報 */
         // 案件名
-        projectName: yup.string().required(),
+        projectName: yup.string().label('案件名').required(),
         // 生産性自動入力チェック
         autoProductivity: yup.boolean(),
         // 生産性(FP/月)
@@ -83,11 +83,11 @@ const setupYupScheme = () => {
 
         // 工程別比率
         processRatios: yup.object({
-            basicDesign: yup.number().rangeCheck(0.000, 1.000),
-            detailedDesign: yup.number().rangeCheck(0.000, 1.000),
-            implementation: yup.number().rangeCheck(0.000, 1.000),
-            integrationTest: yup.number().rangeCheck(0.000, 1.000),
-            systemTest: yup.number().rangeCheck(0.000, 1.000),
+            basicDesign: yup.number().label('基本設計比率').rangeCheck(0.000, 1.000),
+            detailedDesign: yup.number().label('詳細設計比率').rangeCheck(0.000, 1.000),
+            implementation: yup.number().label('製造比率').rangeCheck(0.000, 1.000),
+            integrationTest: yup.number().label('統合テスト比率').rangeCheck(0.000, 1.000),
+            systemTest: yup.number().label('システムテスト比率').rangeCheck(0.000, 1.000),
         }),
         // 工程別FP
         processFPs: yup.object({
