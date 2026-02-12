@@ -1,4 +1,4 @@
-import { format } from '@front/utils/format';
+// import { format } from '@front/utils/format';
 import * as yup from 'yup';
 
 // 正規表現新規作成の場合はここに追加
