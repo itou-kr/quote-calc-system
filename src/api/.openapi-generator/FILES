@@ -6,7 +6,6 @@ src/apis/importApi/index.ts
 src/apis/importApi/types.ts
 src/models/byteBuffer.ts
 src/models/calcTestApplication200Response.ts
-src/models/calcTestApplication200ResponseDataFunctionsInner.ts
 src/models/calcTestApplicationRequest.ts
 src/models/calcTestApplicationRequestDataFunctionsInner.ts
 src/models/calcTestApplicationRequestProcessRatios.ts
@@ -15,8 +14,6 @@ src/models/exportApplication200Response.ts
 src/models/exportApplication200ResponseDataFunctionsInner.ts
 src/models/exportApplication200ResponseExportFile.ts
 src/models/exportApplicationRequest.ts
-src/models/exportApplicationRequestDataFunctionsInner.ts
 src/models/exportApplicationRequestImportFile.ts
-src/models/exportApplicationRequestTransactionFunctionsInner.ts
 src/models/importApplication200Response.ts
 src/models/index.ts

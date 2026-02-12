@@ -12,13 +12,27 @@
 
 
 export class CalcTestApplicationRequestTransactionFunctionsInner {
+    'selected'?: boolean;
+    'name'?: string;
     'externalInput'?: number;
     'externalOutput'?: number;
     'externalInquiry'?: number;
+    'fpValue'?: number;
+    'remarks'?: string;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
+        {
+            "name": "selected",
+            "baseName": "selected",
+            "type": "boolean"
+        },
+        {
+            "name": "name",
+            "baseName": "name",
+            "type": "string"
+        },
         {
             "name": "externalInput",
             "baseName": "externalInput",
@@ -33,6 +47,16 @@ export class CalcTestApplicationRequestTransactionFunctionsInner {
             "name": "externalInquiry",
             "baseName": "externalInquiry",
             "type": "number"
+        },
+        {
+            "name": "fpValue",
+            "baseName": "fpValue",
+            "type": "number"
+        },
+        {
+            "name": "remarks",
+            "baseName": "remarks",
+            "type": "string"
         }    ];
 
     static getAttributeTypeMap() {

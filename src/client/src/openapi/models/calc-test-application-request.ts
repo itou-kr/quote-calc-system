@@ -14,13 +14,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { CalcTestApplication200ResponseDataFunctionsInner } from './calc-test-application200-response-data-functions-inner';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { CalcTestApplication200ResponseProcessRatios } from './calc-test-application200-response-process-ratios';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { CalcTestApplicationRequestDataFunctionsInner } from './calc-test-application-request-data-functions-inner';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { CalcTestApplicationRequestTransactionFunctionsInner } from './calc-test-application-request-transaction-functions-inner';
+import type { CalcTestApplication200ResponseTransactionFunctionsInner } from './calc-test-application200-response-transaction-functions-inner';
 
 /**
  * 工数計算リクエスト
@@ -66,16 +66,16 @@ export interface CalcTestApplicationRequest {
     'ipaValueType'?: string;
     /**
      * 
-     * @type {Array<CalcTestApplicationRequestDataFunctionsInner>}
+     * @type {Array<CalcTestApplication200ResponseDataFunctionsInner>}
      * @memberof CalcTestApplicationRequest
      */
-    'dataFunctions'?: Array<CalcTestApplicationRequestDataFunctionsInner>;
+    'dataFunctions'?: Array<CalcTestApplication200ResponseDataFunctionsInner>;
     /**
      * 
-     * @type {Array<CalcTestApplicationRequestTransactionFunctionsInner>}
+     * @type {Array<CalcTestApplication200ResponseTransactionFunctionsInner>}
      * @memberof CalcTestApplicationRequest
      */
-    'transactionFunctions'?: Array<CalcTestApplicationRequestTransactionFunctionsInner>;
+    'transactionFunctions'?: Array<CalcTestApplication200ResponseTransactionFunctionsInner>;
     /**
      * 
      * @type {CalcTestApplication200ResponseProcessRatios}

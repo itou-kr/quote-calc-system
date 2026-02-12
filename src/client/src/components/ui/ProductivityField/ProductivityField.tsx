@@ -64,7 +64,6 @@ function ProductivityField<T extends FieldValues = any>(props: Props<T>) {
 
     const productivitySlotProps = useMemo(() => ({
         htmlInput: {
-            min: 1,
             step: 1,
             onKeyDown: handleProductivityKeyDown
         }
@@ -92,6 +91,8 @@ function ProductivityField<T extends FieldValues = any>(props: Props<T>) {
                 trigger={trigger} 
                 t={t} 
                 type="number" 
+                min={1}
+                max={9999}
                 hideHelperText 
                 disabled={autoProductivity}
                 slotProps={productivitySlotProps}

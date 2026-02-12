@@ -10,8 +10,9 @@
  * Do not edit the class manually.
  */
 
-import { CalcTestApplication200ResponseDataFunctionsInner } from './calcTestApplication200ResponseDataFunctionsInner';
+import { CalcTestApplicationRequestDataFunctionsInner } from './calcTestApplicationRequestDataFunctionsInner';
 import { CalcTestApplicationRequestProcessRatios } from './calcTestApplicationRequestProcessRatios';
+import { CalcTestApplicationRequestTransactionFunctionsInner } from './calcTestApplicationRequestTransactionFunctionsInner';
 
 /**
 * 工数計算レスポンス
@@ -22,8 +23,8 @@ export class CalcTestApplication200Response {
     'totalFP'?: number;
     'totalManMonths'?: number;
     'standardDurationMonths'?: number;
-    'dataFunctions'?: Array<CalcTestApplication200ResponseDataFunctionsInner>;
-    'transactionFunctions'?: Array<CalcTestApplication200ResponseDataFunctionsInner>;
+    'dataFunctions'?: Array<CalcTestApplicationRequestDataFunctionsInner>;
+    'transactionFunctions'?: Array<CalcTestApplicationRequestTransactionFunctionsInner>;
     'processRatios'?: CalcTestApplicationRequestProcessRatios;
     'processFPs'?: CalcTestApplicationRequestProcessRatios;
     'processManMonths'?: CalcTestApplicationRequestProcessRatios;
@@ -61,12 +62,12 @@ export class CalcTestApplication200Response {
         {
             "name": "dataFunctions",
             "baseName": "dataFunctions",
-            "type": "Array<CalcTestApplication200ResponseDataFunctionsInner>"
+            "type": "Array<CalcTestApplicationRequestDataFunctionsInner>"
         },
         {
             "name": "transactionFunctions",
             "baseName": "transactionFunctions",
-            "type": "Array<CalcTestApplication200ResponseDataFunctionsInner>"
+            "type": "Array<CalcTestApplicationRequestTransactionFunctionsInner>"
         },
         {
             "name": "processRatios",

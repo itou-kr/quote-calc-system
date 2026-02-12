@@ -17,10 +17,10 @@
 import type { CalcTestApplication200ResponseProcessRatios } from './calc-test-application200-response-process-ratios';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { ExportApplication200ResponseDataFunctionsInner } from './export-application200-response-data-functions-inner';
+import type { CalcTestApplication200ResponseTransactionFunctionsInner } from './calc-test-application200-response-transaction-functions-inner';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { ExportApplicationRequestTransactionFunctionsInner } from './export-application-request-transaction-functions-inner';
+import type { ExportApplication200ResponseDataFunctionsInner } from './export-application200-response-data-functions-inner';
 
 /**
  * インポートレスポンス
@@ -96,10 +96,10 @@ export interface ImportApplication200Response {
     'dataFunctions'?: Array<ExportApplication200ResponseDataFunctionsInner>;
     /**
      * 
-     * @type {Array<ExportApplicationRequestTransactionFunctionsInner>}
+     * @type {Array<CalcTestApplication200ResponseTransactionFunctionsInner>}
      * @memberof ImportApplication200Response
      */
-    'transactionFunctions'?: Array<ExportApplicationRequestTransactionFunctionsInner>;
+    'transactionFunctions'?: Array<CalcTestApplication200ResponseTransactionFunctionsInner>;
     /**
      * 
      * @type {Array<string>}

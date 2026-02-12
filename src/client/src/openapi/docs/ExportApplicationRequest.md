@@ -18,8 +18,8 @@ Name | Type | Description | Notes
 **processDurations** | [**CalcTestApplication200ResponseProcessRatios**](CalcTestApplication200ResponseProcessRatios.md) |  | [optional] [default to undefined]
 **importFile** | [**ExportApplicationRequestImportFile**](ExportApplicationRequestImportFile.md) |  | [optional] [default to undefined]
 **exportFile** | [**ExportApplicationRequestImportFile**](ExportApplicationRequestImportFile.md) |  | [optional] [default to undefined]
-**dataFunctions** | [**Array&lt;ExportApplicationRequestDataFunctionsInner&gt;**](ExportApplicationRequestDataFunctionsInner.md) |  | [optional] [default to undefined]
-**transactionFunctions** | [**Array&lt;ExportApplicationRequestTransactionFunctionsInner&gt;**](ExportApplicationRequestTransactionFunctionsInner.md) |  | [optional] [default to undefined]
+**dataFunctions** | [**Array&lt;CalcTestApplication200ResponseDataFunctionsInner&gt;**](CalcTestApplication200ResponseDataFunctionsInner.md) |  | [optional] [default to undefined]
+**transactionFunctions** | [**Array&lt;CalcTestApplication200ResponseTransactionFunctionsInner&gt;**](CalcTestApplication200ResponseTransactionFunctionsInner.md) |  | [optional] [default to undefined]
 
 ## Example
 

@@ -32,41 +32,17 @@ const setupYupScheme = () => {
     return yup.object({
         /** 案件情報 */
         // 案件名
-        projectName: yup.string().required('案件名を入力してください'),
+        projectName: yup.string().label('案件名').required(),
         // 生産性自動入力チェック
         autoProductivity: yup.boolean(),
+        // 生産性(FP/月)
+        productivityFPPerMonth: yup.number().rangeCheck(1, 9999),
         // 開発工程比率自動入力チェック
         autoProcessRatios: yup.boolean(),
-        // 生産性(FP/月)
-        productivityFPPerMonth: yup
-            .number()
-            .rangeCheck(1, 9999)
-            .test('min-when-manual', '1以上の値を入力してください', function(value) {
-                const autoProductivity = this.parent.autoProductivity;
-                // 自動入力がOFFの場合のみminチェック
-                if (autoProductivity === false && value !== undefined && value !== null) {
-                    return value >= 1;
-                }
-                return true;
-            })
-            .test('required-when-manual', '生産性を入力してください', function(value) {
-                const autoProductivity = this.parent.autoProductivity;
-                // 自動入力がOFFの場合のみ必須チェック
-                if (autoProductivity === false) {
-                    return value !== undefined && value !== null;
-                }
-                return true;
-            }),
         // 案件種別
         projectType: yup.string(),
         // 使用するIPA代表値
         ipaValueType: yup.string(),
-        // 総FP
-        totalFP: yup.number(),
-        // 総工数(人月)
-        totalManMonths: yup.number(),
-        // 標準工期(月)
-        standardDurationMonths: yup.number(),
 
         // データファンクション情報
         dataFunctions: yup.array().of(
@@ -74,61 +50,61 @@ const setupYupScheme = () => {
                 selected: yup.boolean(),
                 name: yup.string(),
                 updateType: yup.string(),
-                fpValue: yup.number().min(0, '0以上の値を入力してください'),
+                fpValue: yup.number().default(0),
                 remarks: yup.string(),
             })
         ),
-        
         // トランザクションファンクション情報
         transactionFunctions: yup.array().of(
             yup.object({
                 selected: yup.boolean(),
                 name: yup.string(),
-                externalInput: yup.number().rangeCheck(0, 9999),
-                externalOutput: yup.number().rangeCheck(0, 9999),
-                externalInquiry: yup.number().rangeCheck(0, 9999),
-                fpValue: yup.number().min(0, '0以上の値を入力してください'),
+                externalInput: yup.number().transform((value, originalValue) => originalValue === "" ? undefined : value).rangeCheck(0, 9999),      // 入力欄が空の場合はundefinedに変換
+                externalOutput: yup.number().transform((value, originalValue) => originalValue === "" ? undefined : value).rangeCheck(0, 9999),     // 入力欄が空の場合はundefinedに変換
+                externalInquiry: yup.number().transform((value, originalValue) => originalValue === "" ? undefined : value).rangeCheck(0, 9999),    // 入力欄が空の場合はundefinedに変換
+                fpValue: yup.number().default(0),
                 remarks: yup.string(),
             })
         ),
 
+        // 総FP
+        totalFP: yup.number().default(0),
+        // 総工数(人月)
+        totalManMonths: yup.number().default(0),
+        // 標準工期(月)
+        standardDurationMonths: yup.number().default(0),
         // 工程別比率
         processRatios: yup.object({
-            basicDesign: yup.number().rangeCheck(0.000, 1.000),
-            detailedDesign: yup.number().rangeCheck(0.000, 1.000),
-            implementation: yup.number().rangeCheck(0.000, 1.000),
-            integrationTest: yup.number().rangeCheck(0.000, 1.000),
-            systemTest: yup.number().rangeCheck(0.000, 1.000),
+            basicDesign: yup.number().default(0),
+            detailedDesign: yup.number().default(0),
+            implementation: yup.number().default(0),
+            integrationTest: yup.number().default(0),
+            systemTest: yup.number().default(0),
         }),
-
         // 工程別FP
         processFPs: yup.object({
-            basicDesign: yup.number().min(0).required(),
-            detailedDesign: yup.number().min(0).required(),
-            implementation: yup.number().min(0).required(),
-            integrationTest: yup.number().min(0).required(),
-            systemTest: yup.number().min(0).required(),
+            basicDesign: yup.number().default(0),
+            detailedDesign: yup.number().default(0),
+            implementation: yup.number().default(0),
+            integrationTest: yup.number().default(0),
+            systemTest: yup.number().default(0),
         }),
-
         // 工程別工数
         processManMonths: yup.object({
-            basicDesign: yup.number().min(0).required(),
-            detailedDesign: yup.number().min(0).required(),
-            implementation: yup.number().min(0).required(),
-            integrationTest: yup.number().min(0).required(),
-            systemTest: yup.number().min(0).required(),
+            basicDesign: yup.number().default(0),
+            detailedDesign: yup.number().default(0),
+            implementation: yup.number().default(0),
+            integrationTest: yup.number().default(0),
+            systemTest: yup.number().default(0),
         }),
-        // .optional(),
-
         // 工程別工期
         processDurations: yup.object({
-            basicDesign: yup.number().min(0).required(),
-            detailedDesign: yup.number().min(0).required(),
-            implementation: yup.number().min(0).required(),
-            integrationTest: yup.number().min(0).required(),
-            systemTest: yup.number().min(0).required(),
+            basicDesign: yup.number().default(0),
+            detailedDesign: yup.number().default(0),
+            implementation: yup.number().default(0),
+            integrationTest: yup.number().default(0),
+            systemTest: yup.number().default(0),
         }),
-        // .optional(),
     });
 };
 
@@ -200,6 +176,14 @@ function CalcForm(props: Props) {
     const [processBreakdownOpen, setProcessBreakdownOpen] = useState(false);
     const [dataSelectedCount, setDataSelectedCount] = useState(0);
     const [transactionSelectedCount, setTransactionSelectedCount] = useState(0);
+    // 工程別内訳表に表示する比率（計算ボタン押下時のみ更新）
+    const [displayedProcessRatios, setDisplayedProcessRatios] = useState<ProcessRatios>({
+        basicDesign: 0,
+        detailedDesign: 0,
+        implementation: 0,
+        integrationTest: 0,
+        systemTest: 0,
+    });
 
     // データファンクションテーブルのカラム定義
     const dataColumns: ColumnDefinition[] = useMemo(() => [
@@ -216,9 +200,9 @@ function CalcForm(props: Props) {
     // トランザクションファンクションテーブルのカラム定義
     const transactionColumns: ColumnDefinition[] = useMemo(() => [
         { key: 'name', label: '名称', minWidth: 200, maxWidth: 400, icon: 'edit', type: 'text', maxLength: 50 },
-        { key: 'externalInput', label: '外部入力', width: 120, icon: 'edit', type: 'number' },
-        { key: 'externalOutput', label: '外部出力', width: 120, icon: 'edit', type: 'number' },
-        { key: 'externalInquiry', label: '外部照会', width: 120, icon: 'edit', type: 'number' },
+        { key: 'externalInput', label: '外部入力', width: 120, icon: 'edit', type: 'number', min: 0, max: 9999 },
+        { key: 'externalOutput', label: '外部出力', width: 120, icon: 'edit', type: 'number', min: 0, max: 9999 },
+        { key: 'externalInquiry', label: '外部照会', width: 120, icon: 'edit', type: 'number', min: 0, max: 9999 },
         { key: 'fpValue', label: 'FP', minWidth: 80, maxWidth: 100, icon: 'auto', type: 'number', disabled: true },
         { key: 'remarks', label: '備考', minWidth: 200, maxWidth: 300, icon: 'edit', type: 'text', maxLength: 200 },
         { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
@@ -235,6 +219,17 @@ function CalcForm(props: Props) {
             ...result,
         });
         
+        // 工程別内訳表に表示する比率を更新
+        if (result.processRatios) {
+            setDisplayedProcessRatios({
+                basicDesign: result.processRatios.basicDesign ?? 0,
+                detailedDesign: result.processRatios.detailedDesign ?? 0,
+                implementation: result.processRatios.implementation ?? 0,
+                integrationTest: result.processRatios.integrationTest ?? 0,
+                systemTest: result.processRatios.systemTest ?? 0,
+            });
+        }
+        
         // 工程別比率の表を自動で表示
         setProcessBreakdownOpen(true);
     };
@@ -245,16 +240,6 @@ function CalcForm(props: Props) {
     const processFPs = watch('processFPs');
     const processManMonths = watch('processManMonths');
     const processDurations = watch('processDurations');
-    const processRatios = watch('processRatios');
-    
-    // 工程別内訳表に表示する計算結果
-    const calculatedProcessRatios: ProcessRatios = {
-        basicDesign: processRatios?.basicDesign ?? 0,
-        detailedDesign: processRatios?.detailedDesign ?? 0,
-        implementation: processRatios?.implementation ?? 0,
-        integrationTest: processRatios?.integrationTest ?? 0,
-        systemTest: processRatios?.systemTest ?? 0,
-    };
 
     /** ▼ データファンクション行追加 */
     const onAddDataRow = useCallback(() => {
@@ -307,7 +292,7 @@ function CalcForm(props: Props) {
     };
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 72px)' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
             <FormProvider {...methods}>
                 {/* メインコンテンツエリア */}
                 <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
@@ -455,7 +440,7 @@ function CalcForm(props: Props) {
                             }
                         >
                             <ProcessBreakdownTable
-                                processRatios={calculatedProcessRatios}
+                                processRatios={displayedProcessRatios}
                                 processFPs={processFPs}
                                 processManMonths={processManMonths}
                                 processDurations={processDurations}

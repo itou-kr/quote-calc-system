@@ -42,7 +42,12 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
     useEffect(() => {
         if (autoProcessRatios) {
             const defaultRatios = getProcessRatios(projectType, ipaValueType);
-            setValue('processRatios' as any, defaultRatios as any);
+            // 個別フィールドに設定することで、watchによる合計値の自動更新をトリガー
+            setValue('processRatios.basicDesign' as any, defaultRatios.basicDesign as any);
+            setValue('processRatios.detailedDesign' as any, defaultRatios.detailedDesign as any);
+            setValue('processRatios.implementation' as any, defaultRatios.implementation as any);
+            setValue('processRatios.integrationTest' as any, defaultRatios.integrationTest as any);
+            setValue('processRatios.systemTest' as any, defaultRatios.systemTest as any);
         }
     }, [autoProcessRatios, projectType, ipaValueType, setValue]);
 
@@ -54,7 +59,12 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
         // チェックをONにしたタイミングで自動的にデフォルト値を設定
         if (checked) {
             const defaultRatios = getProcessRatios(projectType, ipaValueType);
-            setValue('processRatios' as any, defaultRatios as any, { shouldValidate: true });
+            // 個別フィールドに設定することで、watchによる合計値の自動更新をトリガー
+            setValue('processRatios.basicDesign' as any, defaultRatios.basicDesign as any, { shouldValidate: true });
+            setValue('processRatios.detailedDesign' as any, defaultRatios.detailedDesign as any, { shouldValidate: true });
+            setValue('processRatios.implementation' as any, defaultRatios.implementation as any, { shouldValidate: true });
+            setValue('processRatios.integrationTest' as any, defaultRatios.integrationTest as any, { shouldValidate: true });
+            setValue('processRatios.systemTest' as any, defaultRatios.systemTest as any, { shouldValidate: true });
             // エラーを解除
             clearErrors?.('processRatios.basicDesign' as any);
             clearErrors?.('processRatios.detailedDesign' as any);
@@ -66,7 +76,12 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
 
     const handleResetClick = useCallback(() => {
         const defaultRatios = getProcessRatios(projectType, ipaValueType);
-        setValue('processRatios' as any, defaultRatios as any, { shouldValidate: true, shouldDirty: true });
+        // 個別フィールドに設定することで、watchによる合計値の自動更新をトリガー
+        setValue('processRatios.basicDesign' as any, defaultRatios.basicDesign as any, { shouldValidate: true, shouldDirty: true });
+        setValue('processRatios.detailedDesign' as any, defaultRatios.detailedDesign as any, { shouldValidate: true, shouldDirty: true });
+        setValue('processRatios.implementation' as any, defaultRatios.implementation as any, { shouldValidate: true, shouldDirty: true });
+        setValue('processRatios.integrationTest' as any, defaultRatios.integrationTest as any, { shouldValidate: true, shouldDirty: true });
+        setValue('processRatios.systemTest' as any, defaultRatios.systemTest as any, { shouldValidate: true, shouldDirty: true });
     }, [setValue, projectType, ipaValueType]);
 
     // フィールドがブランクの場合に0を設定するハンドラー
@@ -79,21 +94,6 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
         };
     }, [watch, setValue]);
 
-    // 小数点第3位までに制限する入力ハンドラー
-    const handleInput = useCallback((e: React.FormEvent<HTMLInputElement>) => {
-        const input = e.currentTarget.value;
-        const decimalIndex = input.indexOf('.');
-        
-        // 小数点がある場合、小数点以下の桁数をチェック
-        if (decimalIndex !== -1) {
-            const decimalPart = input.substring(decimalIndex + 1);
-            // 小数点第3位を超える場合は、入力を制限
-            if (decimalPart.length > 3) {
-                e.currentTarget.value = input.substring(0, decimalIndex + 4);
-            }
-        }
-    }, []);
-
     // スタイルをメモ化
     const fieldSx = useMemo(() => ({
         '& .MuiInputBase-root': { bgcolor: autoProcessRatios ? '#f5f5f5' : 'white' }
@@ -102,9 +102,20 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
     const slotProps = useMemo(() => ({
         htmlInput: { 
             step: 0.001,
-            onInput: handleInput
+            onInput: (e: React.FormEvent<HTMLInputElement>) => {
+                const input = e.currentTarget.value;
+                const decimalIndex = input.indexOf('.');
+                
+                // 小数点第3位までに制限（ProcessRatiosField独自の制御）
+                if (decimalIndex !== -1) {
+                    const decimalPart = input.substring(decimalIndex + 1);
+                    if (decimalPart.length > 3) {
+                        e.currentTarget.value = input.substring(0, decimalIndex + 4);
+                    }
+                }
+            }
         }
-    }), [handleInput]);
+    }), []);
 
     // 合計値を計算（個別フィールドの変更を検知）
     const total = useMemo(() => {
@@ -142,6 +153,8 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
                     type="number"
                     label="基本設計"
                     disabled={autoProcessRatios}
+                    min={0}
+                    max={1}
                     sx={fieldSx}
                     slotProps={slotProps}
                     onBlur={handleBlur('basicDesign')}
@@ -154,6 +167,8 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
                     type="number"
                     label="詳細設計"
                     disabled={autoProcessRatios}
+                    min={0}
+                    max={1}
                     sx={fieldSx}
                     slotProps={slotProps}
                     onBlur={handleBlur('detailedDesign')}
@@ -164,8 +179,10 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
                     trigger={trigger}
                     t={t}
                     type="number"
-                    label="実装"
+                    label="製造"
                     disabled={autoProcessRatios}
+                    min={0}
+                    max={1}
                     sx={fieldSx}
                     slotProps={slotProps}
                     onBlur={handleBlur('implementation')}
@@ -178,6 +195,8 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
                     type="number"
                     label="結合テスト"
                     disabled={autoProcessRatios}
+                    min={0}
+                    max={1}
                     sx={fieldSx}
                     slotProps={slotProps}
                     onBlur={handleBlur('integrationTest')}
@@ -191,6 +210,8 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
                         type="number"
                         label="総合テスト"
                         disabled={autoProcessRatios}
+                        min={0}
+                        max={1}
                         sx={{ ...fieldSx, flex: 1 }}
                         slotProps={slotProps}
                         onBlur={handleBlur('systemTest')}

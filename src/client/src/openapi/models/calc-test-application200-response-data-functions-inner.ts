@@ -21,8 +21,32 @@
 export interface CalcTestApplication200ResponseDataFunctionsInner {
     /**
      * 
+     * @type {boolean}
+     * @memberof CalcTestApplication200ResponseDataFunctionsInner
+     */
+    'selected'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof CalcTestApplication200ResponseDataFunctionsInner
+     */
+    'name'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CalcTestApplication200ResponseDataFunctionsInner
+     */
+    'updateType'?: string;
+    /**
+     * 
      * @type {number}
      * @memberof CalcTestApplication200ResponseDataFunctionsInner
      */
     'fpValue'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof CalcTestApplication200ResponseDataFunctionsInner
+     */
+    'remarks'?: string;
 }

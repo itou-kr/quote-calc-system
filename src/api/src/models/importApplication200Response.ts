@@ -11,8 +11,8 @@
  */
 
 import { CalcTestApplicationRequestProcessRatios } from './calcTestApplicationRequestProcessRatios';
+import { CalcTestApplicationRequestTransactionFunctionsInner } from './calcTestApplicationRequestTransactionFunctionsInner';
 import { ExportApplication200ResponseDataFunctionsInner } from './exportApplication200ResponseDataFunctionsInner';
-import { ExportApplicationRequestTransactionFunctionsInner } from './exportApplicationRequestTransactionFunctionsInner';
 
 /**
 * インポートレスポンス
@@ -29,7 +29,7 @@ export class ImportApplication200Response {
     'processManMonths'?: CalcTestApplicationRequestProcessRatios;
     'processDurations'?: CalcTestApplicationRequestProcessRatios;
     'dataFunctions'?: Array<ExportApplication200ResponseDataFunctionsInner>;
-    'transactionFunctions'?: Array<ExportApplicationRequestTransactionFunctionsInner>;
+    'transactionFunctions'?: Array<CalcTestApplicationRequestTransactionFunctionsInner>;
     'errorMessages'?: Array<string>;
 
     static discriminator: string | undefined = undefined;
@@ -93,7 +93,7 @@ export class ImportApplication200Response {
         {
             "name": "transactionFunctions",
             "baseName": "transactionFunctions",
-            "type": "Array<ExportApplicationRequestTransactionFunctionsInner>"
+            "type": "Array<CalcTestApplicationRequestTransactionFunctionsInner>"
         },
         {
             "name": "errorMessages",

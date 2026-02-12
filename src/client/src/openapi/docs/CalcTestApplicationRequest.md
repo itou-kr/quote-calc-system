@@ -12,8 +12,8 @@ Name | Type | Description | Notes
 **productivityFPPerMonth** | **number** |  | [optional] [default to undefined]
 **projectType** | **string** |  | [optional] [default to undefined]
 **ipaValueType** | **string** |  | [optional] [default to undefined]
-**dataFunctions** | [**Array&lt;CalcTestApplicationRequestDataFunctionsInner&gt;**](CalcTestApplicationRequestDataFunctionsInner.md) |  | [optional] [default to undefined]
-**transactionFunctions** | [**Array&lt;CalcTestApplicationRequestTransactionFunctionsInner&gt;**](CalcTestApplicationRequestTransactionFunctionsInner.md) |  | [optional] [default to undefined]
+**dataFunctions** | [**Array&lt;CalcTestApplication200ResponseDataFunctionsInner&gt;**](CalcTestApplication200ResponseDataFunctionsInner.md) |  | [optional] [default to undefined]
+**transactionFunctions** | [**Array&lt;CalcTestApplication200ResponseTransactionFunctionsInner&gt;**](CalcTestApplication200ResponseTransactionFunctionsInner.md) |  | [optional] [default to undefined]
 **processRatios** | [**CalcTestApplication200ResponseProcessRatios**](CalcTestApplication200ResponseProcessRatios.md) |  | [optional] [default to undefined]
 
 ## Example

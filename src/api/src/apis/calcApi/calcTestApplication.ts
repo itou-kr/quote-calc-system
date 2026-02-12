@@ -24,7 +24,7 @@ const validateInputData = (calcTestApplicationRequest: CalcTestApplicationReques
     const ratioFields: Array<{ key: keyof typeof ratios; label: string }> = [
       { key: 'basicDesign', label: '基本設計' },
       { key: 'detailedDesign', label: '詳細設計' },
-      { key: 'implementation', label: '実装' },
+      { key: 'implementation', label: '製造' },
       { key: 'integrationTest', label: '結合テスト' },
       { key: 'systemTest', label: 'システムテスト' },
     ];
@@ -50,10 +50,42 @@ const validateInputData = (calcTestApplicationRequest: CalcTestApplicationReques
     }
   }
 
-  // トランザクションファンクションのチェック（整数かつ4桁以下）
-  // クライアント側の以下の箇所でチェックしているため不要
-  // 1. FunctionTable.tsxで小数点を入力できないように制御
-  // 2. CalcForm.tsxのsetupYupScheme()で4桁以下のバリデーションを実施している
+  // データファンクションのチェック
+  if (calcTestApplicationRequest.dataFunctions) {
+    const errorRows: number[] = [];
+    calcTestApplicationRequest.dataFunctions.forEach((df, index) => {
+      const hasName = df.name && df.name.trim() !== '';
+      const hasUpdateType = df.updateType && df.updateType !== '';
+      // 名称と種類の組み合わせが不正（片方だけ入力されている）
+      if ((hasName && !hasUpdateType) || (!hasName && hasUpdateType)) {
+        errorRows.push(index + 1);
+      }
+    });
+    
+    if (errorRows.length > 0) {
+      errorMessage.push(`データファンクションの名称もしくはデータファンクションの種類が不足しています。(No.${errorRows.join(', ')})`);
+    }
+  }
+
+  // トランザクションファンクションのチェック
+  if (calcTestApplicationRequest.transactionFunctions) {
+    const errorRows: number[] = [];
+    calcTestApplicationRequest.transactionFunctions.forEach((tf, index) => {
+      const hasName = tf.name && tf.name.trim() !== '';
+      const total = (tf.externalInput ?? 0) + (tf.externalOutput ?? 0) + (tf.externalInquiry ?? 0);
+      
+      // 名称が入力されているが外部入力・出力・参照の合計が0
+      // または名称が空で外部入力・出力・参照の合計が0より大きい
+      if ((hasName && total === 0) || (!hasName && total > 0)) {
+        errorRows.push(index + 1);
+      }
+    });
+    
+    if (errorRows.length > 0) {
+      errorMessage.push(`トランザクションファンクションの名称もしくは外部入力・外部出力・外部参照の入力が不足しています。(No.${errorRows.join(', ')})`);
+    }
+  }
+
 };
 
 export const calcTestApplication: CalcApi.calcTestApplication = async ({
@@ -139,9 +171,9 @@ response.transactionFunctions =
 
   response.totalFP = dataFunctionsFP + transactionFunctionsFP;
 
-  // 総FPのバリデーション（整数かつ4桁以下）
-  if (response.totalFP > 9999) {
-    errorMessage.push('総FPが4桁を超えています。データファンクションまたはトランザクションファンクションの値を調整してください');
+  // 総FPのバリデーション
+  if (response.totalFP == null || typeof response.totalFP !== 'number' || isNaN(response.totalFP) || response.totalFP < 0) {
+    errorMessage.push('工数計算に失敗しました。');
     response.errorMessages = errorMessage;
     return response;
   }
@@ -203,7 +235,7 @@ response.transactionFunctions =
     detailedDesignFP = Math.round((response.totalFP ?? 0) * (processRatios?.detailedDesign ?? 0) * 100) / 100;
     integrationTestFP = Math.round((response.totalFP ?? 0) * (processRatios?.integrationTest ?? 0) * 100) / 100;
     systemTestFP = Math.round((response.totalFP ?? 0) * (processRatios?.systemTest ?? 0) * 100) / 100;
-    // 実装工程で丸め誤差を吸収
+    // 製造工程で丸め誤差を吸収
     implementationFP = Math.round((allocatableFP - basicDesignFP - detailedDesignFP - integrationTestFP - systemTestFP) * 100) / 100;
   }
   
@@ -230,7 +262,7 @@ response.transactionFunctions =
     detailedDesignManMonths = Math.round((response.totalManMonths ?? 0) * (processRatios?.detailedDesign ?? 0) * 100) / 100;
     integrationTestManMonths = Math.round((response.totalManMonths ?? 0) * (processRatios?.integrationTest ?? 0) * 100) / 100;
     systemTestManMonths = Math.round((response.totalManMonths ?? 0) * (processRatios?.systemTest ?? 0) * 100) / 100;
-    // 実装工程で丸め誤差を吸収
+    // 製造工程で丸め誤差を吸収
     implementationManMonths = Math.round((allocatableManMonths - basicDesignManMonths - detailedDesignManMonths - integrationTestManMonths - systemTestManMonths) * 100) / 100;
   }
 
@@ -256,7 +288,7 @@ response.transactionFunctions =
     detailedDesignDuration = Math.round((response.standardDurationMonths ?? 0) * (processRatios?.detailedDesign ?? 0) * 100) / 100;
     integrationTestDuration = Math.round((response.standardDurationMonths ?? 0) * (processRatios?.integrationTest ?? 0) * 100) / 100;
     systemTestDuration = Math.round((response.standardDurationMonths ?? 0) * (processRatios?.systemTest ?? 0) * 100) / 100;
-    // 実装工程で丸め誤差を吸収
+    // 製造工程で丸め誤差を吸収
     implementationDuration = Math.round((allocatableDuration - basicDesignDuration - detailedDesignDuration - integrationTestDuration - systemTestDuration) * 100) / 100;
   }
 

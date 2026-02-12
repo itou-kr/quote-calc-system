@@ -37,19 +37,35 @@ paths:
                   items:
                     type: object
                     properties:
+                      selected:
+                        type: boolean
+                      name:
+                        type: string
                       updateType:
+                        type: string
+                      fpValue:
+                        type: number
+                      remarks:
                         type: string
                 transactionFunctions:
                   type: array
                   items:
                     type: object
                     properties:
+                      selected:
+                        type: boolean
+                      name:
+                        type: string
                       externalInput:
                         type: number
                       externalOutput:
                         type: number
                       externalInquiry:
                         type: number
+                      fpValue:
+                        type: number
+                      remarks:
+                        type: string
                 processRatios:
                   type: object
                   properties:
@@ -87,15 +103,35 @@ paths:
                     items:
                       type: object
                       properties:
+                        selected:
+                          type: boolean
+                        name:
+                          type: string
+                        updateType:
+                          type: string
                         fpValue:
                           type: number
+                        remarks:
+                          type: string
                   transactionFunctions:
                     type: array
                     items:
                       type: object
                       properties:
+                        selected:
+                          type: boolean
+                        name:
+                          type: string
+                        externalInput:
+                          type: number
+                        externalOutput:
+                          type: number
+                        externalInquiry:
+                          type: number
                         fpValue:
                           type: number
+                        remarks:
+                          type: string
                   processRatios:
                     type: object
                     properties:
@@ -246,6 +282,8 @@ paths:
                   items:
                     type: object
                     properties:
+                      selected:
+                        type: boolean
                       name:
                         type: string
                       updateType:
@@ -259,6 +297,8 @@ paths:
                   items:
                     type: object
                     properties:
+                      selected:
+                        type: boolean
                       name:
                         type: string
                       externalInput:
@@ -411,6 +451,8 @@ paths:
                     items:
                       type: object
                       properties:
+                        selected:
+                          type: boolean
                         name:
                           type: string
                         externalInput:
