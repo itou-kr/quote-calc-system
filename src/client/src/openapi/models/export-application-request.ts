@@ -14,16 +14,16 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { CalcTestApplication200ResponseDataFunctionsInner } from './calc-test-application200-response-data-functions-inner';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { CalcTestApplication200ResponseProcessRatios } from './calc-test-application200-response-process-ratios';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { ExportApplicationRequestDataFunctionsInner } from './export-application-request-data-functions-inner';
+import type { CalcTestApplication200ResponseTransactionFunctionsInner } from './calc-test-application200-response-transaction-functions-inner';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { ExportApplicationRequestImportFile } from './export-application-request-import-file';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { ExportApplicationRequestTransactionFunctionsInner } from './export-application-request-transaction-functions-inner';
 
 /**
  * エクスポートリクエスト
@@ -105,14 +105,14 @@ export interface ExportApplicationRequest {
     'exportFile'?: ExportApplicationRequestImportFile;
     /**
      * 
-     * @type {Array<ExportApplicationRequestDataFunctionsInner>}
+     * @type {Array<CalcTestApplication200ResponseDataFunctionsInner>}
      * @memberof ExportApplicationRequest
      */
-    'dataFunctions'?: Array<ExportApplicationRequestDataFunctionsInner>;
+    'dataFunctions'?: Array<CalcTestApplication200ResponseDataFunctionsInner>;
     /**
      * 
-     * @type {Array<ExportApplicationRequestTransactionFunctionsInner>}
+     * @type {Array<CalcTestApplication200ResponseTransactionFunctionsInner>}
      * @memberof ExportApplicationRequest
      */
-    'transactionFunctions'?: Array<ExportApplicationRequestTransactionFunctionsInner>;
+    'transactionFunctions'?: Array<CalcTestApplication200ResponseTransactionFunctionsInner>;
 }
