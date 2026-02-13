@@ -38,5 +38,43 @@ yup.addMethod(yup.number, 'rangeCheck', function rangeCheck(min: number, max: nu
     );
 });
 
+yup.addMethod(yup.object, 'transactionPairCheck', function () {
+    return this.test('transactionPairCheck', function (value) {
+        if (!value) return true;
+
+        const {
+        name,
+        externalInput,
+        externalOutput,
+        externalInquiry,
+        } = value;
+
+        const hasName = !!name?.trim();
+        const hasExternal =
+        externalInput != null ||
+        externalOutput != null ||
+        externalInquiry != null;
+
+        if (!hasName && !hasExternal) return true;
+
+        if (hasName && !hasExternal) {
+        return this.createError({
+            path: 'externalInput',
+            message: '外部入力・外部出力・外部照会のいずれかを入力してください',
+        });
+        }
+
+        if (!hasName && hasExternal) {
+        return this.createError({
+            path: 'name',
+            message: '名称を入力してください',
+        });
+        }
+
+        return true;
+    });
+});
+
+
 
 }

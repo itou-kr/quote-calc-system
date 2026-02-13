@@ -75,19 +75,15 @@ const setupYupScheme = () => {
                 selected: yup.boolean(),
                 name: yup
                     .string()
-                    .label('トランザクションファンクションテーブルの名称')
-                    .when(['externalInput', 'externalOutput', 'externalInquiry'], {
-                        is: (externalInput: number | undefined, externalOutput: number | undefined, externalInquiry: number | undefined) =>
-                        (externalInput !== undefined && externalInput !== null) || (externalOutput !== undefined && externalOutput !== null)|| (externalInquiry !== undefined && externalInquiry !== null),
-                        then: (schema) => schema.required(),
-                        otherwise: (schema) => schema,
-                    }),
-                externalInput: yup.number().transform((value, originalValue) => originalValue === "" ? undefined : value).rangeCheck(0, 9999),      // 入力欄が空の場合はundefinedに変換
+                    .label('トランザクションファンクションテーブルの名称'),
+                externalInput: yup
+                    .number()
+                    .transform((value, originalValue) => originalValue === "" ? undefined : value).rangeCheck(0, 9999),
                 externalOutput: yup.number().transform((value, originalValue) => originalValue === "" ? undefined : value).rangeCheck(0, 9999),     // 入力欄が空の場合はundefinedに変換
                 externalInquiry: yup.number().transform((value, originalValue) => originalValue === "" ? undefined : value).rangeCheck(0, 9999),    // 入力欄が空の場合はundefinedに変換
                 fpValue: yup.number().rangeCheck(0, 9999),
                 remarks: yup.string(),
-            })
+            }).transactionPairCheck(),
         ),
 
         // 工程別比率
