@@ -4,12 +4,10 @@ import { useAppDispatch } from '@front/stores';
 
 import { FormType } from '@front/components/pages/CALC/form/CalcForm/CalcForm';
 import type { CalcTestApplicationRequest } from '@front/openapi/models';
-import calcStore from '@front/stores/TEST/test/calcStore';
+import calcStore, { viewId } from '@front/stores/CALC/calc/calcStore';
 
 import { useClear as useClearAlertMessage, useSetAlertMessage } from '@front/hooks/alertMessage';
 import { calcApi } from '@front/openapi';
-
-const viewId = 'CALC';
 
 export function useCalc() {
     const clearAlertMessage = useClearAlertMessage(viewId);

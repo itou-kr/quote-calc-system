@@ -1,14 +1,15 @@
 import { exportApi } from '@front/openapi';
 import { useClear as useClearAlertMessage, useSetAlertMessage } from '@front/hooks/alertMessage';
 import type { ExportApplicationRequest } from '@front/openapi/models';
+import { viewId } from '@front/stores/CALC/calc/calcStore';
 
 /**
  * CALC画面用のエクスポートフック
- * viewIdを'CALC'で固定
+ * viewIdをcalcStoreから取得
  */
 export const useExportFile = () => {
-  const setAlertMessage = useSetAlertMessage('CALC');
-  const clearAlertMessage = useClearAlertMessage('CALC');
+  const setAlertMessage = useSetAlertMessage(viewId);
+  const clearAlertMessage = useClearAlertMessage(viewId);
 
   return async (formData: ExportApplicationRequest) => {
     clearAlertMessage();

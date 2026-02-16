@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import { useCalc } from '@front/hooks/CALC/calc';
 import { useImportFile, useExportFile } from '@front/hooks/CALC/calc';
-import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
+import { viewId, ViewIdType } from '@front/stores/CALC/calc/calcStore';
 import { useMemo, useState, useCallback } from 'react';
 import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -142,8 +142,8 @@ function CalcForm(props: Props) {
     const calc = useCalc();
     const importFile = useImportFile();
     const exportFile = useExportFile();
-    const setAlertMessage = useSetAlertMessage('CALC');
-    const clearAlertMessage = useClear('CALC');
+    const setAlertMessage = useSetAlertMessage(viewId);
+    const clearAlertMessage = useClear(viewId);
     const methods = useForm<FormType>({
         mode: 'onSubmit',
         reValidateMode: 'onSubmit',
