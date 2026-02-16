@@ -51,12 +51,8 @@ const setupYupScheme = () => {
         dataFunctions: yup.array().of(
             yup.object({
                 selected: yup.boolean().label('選択行'),
-                name: yup
-                    .string()
-                    .label('名称'),
-                updateType: yup
-                    .string()
-                    .label('データファンクションの種類'),
+                name: yup.string().label('名称'),
+                updateType: yup.string().label('データファンクションの種類'),
                 fpValue: yup.number().label('FP').default(0),
                 remarks: yup.string().label('備考'),
             }).dataFunctionPairCheck(),
@@ -65,9 +61,7 @@ const setupYupScheme = () => {
         transactionFunctions: yup.array().of(
             yup.object({
                 selected: yup.boolean().label('選択行'),
-                name: yup
-                    .string()
-                    .label('トランザクションファンクションテーブルの名称'),
+                name: yup.string().label('トランザクションファンクションテーブルの名称'),
                 externalInput: yup
                     .number()
                     .label('外部入力')
@@ -389,69 +383,15 @@ function CalcForm(props: Props) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const flattenErrors = (errors: any, path: string = ''): string[] => {
-        const result: Array<{ message: string; rowNumber?: number; fieldType?: string }> = [];
-        
-        const traverse = (obj: any, currentPath: string) => {
-            if (obj?.message) {
-                // パスから行番号とフィールドタイプを抽出
-                const match = currentPath.match(/(dataFunctions|transactionFunctions)\[(\d+)\]/);
-                if (match) {
-                    const fieldType = match[1] === 'dataFunctions' ? 'data' : 'transaction';
-                    const rowNumber = parseInt(match[2], 10) + 1; // 0-indexedなので+1
-                    result.push({ message: obj.message, rowNumber, fieldType });
-                } else {
-                    result.push({ message: obj.message });
-                }
-                return;
-            }
-            
-            if (typeof obj === 'object' && obj !== null) {
-                if (Array.isArray(obj)) {
-                    obj.forEach((item, index) => {
-                        traverse(item, `${currentPath}[${index}]`);
-                    });
-                } else {
-                    Object.entries(obj).forEach(([key, value]) => {
-                        traverse(value, currentPath ? `${currentPath}.${key}` : key);
-                    });
-                }
-            }
-        };
-        
-        traverse(errors, path);
-        
-        // 同じメッセージをグループ化して行番号を付加
-        const grouped = new Map<string, Array<{ rowNumber: number; fieldType: string }>>();
-        const standalone: string[] = [];
-        
-        result.forEach(({ message, rowNumber, fieldType }) => {
-            if (rowNumber !== undefined && fieldType !== undefined) {
-                if (!grouped.has(message)) {
-                    grouped.set(message, []);
-                }
-                grouped.get(message)!.push({ rowNumber, fieldType });
-            } else {
-                standalone.push(message);
-            }
+    const flattenErrors = (errors: any): string[] => {
+        const messages = Object.values(errors).flatMap((error: any) => {
+            if (error?.message) return [error.message];
+            if (typeof error === 'object') return flattenErrors(error);
+            return [];
         });
         
-        const messages: string[] = [];
-        
-        // 行番号付きメッセージを追加
-        grouped.forEach((rows, message) => {
-            if (rows.length === 1) {
-                messages.push(`${message}（No.${rows[0].rowNumber}）`);
-            } else {
-                const rowNumbers = rows.map(r => r.rowNumber).sort((a, b) => a - b);
-                messages.push(`${message}（No.${rowNumbers.join(', No.')}）`);
-            }
-        });
-        
-        // 行番号なしメッセージを追加
-        messages.push(...standalone);
-        
-        return messages;
+        // 重複しているメッセージを削除
+        return Array.from(new Set(messages));
     };
 
     return (
