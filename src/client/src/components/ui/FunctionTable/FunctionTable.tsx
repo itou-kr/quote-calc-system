@@ -228,6 +228,7 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                         control={control}
                         trigger={trigger}
                         t={t}
+                        hideHelperText
                         type="number"
                         notFullWidth
                         disabled={column.disabled}
@@ -269,6 +270,7 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                     control={control}
                     trigger={trigger}
                     t={t}
+                    hideHelperText
                     error={fieldErrors?.[index]?.[column.key] || false}
                     maxLength={column.maxLength}
                     sx={{ 

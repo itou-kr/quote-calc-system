@@ -59,7 +59,7 @@ const setupYupScheme = () => {
                     .label('データファンクションの種類'),
                 fpValue: yup.number().label('FP').default(0),
                 remarks: yup.string().label('備考'),
-            })
+            }).dataFunctionPairCheck(),
         ),
         // トランザクションファンクション情報
         transactionFunctions: yup.array().of(
@@ -85,7 +85,7 @@ const setupYupScheme = () => {
                     .rangeCheck(0, 9999),
                 fpValue: yup.number().label('FP').default(0),
                 remarks: yup.string().label('備考'),
-            })
+            }).transactionFunctionPairCheck(),
         ),
 
         // 総FP
@@ -229,6 +229,70 @@ function CalcForm(props: Props) {
         { key: 'remarks', label: '備考', minWidth: 200, maxWidth: 300, icon: 'edit', type: 'text', maxLength: 200 },
         { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
     ], []);
+    
+    // データファンクションのエラー表示制御
+    const dataFieldErrors = useMemo(() => {
+        const errors = methods.formState.errors?.dataFunctions;
+        if (!errors || !Array.isArray(errors)) return undefined;
+
+        const result: Record<number, Record<string, boolean>> = {};
+
+        errors.forEach((rowError, index) => {
+            if (!rowError) return;
+
+            const rowFlags: Record<string, boolean> = {};
+            
+            // 各フィールドのエラーをマーク
+            if ((rowError as any).name) rowFlags.name = true;
+            if ((rowError as any).updateType) rowFlags.updateType = true;
+
+            if (Object.keys(rowFlags).length > 0) {
+                result[index] = rowFlags;
+            }
+        });
+
+        return Object.keys(result).length > 0 ? result : undefined;
+    }, [methods.formState.errors?.dataFunctions]);
+
+    // トランザクションファンクションのエラー表示制御
+    const transactionFieldErrors = useMemo(() => {
+        const errors = methods.formState.errors?.transactionFunctions;
+        if (!errors || !Array.isArray(errors)) return undefined;
+
+        const result: Record<number, Record<string, boolean>> = {};
+
+        errors.forEach((rowError, index) => {
+            if (!rowError) return;
+
+            const rowFlags: Record<string, boolean> = {};
+            
+            // 各フィールドのエラーをチェック
+            const hasName = !!(rowError as any).name;
+            const hasExternalInput = !!(rowError as any).externalInput;
+            const hasExternalOutput = !!(rowError as any).externalOutput;
+            const hasExternalInquiry = !!(rowError as any).externalInquiry;
+
+            if (hasName) rowFlags.name = true;
+            
+            // externalInputにのみエラーがある場合は、3つ全てを赤枠表示
+            if (hasExternalInput && !hasExternalOutput && !hasExternalInquiry) {
+                rowFlags.externalInput = true;
+                rowFlags.externalOutput = true;
+                rowFlags.externalInquiry = true;
+            } else {
+                // それ以外の場合は通常通り個別のエラーを表示
+                if (hasExternalInput) rowFlags.externalInput = true;
+                if (hasExternalOutput) rowFlags.externalOutput = true;
+                if (hasExternalInquiry) rowFlags.externalInquiry = true;
+            }
+
+            if (Object.keys(rowFlags).length > 0) {
+                result[index] = rowFlags;
+            }
+        });
+
+        return Object.keys(result).length > 0 ? result : undefined;
+    }, [methods.formState.errors?.transactionFunctions]);
 
     // /** ▼ 工数計算実行（バリデーショントリガー） */
     const handleCalcClick = async (onValid: FormType) => {
@@ -325,12 +389,69 @@ function CalcForm(props: Props) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const flattenErrors = (errors: any): string[] => {
-        return Object.values(errors).flatMap((error: any) => {
-            if (error?.message) return [error.message];
-            if (typeof error === 'object') return flattenErrors(error);
-            return [];
+    const flattenErrors = (errors: any, path: string = ''): string[] => {
+        const result: Array<{ message: string; rowNumber?: number; fieldType?: string }> = [];
+        
+        const traverse = (obj: any, currentPath: string) => {
+            if (obj?.message) {
+                // パスから行番号とフィールドタイプを抽出
+                const match = currentPath.match(/(dataFunctions|transactionFunctions)\[(\d+)\]/);
+                if (match) {
+                    const fieldType = match[1] === 'dataFunctions' ? 'data' : 'transaction';
+                    const rowNumber = parseInt(match[2], 10) + 1; // 0-indexedなので+1
+                    result.push({ message: obj.message, rowNumber, fieldType });
+                } else {
+                    result.push({ message: obj.message });
+                }
+                return;
+            }
+            
+            if (typeof obj === 'object' && obj !== null) {
+                if (Array.isArray(obj)) {
+                    obj.forEach((item, index) => {
+                        traverse(item, `${currentPath}[${index}]`);
+                    });
+                } else {
+                    Object.entries(obj).forEach(([key, value]) => {
+                        traverse(value, currentPath ? `${currentPath}.${key}` : key);
+                    });
+                }
+            }
+        };
+        
+        traverse(errors, path);
+        
+        // 同じメッセージをグループ化して行番号を付加
+        const grouped = new Map<string, Array<{ rowNumber: number; fieldType: string }>>();
+        const standalone: string[] = [];
+        
+        result.forEach(({ message, rowNumber, fieldType }) => {
+            if (rowNumber !== undefined && fieldType !== undefined) {
+                if (!grouped.has(message)) {
+                    grouped.set(message, []);
+                }
+                grouped.get(message)!.push({ rowNumber, fieldType });
+            } else {
+                standalone.push(message);
+            }
         });
+        
+        const messages: string[] = [];
+        
+        // 行番号付きメッセージを追加
+        grouped.forEach((rows, message) => {
+            if (rows.length === 1) {
+                messages.push(`${message}（No.${rows[0].rowNumber}）`);
+            } else {
+                const rowNumbers = rows.map(r => r.rowNumber).sort((a, b) => a - b);
+                messages.push(`${message}（No.${rowNumbers.join(', No.')}）`);
+            }
+        });
+        
+        // 行番号なしメッセージを追加
+        messages.push(...standalone);
+        
+        return messages;
     };
 
     return (
@@ -445,6 +566,7 @@ function CalcForm(props: Props) {
                                     onDeleteSelected={onDeleteDataSelected}
                                     selectedCount={dataSelectedCount}
                                     onSelectedCountChange={setDataSelectedCount}
+                                    fieldErrors={dataFieldErrors}
                                     maxHeight="100%"
                                 />
                             </TabPanel>
@@ -460,6 +582,7 @@ function CalcForm(props: Props) {
                                     onDeleteSelected={onDeleteTransactionSelected}
                                     selectedCount={transactionSelectedCount}
                                     onSelectedCountChange={setTransactionSelectedCount}
+                                    fieldErrors={transactionFieldErrors}
                                     maxHeight="100%"
                                 />
                             </TabPanel>

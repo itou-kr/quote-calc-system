@@ -83,7 +83,7 @@ const setupYupScheme = () => {
                 externalInquiry: yup.number().transform((value, originalValue) => originalValue === "" ? undefined : value).rangeCheck(0, 9999),    // 入力欄が空の場合はundefinedに変換
                 fpValue: yup.number().rangeCheck(0, 9999),
                 remarks: yup.string(),
-            }).transactionPairCheck(),
+            }).transactionFunctionPairCheck(),
         ),
 
         // 工程別比率

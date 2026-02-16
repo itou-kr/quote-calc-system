@@ -9,6 +9,10 @@ declare module 'yup' {
     }
     // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
     export interface ObjectSchema {
-        transactionPairCheck(): this;
+        dataFunctionPairCheck(): this;
+    }
+    // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+    export interface ObjectSchema {
+        transactionFunctionPairCheck(): this;
     }
 }

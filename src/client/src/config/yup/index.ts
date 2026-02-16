@@ -38,37 +38,69 @@ yup.addMethod(yup.number, 'rangeCheck', function rangeCheck(min: number, max: nu
     );
 });
 
-yup.addMethod(yup.object, 'transactionPairCheck', function () {
-    return this.test('transactionPairCheck', function (value) {
+yup.addMethod(yup.object, 'dataFunctionPairCheck', function () {
+    return this.test('dataFunctionPairCheck', function (value) {
+        if (!value) return true;
+
+        const { name, updateType } = value;
+
+        const hasName = !!name?.trim();
+        const hasUpdateType = !!updateType?.trim();
+
+        if (!hasName && !hasUpdateType) return true;
+
+        const basePath = this.path || '';
+
+        if (hasName && !hasUpdateType) {
+            const message = 'データファンクションの種類を選択してください';
+            return this.createError({
+                path: basePath ? `${basePath}.updateType` : 'updateType',
+                message,
+            });
+        }
+
+        if (!hasName && hasUpdateType) {
+            return this.createError({
+                path: basePath ? `${basePath}.name` : 'name',
+                message: 'データファンクションの名称を入力してください',
+            });
+        }
+
+        return true;
+    });
+});
+
+yup.addMethod(yup.object, 'transactionFunctionPairCheck', function () {
+    return this.test('transactionFunctionPairCheck', function (value) {
         if (!value) return true;
 
         const {
-        name,
-        externalInput,
-        externalOutput,
-        externalInquiry,
+            name,
+            externalInput,
+            externalOutput,
+            externalInquiry,
         } = value;
 
         const hasName = !!name?.trim();
-        const hasExternal =
-        externalInput != null ||
-        externalOutput != null ||
-        externalInquiry != null;
+        const hasExternal = externalInput != null || externalOutput != null || externalInquiry != null;
 
         if (!hasName && !hasExternal) return true;
 
+        const basePath = this.path || '';
+
         if (hasName && !hasExternal) {
-        return this.createError({
-            path: 'externalInput',
-            message: '外部入力・外部出力・外部照会のいずれかを入力してください',
-        });
+            const message = '外部入力・外部出力・外部照会のいずれかを入力してください';
+            return this.createError({
+                path: basePath ? `${basePath}.externalInput` : 'externalInput',
+                message,
+            });
         }
 
         if (!hasName && hasExternal) {
-        return this.createError({
-            path: 'name',
-            message: '名称を入力してください',
-        });
+            return this.createError({
+                path: basePath ? `${basePath}.name` : 'name',
+                message: 'トランザクションファンクションの名称を入力してください',
+            });
         }
 
         return true;
