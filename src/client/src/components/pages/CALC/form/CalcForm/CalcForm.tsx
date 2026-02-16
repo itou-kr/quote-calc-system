@@ -3,7 +3,7 @@ import { useCalc } from '@front/hooks/CALC/calc';
 import { useImportFile, useExportFile } from '@front/hooks/CALC/calc';
 import { viewId, ViewIdType } from '@front/stores/CALC/calc/calcStore';
 import { useMemo, useState, useCallback } from 'react';
-import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Stack, Paper, Select, MenuItem, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
@@ -30,6 +30,7 @@ import { getProcessRatios } from '@common/constants/processRatios';
 import { FieldErrors } from 'react-hook-form';
 import { useSetAlertMessage } from '@front/hooks/alertMessage/useSetAlertMessage';
 import { useClear } from '@front/hooks/alertMessage/useClear';
+import FormContainerProvider from '@front/components/ui/Layout/Form/FormContainerProvider';
 
 const setupYupScheme = () => {
     return yup.object({
@@ -396,7 +397,7 @@ function CalcForm(props: Props) {
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-            <FormProvider {...methods}>
+            <FormContainerProvider blockNavigation={methods.formState.isDirty} {...methods}>
                 {/* メインコンテンツエリア */}
                 <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
                     {/* 左サイドバー - 案件情報 */}
@@ -553,7 +554,7 @@ function CalcForm(props: Props) {
                         </CalculationResultsPanel>
                     </Box>
                 </Box>
-            </FormProvider>
+            </FormContainerProvider>
         </Box>
     );
 }
