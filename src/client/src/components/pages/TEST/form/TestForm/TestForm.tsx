@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import { useCalcTest } from '@front/hooks/TEST/test';
 import { useImportFile, useExportFile } from '@front/hooks/TEST/test';
-import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
+import { viewId, ViewIdType } from '@front/stores/TEST/test/testStore/index';
 // import { useMemo, useState, useCallback, useEffect } from 'react';
 import { useMemo, useState, useCallback } from 'react';
 // import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
@@ -34,7 +34,7 @@ import { getProcessRatios } from '@common/constants/processRatios';
 import { FieldErrors } from 'react-hook-form';
 import { useSetAlertMessage } from '@front/hooks/alertMessage/useSetAlertMessage';
 import FormContainerProvider from '@front/components/ui/Layout/Form/FormContainerProvider';
-
+import { useClear as useClearAlertMessage } from '@front/hooks/alertMessage';
 
 
 const setupYupScheme = () => {
@@ -124,19 +124,22 @@ const setupYupScheme = () => {
 export type FormType = yup.InferType<ReturnType<typeof setupYupScheme>>;
 
 type Props = {
-    viewId: ViewIdType | 'CALC';
+    viewId: ViewIdType | 'TEST';
     data?: FormType;
     isDirty: boolean;
 };
 
 function CalcForm(props: Props) {
     // const { viewId, isDirty } = props;
-    const { viewId } = props;
+    // const { viewId } = props;
+    
     const schema = useMemo(() => setupYupScheme(), []);
     const calc = useCalcTest(viewId as ViewIdType);
     const importFile = useImportFile();
     const exportFile = useExportFile();
     const setAlertMessage = useSetAlertMessage('TEST');
+    const clearAlertMessage = useClearAlertMessage(viewId);
+
     // const setDirty = useSetDirty();
     const methods = useForm<FormType>({
         mode: 'onSubmit',
@@ -311,6 +314,7 @@ function CalcForm(props: Props) {
 
     /** ▼ バリデーションエラー時処理 */
     const handleInvalid = (errors: FieldErrors<FormType>) => {
+        clearAlertMessage();
         const messages = flattenErrors(errors);
         setAlertMessage({
             severity: 'error',
