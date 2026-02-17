@@ -530,28 +530,30 @@ function CalcForm(props: Props) {
                         </Box>
 
                         {/* 計算結果 */}
-                        <CalculationResultsPanel
-                            isOpen={processBreakdownOpen}
-                            onToggle={useCallback(() => setProcessBreakdownOpen(prev => !prev), [])}
-                            summaryContent={
-                                <Paper elevation={0} sx={{ p: 2, bgcolor: 'white' }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, pl: 0 }}>
-                                        <AutoAwesomeIcon sx={{ fontSize: 18, mr: 0.5, color: 'text.secondary' }} />
-                                        <Typography variant="body2" sx={{ fontWeight: 'bold', fontSize: '0.95rem' }}>サマリー</Typography>
-                                    </Box>
-                                    <SummaryCard2 label="FP" value={totalFP} colorVariant="periwinkle" />
-                                    <SummaryCard2 label="工数(人月)" value={manMonths} colorVariant="green" />
-                                    <SummaryCard2 label="標準工期(月)" value={standardDuration} colorVariant="orange" />
-                                </Paper>
-                            }
-                        >
-                            <ProcessBreakdownTable
-                                processRatios={displayedProcessRatios}
-                                processFPs={processFPs}
-                                processManMonths={processManMonths}
-                                processDurations={processDurations}
-                            />
-                        </CalculationResultsPanel>
+                        <Box sx={{ overflowY: 'auto' }}>
+                            <CalculationResultsPanel
+                                isOpen={processBreakdownOpen}
+                                onToggle={useCallback(() => setProcessBreakdownOpen(prev => !prev), [])}
+                                summaryContent={
+                                    <Paper elevation={0} sx={{ p: 2, bgcolor: 'white' }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, pl: 0 }}>
+                                            <AutoAwesomeIcon sx={{ fontSize: 18, mr: 0.5, color: 'text.secondary' }} />
+                                            <Typography variant="body2" sx={{ fontWeight: 'bold', fontSize: '0.95rem' }}>サマリー</Typography>
+                                        </Box>
+                                        <SummaryCard2 label="FP" value={totalFP} colorVariant="periwinkle" />
+                                        <SummaryCard2 label="工数(人月)" value={manMonths} colorVariant="green" />
+                                        <SummaryCard2 label="標準工期(月)" value={standardDuration} colorVariant="orange" />
+                                    </Paper>
+                                }
+                            >
+                                <ProcessBreakdownTable
+                                    processRatios={displayedProcessRatios}
+                                    processFPs={processFPs}
+                                    processManMonths={processManMonths}
+                                    processDurations={processDurations}
+                                />
+                            </CalculationResultsPanel>
+                        </Box>
                     </Box>
                 </Box>
             </FormContainerProvider>
