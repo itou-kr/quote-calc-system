@@ -8,6 +8,7 @@ import { CalcTestApplicationRequest } from '@front/openapi';
 import { FormProviderProps } from 'react-hook-form';
 import { viewId } from '@front/stores/TEST/test/testStore';
 
+
 type Props = {
     methods: Omit<FormProviderProps<FormType>, 'children'>;
 };
