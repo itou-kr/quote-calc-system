@@ -39,6 +39,10 @@ export const useExportFile = () => {
       }
 
       downloadBase64File(exportFileData.exportFile.content!, exportFileData.exportFile.name!);
+
+      // 正常メッセージの表示
+      setAlertMessage({ severity: 'success', message: 'エクスポートに成功しました。' });   
+
     } catch (error) {
       setAlertMessage({
         severity: 'error',

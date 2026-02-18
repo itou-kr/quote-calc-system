@@ -32,6 +32,9 @@ export function useCalc() {
             console.log('response', response);
             dispatch(calcStore.actions.setCalc(calcResultData));
 
+            // 正常メッセージの表示
+            setAlertMessage({ severity: 'success', message: '工数を出力しました。' });   
+
             return calcResultData;
         },
         [clearAlertMessage, setAlertMessage, dispatch]

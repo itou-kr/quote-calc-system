@@ -22,6 +22,9 @@ export const useImportFile = () => {
       return;
     }
     
+    // 正常メッセージの表示
+    setAlertMessage({ severity: 'success', message: 'インポートが完了しました。' });   
+
     console.log('response', response);
     return importFileData;
   }
