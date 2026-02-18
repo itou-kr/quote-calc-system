@@ -88,12 +88,12 @@ function ProcessBreakdownTable(props: Props) {
                 <TableHead>
                     <TableRow>
                         <TableCell sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 120 }}></TableCell>
-                        <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 'calc((100% - 420px) / 6)' }}>基本設計</TableCell>
-                        <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 'calc((100% - 420px) / 6)' }}>詳細設計</TableCell>
-                        <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 'calc((100% - 420px) / 6)' }}>製造</TableCell>
-                        <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 'calc((100% - 420px) / 6)' }}>結合テスト</TableCell>
-                        <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 'calc((100% - 420px) / 6)' }}>総合テスト</TableCell>
-                        <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 'calc((100% - 420px) / 6)' }}>合計</TableCell>
+                        <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 'calc((100% - 120px) / 6)' }}>基本設計</TableCell>
+                        <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 'calc((100% - 120px) / 6)' }}>詳細設計</TableCell>
+                        <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 'calc((100% - 120px) / 6)' }}>製造</TableCell>
+                        <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 'calc((100% - 120px) / 6)' }}>結合テスト</TableCell>
+                        <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', borderRight: 1, borderColor: 'divider', width: 'calc((100% - 120px) / 6)' }}>総合テスト</TableCell>
+                        <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 'calc((100% - 120px) / 6)' }}>合計</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>

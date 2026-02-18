@@ -83,7 +83,7 @@ const setupYupScheme = () => {
                 externalInquiry: yup.number().transform((value, originalValue) => originalValue === "" ? undefined : value).rangeCheck(0, 9999),    // 入力欄が空の場合はundefinedに変換
                 fpValue: yup.number().rangeCheck(0, 9999),
                 remarks: yup.string(),
-            }).transactionPairCheck(),
+            }).transactionFunctionPairCheck(),
         ),
 
         // 工程別比率
@@ -182,9 +182,8 @@ function CalcForm(props: Props) {
             ...props.data,
         },
     });
-    const { control, trigger, watch, setValue, getValues, handleSubmit, clearErrors,
-    // const { control, trigger, watch, setValue, getValues, handleSubmit, clearErrors,
- } = methods;
+    const { control, trigger, watch, setValue, getValues, handleSubmit, clearErrors } = methods;
+    // const { control, trigger, watch, setValue, getValues, handleSubmit, clearErrors } = methods;
     const { fields: dataFields, append: appendData, remove: removeData } = useFieldArray({
         control,
         name: 'dataFunctions',
@@ -410,7 +409,7 @@ function CalcForm(props: Props) {
 
                     {/* 右メインエリア - 画面情報入力 */}
                     <Box sx={{ flex: 1, pt: 2, px: 2, pb: 0, overflow: 'hidden', bgcolor: '#fafafa', display: 'flex', flexDirection: 'column' }}>
-                        {/* テーブルタsブと操作ボタン */}
+                        {/* テーブルタブと操作ボタン */}
                         <TableToolbar
                             tabs={[
                                 { label: 'データファンクション' },

@@ -1,9 +1,9 @@
 import * as yup from 'yup';
 import { useCalc } from '@front/hooks/CALC/calc';
 import { useImportFile, useExportFile } from '@front/hooks/CALC/calc';
-import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
+import { viewId, ViewIdType } from '@front/stores/CALC/calc/calcStore';
 import { useMemo, useState, useCallback } from 'react';
-import { FormProvider, useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Stack, Paper, Select, MenuItem, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
@@ -30,6 +30,7 @@ import { getProcessRatios } from '@common/constants/processRatios';
 import { FieldErrors } from 'react-hook-form';
 import { useSetAlertMessage } from '@front/hooks/alertMessage/useSetAlertMessage';
 import { useClear } from '@front/hooks/alertMessage/useClear';
+import FormContainerProvider from '@front/components/ui/Layout/Form/FormContainerProvider';
 
 const setupYupScheme = () => {
     return yup.object({
@@ -51,23 +52,17 @@ const setupYupScheme = () => {
         dataFunctions: yup.array().of(
             yup.object({
                 selected: yup.boolean().label('選択行'),
-                name: yup
-                    .string()
-                    .label('名称'),
-                updateType: yup
-                    .string()
-                    .label('データファンクションの種類'),
+                name: yup.string().label('名称'),
+                updateType: yup.string().label('データファンクションの種類'),
                 fpValue: yup.number().label('FP').default(0),
                 remarks: yup.string().label('備考'),
-            })
+            }).dataFunctionPairCheck(),
         ),
         // トランザクションファンクション情報
         transactionFunctions: yup.array().of(
             yup.object({
                 selected: yup.boolean().label('選択行'),
-                name: yup
-                    .string()
-                    .label('トランザクションファンクションテーブルの名称'),
+                name: yup.string().label('トランザクションファンクションテーブルの名称'),
                 externalInput: yup
                     .number()
                     .label('外部入力')
@@ -85,7 +80,7 @@ const setupYupScheme = () => {
                     .rangeCheck(0, 9999),
                 fpValue: yup.number().label('FP').default(0),
                 remarks: yup.string().label('備考'),
-            })
+            }).transactionFunctionPairCheck(),
         ),
 
         // 総FP
@@ -142,8 +137,8 @@ function CalcForm(props: Props) {
     const calc = useCalc();
     const importFile = useImportFile();
     const exportFile = useExportFile();
-    const setAlertMessage = useSetAlertMessage('CALC');
-    const clearAlertMessage = useClear('CALC');
+    const setAlertMessage = useSetAlertMessage(viewId);
+    const clearAlertMessage = useClear(viewId);
     const methods = useForm<FormType>({
         mode: 'onSubmit',
         reValidateMode: 'onSubmit',
@@ -229,6 +224,70 @@ function CalcForm(props: Props) {
         { key: 'remarks', label: '備考', minWidth: 200, maxWidth: 300, icon: 'edit', type: 'text', maxLength: 200 },
         { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
     ], []);
+    
+    // データファンクションのエラー表示制御
+    const dataFieldErrors = useMemo(() => {
+        const errors = methods.formState.errors?.dataFunctions;
+        if (!errors || !Array.isArray(errors)) return undefined;
+
+        const result: Record<number, Record<string, boolean>> = {};
+
+        errors.forEach((rowError, index) => {
+            if (!rowError) return;
+
+            const rowFlags: Record<string, boolean> = {};
+            
+            // 各フィールドのエラーをマーク
+            if ((rowError as any).name) rowFlags.name = true;
+            if ((rowError as any).updateType) rowFlags.updateType = true;
+
+            if (Object.keys(rowFlags).length > 0) {
+                result[index] = rowFlags;
+            }
+        });
+
+        return Object.keys(result).length > 0 ? result : undefined;
+    }, [methods.formState.errors?.dataFunctions]);
+
+    // トランザクションファンクションのエラー表示制御
+    const transactionFieldErrors = useMemo(() => {
+        const errors = methods.formState.errors?.transactionFunctions;
+        if (!errors || !Array.isArray(errors)) return undefined;
+
+        const result: Record<number, Record<string, boolean>> = {};
+
+        errors.forEach((rowError, index) => {
+            if (!rowError) return;
+
+            const rowFlags: Record<string, boolean> = {};
+            
+            // 各フィールドのエラーをチェック
+            const hasName = !!(rowError as any).name;
+            const hasExternalInput = !!(rowError as any).externalInput;
+            const hasExternalOutput = !!(rowError as any).externalOutput;
+            const hasExternalInquiry = !!(rowError as any).externalInquiry;
+
+            if (hasName) rowFlags.name = true;
+            
+            // externalInputにのみエラーがある場合は、3つ全てを赤枠表示
+            if (hasExternalInput && !hasExternalOutput && !hasExternalInquiry) {
+                rowFlags.externalInput = true;
+                rowFlags.externalOutput = true;
+                rowFlags.externalInquiry = true;
+            } else {
+                // それ以外の場合は通常通り個別のエラーを表示
+                if (hasExternalInput) rowFlags.externalInput = true;
+                if (hasExternalOutput) rowFlags.externalOutput = true;
+                if (hasExternalInquiry) rowFlags.externalInquiry = true;
+            }
+
+            if (Object.keys(rowFlags).length > 0) {
+                result[index] = rowFlags;
+            }
+        });
+
+        return Object.keys(result).length > 0 ? result : undefined;
+    }, [methods.formState.errors?.transactionFunctions]);
 
     // /** ▼ 工数計算実行（バリデーショントリガー） */
     const handleCalcClick = async (onValid: FormType) => {
@@ -326,16 +385,19 @@ function CalcForm(props: Props) {
     };
 
     const flattenErrors = (errors: any): string[] => {
-        return Object.values(errors).flatMap((error: any) => {
+        const messages = Object.values(errors).flatMap((error: any) => {
             if (error?.message) return [error.message];
             if (typeof error === 'object') return flattenErrors(error);
             return [];
         });
+        
+        // 重複しているメッセージを削除
+        return Array.from(new Set(messages));
     };
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-            <FormProvider {...methods}>
+            <FormContainerProvider blockNavigation={methods.formState.isDirty} {...methods}>
                 {/* メインコンテンツエリア */}
                 <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
                     {/* 左サイドバー - 案件情報 */}
@@ -445,6 +507,7 @@ function CalcForm(props: Props) {
                                     onDeleteSelected={onDeleteDataSelected}
                                     selectedCount={dataSelectedCount}
                                     onSelectedCountChange={setDataSelectedCount}
+                                    fieldErrors={dataFieldErrors}
                                     maxHeight="100%"
                                 />
                             </TabPanel>
@@ -460,37 +523,40 @@ function CalcForm(props: Props) {
                                     onDeleteSelected={onDeleteTransactionSelected}
                                     selectedCount={transactionSelectedCount}
                                     onSelectedCountChange={setTransactionSelectedCount}
+                                    fieldErrors={transactionFieldErrors}
                                     maxHeight="100%"
                                 />
                             </TabPanel>
                         </Box>
 
                         {/* 計算結果 */}
-                        <CalculationResultsPanel
-                            isOpen={processBreakdownOpen}
-                            onToggle={useCallback(() => setProcessBreakdownOpen(prev => !prev), [])}
-                            summaryContent={
-                                <Paper elevation={0} sx={{ p: 2, bgcolor: 'white' }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, pl: 0 }}>
-                                        <AutoAwesomeIcon sx={{ fontSize: 18, mr: 0.5, color: 'text.secondary' }} />
-                                        <Typography variant="body2" sx={{ fontWeight: 'bold', fontSize: '0.95rem' }}>サマリー</Typography>
-                                    </Box>
-                                    <SummaryCard2 label="FP" value={totalFP} colorVariant="periwinkle" />
-                                    <SummaryCard2 label="工数(人月)" value={manMonths} colorVariant="green" />
-                                    <SummaryCard2 label="標準工期(月)" value={standardDuration} colorVariant="orange" />
-                                </Paper>
-                            }
-                        >
-                            <ProcessBreakdownTable
-                                processRatios={displayedProcessRatios}
-                                processFPs={processFPs}
-                                processManMonths={processManMonths}
-                                processDurations={processDurations}
-                            />
-                        </CalculationResultsPanel>
+                        <Box sx={{ overflowY: 'auto' }}>
+                            <CalculationResultsPanel
+                                isOpen={processBreakdownOpen}
+                                onToggle={useCallback(() => setProcessBreakdownOpen(prev => !prev), [])}
+                                summaryContent={
+                                    <Paper elevation={0} sx={{ p: 2, bgcolor: 'white' }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, pl: 0 }}>
+                                            <AutoAwesomeIcon sx={{ fontSize: 18, mr: 0.5, color: 'text.secondary' }} />
+                                            <Typography variant="body2" sx={{ fontWeight: 'bold', fontSize: '0.95rem' }}>サマリー</Typography>
+                                        </Box>
+                                        <SummaryCard2 label="FP" value={totalFP} colorVariant="periwinkle" />
+                                        <SummaryCard2 label="工数(人月)" value={manMonths} colorVariant="green" />
+                                        <SummaryCard2 label="標準工期(月)" value={standardDuration} colorVariant="orange" />
+                                    </Paper>
+                                }
+                            >
+                                <ProcessBreakdownTable
+                                    processRatios={displayedProcessRatios}
+                                    processFPs={processFPs}
+                                    processManMonths={processManMonths}
+                                    processDurations={processDurations}
+                                />
+                            </CalculationResultsPanel>
+                        </Box>
                     </Box>
                 </Box>
-            </FormProvider>
+            </FormContainerProvider>
         </Box>
     );
 }
