@@ -7,7 +7,10 @@ import * as Excel from 'exceljs';
 export const exportApplication: ExportApi.exportApplication = async ({
   exportApplicationRequest = {},
 }) => {
-  
+  const exportResult = '見積算出結果';
+  const underScore  ='_';
+  const xlsx = '.xlsx';
+
   const owb = new Excel.Workbook();
   await owb.xlsx.readFile('templates/sample.xlsx');
   const ows = owb.getWorksheet(1) // 1番目のシートを取得;
@@ -77,8 +80,21 @@ export const exportApplication: ExportApi.exportApplication = async ({
   const base64 = Buffer.from(buffer).toString('base64');
   // const base64 = Buffer.from(buffer).toStrisng('base64');
 
+ const currentDate = new Date()
+  .toLocaleString("ja-JP", {timeZone: "Asia/Tokyo",
+    year: "numeric",    month: "2-digit",    day: "2-digit",
+    hour: "2-digit",    minute: "2-digit",    second: "2-digit"
+  })
+  .replace(/\//g, "")
+  .replace(/:/g, "")
+  .replace(/ /g, "");
+
+  console.log(currentDate); // eslint-disable-line no-console
+  const prjName = exportApplicationRequest.projectName;
+
   let fileName = 'exportApplication.xlsx';
-  fileName = 'テストエクスポート.xlsx';
+  fileName =  exportResult + underScore + prjName + 
+              underScore + currentDate + xlsx;
 
   // content = Buffer.from(buffer).toString('base64');
 
