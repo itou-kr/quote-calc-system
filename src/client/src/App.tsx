@@ -9,7 +9,7 @@ import { SystemError } from '@front/pages/ERROR';
 import { wrapPromise } from '@front/utils/wrapPromise';
 
 // import { AreaProvider, AuthProvider, ConfirmProvider, MenuProvider, ProgressProvider, ReduxProvider, RouterProvider, ThemeProvider, ConsentProvider } from '@front/providers';
-import { ReduxProvider, RouterProvider, ThemeProvider } from '@front/providers';
+import { ReduxProvider, RouterProvider, ThemeProvider, ConfirmProvider } from '@front/providers';
 
 // import Nowloading from '@front/components/Nowloading';
 
@@ -23,15 +23,17 @@ function App() {
                 <I18nextProvider i18n={i18n.result()}>
                     <ErrorBoundary FallbackComponent={SystemError} >
                         <ReduxProvider>
-                            {/* <AreaProvider>
-                                <AuthProvider>
-                                    <MenuProvider>
-                                        <ConsentProvider> */}
-                                            <RouterProvider />
-                                        {/* </ConsentProvider>
-                                    </MenuProvider>
-                                </AuthProvider>
-                            </AreaProvider> */}
+                            <ConfirmProvider>
+                                {/* <AreaProvider>
+                                    <AuthProvider>
+                                        <MenuProvider>
+                                            <ConsentProvider> */}
+                                                <RouterProvider />
+                                            {/* </ConsentProvider>
+                                        </MenuProvider>
+                                    </AuthProvider>
+                                </AreaProvider> */}
+                            </ConfirmProvider>
                         </ReduxProvider>
                     </ErrorBoundary>
                 </I18nextProvider>

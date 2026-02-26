@@ -15,8 +15,7 @@ export type Props = {
 };
 
 function Dialog(props: Props) {
-    // const { open = false, title, escapeKeyDown, onClose, children, maxWidth = 'md', sx } = props;
-    const { open = false, title, escapeKeyDown, onClose, maxWidth = 'md', sx } = props;
+    const { open = false, title, escapeKeyDown, onClose, children, maxWidth = 'md', sx } = props;
 
     return (
         <MuiDialog disableEscapeKeyDown={!escapeKeyDown} open={open} fullWidth maxWidth={maxWidth} sx={sx}>
@@ -30,8 +29,9 @@ function Dialog(props: Props) {
                 )}    
                 </Grid>
             </StyledDialogTitle>
+            {children}
         </MuiDialog>
-    )
+    );
 }
 
 export default Dialog;
