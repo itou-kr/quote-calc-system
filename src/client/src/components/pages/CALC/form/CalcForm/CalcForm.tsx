@@ -180,7 +180,7 @@ function CalcForm(props: Props) {
             ...props.data,
         },
     });
-    const { control, trigger, watch, setValue, getValues, handleSubmit, clearErrors } = methods;
+    const { control, trigger, watch, setValue, getValues, clearErrors } = methods;
     const { fields: dataFields, append: appendData, remove: removeData } = useFieldArray({
         control,
         name: 'dataFunctions',
@@ -423,7 +423,7 @@ function CalcForm(props: Props) {
                                 <Text variant="subsectionTitle">インポート / エクスポート</Text>
                                 <Stack direction="row" spacing={1}>
                                     <ImportButton onFileSelect={onImportButtonClick} onClick={() => {}} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }}>インポート</ImportButton>
-                                    <ExportButton onClick={handleSubmit(onExportButtonClick)} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }} />
+                                    <ExportButton onClick={onExportButtonClick} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }} />
                                 </Stack>
                             </Box>
 
