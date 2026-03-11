@@ -1,17 +1,13 @@
-import { Box, Stack, Tabs, Tab, SxProps, Theme } from '@mui/material';
-import Button from '@front/components/ui/Button';
+import { Box, Stack, Tabs, Tab } from '@mui/material';
+// import Button from '@front/components/ui/Button';
+import React from 'react';
 
 export type TabDefinition = {
     label: string;
 };
 
 export type ActionButton = {
-    label: string;
-    icon?: React.ReactNode;
-    onClick: () => void;
-    disabled?: boolean;
-    variant?: 'outlined' | 'contained' | 'text';
-    sx?: SxProps<Theme>;
+    component: React.ReactNode;
 };
 
 export type Props = {
@@ -66,19 +62,9 @@ function TableToolbar(props: Props) {
                         whiteSpace: 'nowrap' // 改行を防止
                     }}
                 >
-                    {actions.map((action, index) => (
-                        <Button
-                            key={index}
-                            variant={action.variant || 'outlined'}
-                            startIcon={action.icon}
-                            onClick={action.onClick}
-                            size="small"
-                            disabled={action.disabled}
-                            sx={action.sx}
-                        >
-                            {action.label}
-                        </Button>
-                    ))}
+                {actions.map((action, index) =>
+                        <Box key={index}>{action.component}</Box>
+                )}
                 </Stack>
             )}
         </Box>

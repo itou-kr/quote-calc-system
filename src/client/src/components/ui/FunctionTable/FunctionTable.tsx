@@ -1,61 +1,101 @@
-import { Paper, Box, Table, TableHead, TableRow, TableCell, Checkbox, Select, MenuItem } from '@mui/material';
-import { Controller, Control, FieldValues, FieldPath, UseFormTrigger, FieldArrayWithId } from 'react-hook-form';
+import {
+    Paper,
+    Box,
+    Table,
+    TableHead,
+    TableRow,
+    TableCell,
+    Checkbox,
+    Select,
+    MenuItem,
+    Stack,
+} from '@mui/material';
+import {
+    Controller,
+    Control,
+    FieldPath,
+    UseFormTrigger,
+    FieldArrayWithId,
+    FieldValues,
+    ArrayPath,
+} from 'react-hook-form';
 import { TFunction } from 'i18next';
-import { useCallback, memo, useRef, useState, useEffect } from 'react';
+import { useCallback, memo, useRef, useState, useEffect, useMemo } from 'react';
 import { FixedSizeList } from 'react-window';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
+// import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import TextField from '@front/components/ui/TextField';
-import Button from '@front/components/ui/Button';
+import AddRowButton from '../Button/AddRowButton';
+import DeleteRowButton from '../Button/DeleteRowButton';
+import DeleteIcon from '@mui/icons-material/Delete';
 
-export type ColumnDefinition = {
-    key: string;
+export type ColumnDefinition<TRow> = {
+    key: keyof TRow;
     label: string;
     width?: number | string;
     minWidth?: number | string;
     align?: 'left' | 'center' | 'right';
-    type?: 'text' | 'number' | 'select' | 'checkbox' | 'readonly';
+    type?: 'text' | 'number' | 'select' | 'checkbox' | 'readonly' | 'updateType';
     icon?: 'edit' | 'auto';
     options?: { value: string; label: string }[];
     disabled?: boolean;
     maxLength?: number;
     min?: number;
     max?: number;
+    render?: (index: number, fieldName: string) => React.ReactNode;
 };
 
-export type Props<T extends FieldValues = FieldValues> = {
-    fields: FieldArrayWithId<T>[];
-    columns: ColumnDefinition[];
-    baseName: FieldPath<T>;
-    control: Control<T>;
-    trigger: UseFormTrigger<T>;
+export type Props<
+    TForm extends FieldValues = FieldValues,
+    TFieldArrayName extends ArrayPath<TForm> = ArrayPath<TForm>
+> = {
+    fields: FieldArrayWithId<TForm, TFieldArrayName>[];
+    columns: ColumnDefinition<
+        TForm[TFieldArrayName] extends Array<infer TRow> ? TRow : never
+    >[];
+    baseName: TFieldArrayName;
+    control: Control<TForm>;
+    trigger: UseFormTrigger<TForm>;
     t: TFunction<'translation', undefined>;
-    onRowAdd: () => void;
-    onDeleteSelected: () => void;
+    handleAddDataRow: () => void;
+    handleDeleteDataRow: () => void;
     selectedCount: number;
     onSelectedCountChange: (count: number) => void;
     maxHeight?: string;
     fieldErrors?: Record<number, Record<string, boolean>>;
 };
 
-/**
- * データファンクション/トランザクションファンクション共通テーブル（react-windowで仮想化）
- */
-function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
-    const { fields, columns, baseName, control, trigger, t, onRowAdd, onDeleteSelected, selectedCount, onSelectedCountChange, fieldErrors } = props;
+function FunctionTable<
+    TForm extends FieldValues,
+    TFieldArrayName extends ArrayPath<TForm>
+>(props: Props<TForm, TFieldArrayName>) {
+    const {
+        fields,
+        columns,
+        baseName,
+        control,
+        trigger,
+        t,
+        handleAddDataRow,
+        handleDeleteDataRow,
+        onSelectedCountChange,
+        fieldErrors,
+    } = props;
 
-    const ROW_HEIGHT = 53; // 1行の高さ（px）
-    
-    // リストコンテナのrefと高さstate
+    const ROW_HEIGHT = 53;
+
     const listContainerRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const headerContainerRef = useRef<HTMLDivElement>(null);
-    const [listHeight, setListHeight] = useState(0);
-    const [scrollbarWidth, setScrollbarWidth] = useState(15); // 一般的なスクロールバー幅で初期化
 
-    // スクロールバーの幅を計算（LayoutEffect で同期的に実行）
+    const [listHeight, setListHeight] = useState(0);
+    const [scrollbarWidth, setScrollbarWidth] = useState(15);
+
+    /* =========================
+        レイアウト制御
+    ========================= */
+
     useEffect(() => {
         if (scrollContainerRef.current) {
             const width = scrollContainerRef.current.offsetWidth - scrollContainerRef.current.clientWidth;
@@ -88,19 +128,19 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
         }
 
         window.addEventListener('resize', updateHeight);
-        
+
         // ResizeObserverでコンテナサイズ変更を監視
         const observer = new ResizeObserver(updateHeight);
         if (listContainerRef.current) {
-            observer.observe(listContainerRef.current);
+        observer.observe(listContainerRef.current);
         }
 
         return () => {
             if (timeoutId) {
                 clearTimeout(timeoutId);
             }
-            window.removeEventListener('resize', updateHeight);
-            observer.disconnect();
+        window.removeEventListener('resize', updateHeight);
+        observer.disconnect();
         };
     }, []);
 
@@ -133,17 +173,49 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
         return null;
     }, []);
 
-    const renderCell = useCallback((_field: FieldArrayWithId<T>, index: number, column: ColumnDefinition) => {
-        const fieldName = `${baseName}.${index}.${column.key}` as FieldPath<T>;
+    /* =========================
+        列確定（SendScriptSearchTableと同じ思想）
+    ========================= */
 
-        if (column.key === 'selected') {
+    const resolvedColumns = useMemo(() => {
+        return columns.map((column) => {
+        const renderCell = (index: number) => {
+            const fieldName =
+            `${baseName}.${index}.${String(column.key)}` as FieldPath<TForm>;
+
+            // const hasError = fieldErrors?.[index]?.[
+            // column.key as string
+            // ] || false;
+
+            // custom render
+            if (column.render) {
+                return (
+                    <TableCell
+                        key={String(column.key)}
+                        sx={{
+                            width: column.width,
+                            minWidth: column.minWidth,
+                            flexShrink: 0,
+                            borderBottom: 'none',
+                            display: 'flex',
+                            alignItems: 'center',
+                            padding: '6px 16px'
+                        }}
+                    >
+                        {column.render(index, fieldName)}
+                    </TableCell>
+                );
+            }
+
+            // checkbox
+            if (column.key === 'selected') {
             return (
-                <TableCell key={column.key} sx={{ width: column.width, minWidth: column.minWidth, flexShrink: 0, borderLeft: 1, borderRight: 1, borderColor: 'divider', borderBottom: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px 16px' }}>
+                <TableCell key={column.key} sx={{ width: column.width, minWidth: column.minWidth, flexShrink: 0, borderLeft: 0, borderRight: 0, borderColor: 'divider', borderBottom: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px 16px' }}>
                     <Controller
                         name={fieldName}
                         control={control}
                         render={({ field: controllerField }) => (
-                            <Checkbox 
+                            <Checkbox
                                 {...controllerField} 
                                 checked={controllerField.value || false} 
                                 onChange={(e) => {
@@ -158,23 +230,29 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                                     }, 0);
                                 }}
                             />
-                        )}
-                    />
+                    )}
+                />
                 </TableCell>
             );
-        }
+            }
 
-        if (column.type === 'select') {
-            const hasError = fieldErrors?.[index]?.[column.key] || false;
+            // select
+            if (column.type === 'updateType') {
+
+            const hasError = fieldErrors?.[index]?.[
+            column.key as string
+            ] || false;
+
+            // const hasError = fieldErrors?.[index]?.[column.key] || false;
             return (
-                <TableCell key={column.key} sx={{ width: column.width, minWidth: column.minWidth, flexShrink: 0, borderBottom: 'none', display: 'flex', alignItems: 'center', padding: '6px 16px' }}>
-                    <Controller
-                        name={fieldName}
-                        control={control}
-                        render={({ field: controllerField }) => (
-                            <Select 
-                                {...controllerField} 
-                                size="small" 
+                <TableCell key={String(column.key)} sx={{ width: column.width, minWidth: column.minWidth, flexShrink: 0, borderBottom: 'none', display: 'flex', alignItems: 'center', padding: '6px 16px' }}>
+                <Controller
+                    name={fieldName}
+                    control={control}
+                    render={({ field: controllerField }) => (
+                    <Select 
+                        {...controllerField} 
+                        size="small" 
                                 fullWidth 
                                 displayEmpty 
                                 error={hasError}
@@ -187,27 +265,31 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                                         },
                                     }),
                                 }}
-                            >
-                                <MenuItem value="">選択してください</MenuItem>
+                        >
+                            <MenuItem value="">選択してください</MenuItem>
                                 {column.options?.map((option) => (
                                     <MenuItem key={option.value} value={option.value}>
                                         {option.label}
                                     </MenuItem>
                                 ))}
-                            </Select>
-                        )}
-                    />
+                        </Select>
+                    )}
+                />
                 </TableCell>
             );
-        }
+            }
 
-        if (column.type === 'number') {
-            const hasError = fieldErrors?.[index]?.[column.key] || false;
+            // number
+            if (column.type === 'number') {
+            const hasError = fieldErrors?.[index]?.[
+            column.key as string
+            ] || false;
+            // const hasError = fieldErrors?.[index]?.[column.key] || false;
             
             // disabled の場合は通常のテキスト表示にする
             if (column.disabled) {
                 return (
-                    <TableCell key={column.key} sx={{ width: column.width, minWidth: column.minWidth, flexShrink: 0, borderLeft: 1, borderRight: 1, borderColor: 'divider', borderBottom: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px 16px' }}>
+                    <TableCell key={String(column.key)} sx={{ width: column.width, minWidth: column.minWidth, flexShrink: 0, borderLeft: 0, borderRight: 0, borderColor: 'divider', borderBottom: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px 16px' }}>
                         <Controller
                             name={fieldName}
                             control={control}
@@ -222,72 +304,94 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
             }
             
             return (
-                <TableCell key={column.key} sx={{ width: column.width, minWidth: column.minWidth, flexShrink: 0, borderBottom: 'none', display: 'flex', alignItems: 'center', padding: '6px 16px' }}>
-                    <TextField
-                        name={fieldName}
-                        control={control}
-                        trigger={trigger}
-                        t={t}
-                        type="number"
-                        notFullWidth
-                        disabled={column.disabled}
-                        error={hasError}
-                        min={column.min}
-                        max={column.max}
-                        slotProps={{ 
-                            htmlInput: { 
-                                onKeyDown: (e: React.KeyboardEvent) => { 
-                                    // 整数のみなので小数点も禁止
-                                    if (e.key === '.') e.preventDefault(); 
-                                } 
-                            } 
-                        }}
-                        sx={{ 
-                            '& .MuiInputBase-root': { 
-                                bgcolor: column.disabled ? '#f5f5f5' : 'white', 
-                                width: 80 
-                            },
-                            '& input[type="number"]': {
-                                paddingRight: '4px',
-                            },
-                            ...(hasError && {
-                                '& .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: '#d32f2f !important',
-                                    borderWidth: '2px !important',
-                                },
-                            }),
-                        }}
-                    />
-                </TableCell>
-            );
-        }
-
-        return (
-            <TableCell key={column.key} sx={{ width: column.width, minWidth: column.minWidth, flex: column.width ? '0 0 auto' : 1, borderRight: column.width ? 1 : undefined, borderColor: 'divider', borderBottom: 'none', display: 'flex', alignItems: 'center', padding: '6px 16px' }}>
-                <TextField 
+                <TableCell key={String(column.key)} sx={{ width: column.width, minWidth: column.minWidth, flexShrink: 0, borderBottom: 'none', display: 'flex', alignItems: 'center', padding: '6px 16px' }}>
+                <TextField
                     name={fieldName}
                     control={control}
                     trigger={trigger}
                     t={t}
-                    error={fieldErrors?.[index]?.[column.key] || false}
-                    maxLength={column.maxLength}
+                    type="number"
+                    notFullWidth
+                    disabled={column.disabled}
+                    error={hasError}
+                    min={column.min}
+                    max={column.max}
+                    slotProps={{ 
+                        htmlInput: { 
+                            onKeyDown: (e: React.KeyboardEvent) => { 
+                                // 整数のみなので小数点も禁止
+                                if (e.key === '.') e.preventDefault(); 
+                            } 
+                        } 
+                    }}
                     sx={{ 
-                        '& .MuiInputBase-root': { bgcolor: 'white' },
-                        ...(fieldErrors?.[index]?.[column.key] && {
+                        '& .MuiInputBase-root': { 
+                            bgcolor: column.disabled ? '#f5f5f5' : 'white', 
+                            width: 80 
+                        },
+                        '& input[type="number"]': {
+                            paddingRight: '4px',
+                        },
+                        ...(hasError && {
                             '& .MuiOutlinedInput-notchedOutline': {
                                 borderColor: '#d32f2f !important',
                                 borderWidth: '2px !important',
                             },
                         }),
                     }}
+                    hideHelperText
+                />
+                </TableCell>
+            );
+            }
+
+            // default text
+            return (
+            <TableCell key={String(column.key)} sx={{ width: column.width, minWidth: column.minWidth, flex: column.width ? '0 0 auto' : 1, borderRight: column.width ? 1 : undefined, borderColor: 'divider', borderBottom: 'none', display: 'flex', alignItems: 'center', padding: '6px 16px' }}>
+                <TextField
+                name={fieldName}
+                control={control}
+                trigger={trigger}
+                t={t}
+                error={fieldErrors?.[index]?.[column.key as string ] || false}
+                maxLength={column.maxLength}
+                sx={{ 
+                    '& .MuiInputBase-root': { bgcolor: 'white' },
+                    ...(fieldErrors?.[index]?.[column.key as string] && {
+                        '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#d32f2f !important',
+                            borderWidth: '2px !important',
+                        },
+                    }),
+                }}
+                hideHelperText
                 />
             </TableCell>
-        );
-    }, [baseName, control, fields, onSelectedCountChange, trigger, t, fieldErrors]);
+            );
+        };
 
-    // 仮想化リストの行コンポーネント（memo化でちらつき軽減）
-    const Row = memo(({ index, style }: { index: number; style: React.CSSProperties }) => {
-        // 最終行+1の位置に行追加・行削除ボタンを表示
+        return {
+            ...column,
+            renderCell,
+        };
+        });
+    }, [
+        columns,
+        baseName,
+        control,
+        trigger,
+        t,
+        fieldErrors,
+        fields,
+        onSelectedCountChange,
+    ]);
+
+    /* =========================
+        仮想行
+    ========================= */
+
+    const Row = memo(
+        ({ index, style }: { index: number; style: React.CSSProperties }) => {
         if (index === fields.length) {
             return (
                 <Box style={style} sx={{ 
@@ -300,57 +404,28 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                     pl: '77px',
                     pr: 2
                 }}>
-                    <Button 
-                        variant="outlined" 
-                        startIcon={<AddIcon />} 
-                        onClick={onRowAdd}
-                        size="small"
-                        sx={{ 
-                            borderColor: '#1e88e5', 
-                            color: '#1e88e5',
-                            '&:hover': { 
-                                borderColor: '#1565c0',
-                                bgcolor: '#e3f2fd'
-                            }
-                        }}
-                    >
-                        行を追加
-                    </Button>
-                    <Button 
-                        variant="outlined" 
-                        startIcon={<DeleteIcon />} 
-                        onClick={onDeleteSelected}
-                        size="small"
-                        disabled={selectedCount === 0}
-                        sx={{ 
-                            borderColor: '#e53935', 
-                            color: '#e53935',
-                            '&:hover': { 
-                                borderColor: '#c62828',
-                                bgcolor: '#ffebee'
-                            },
-                            '&.Mui-disabled': {
-                                borderColor: 'rgba(0, 0, 0, 0.12)',
-                                color: 'rgba(0, 0, 0, 0.26)'
-                            }
-                        }}
-                    >
-                        選択した行を削除{selectedCount > 0 ? ` (${selectedCount})` : ''}
-                    </Button>
+                    <Stack direction="row" spacing={1}>
+                        <AddRowButton onClick={handleAddDataRow} />
+                        <DeleteRowButton onClick={handleDeleteDataRow} />
+                    </Stack>
                 </Box>
             );
         }
 
-        const field = fields[index];
         return (
             <Box style={style} sx={{ borderBottom: '1px solid rgba(224, 224, 224, 1)' }}>
                 <TableRow hover sx={{ display: 'flex', alignItems: 'stretch', width: '100%', height: ROW_HEIGHT }}>
-                    <TableCell align="center" sx={{ width: 60, flexShrink: 0, borderRight: 1, borderColor: 'divider', borderBottom: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px 16px' }}>{index + 1}</TableCell>
-                    {columns.map((column) => renderCell(field, index, column))}
-                </TableRow>
+                    <TableCell align="center" sx={{ width: 60, flexShrink: 0, borderRight: 0, borderColor: 'divider', borderBottom: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px 16px' }}>{index + 1}</TableCell>
+                    {resolvedColumns.map((col) => col.renderCell(index))}
+            </TableRow>
             </Box>
         );
-    });
+        }
+    );
+
+    /* =========================
+        Render
+    ========================= */
 
     return (
         <Paper elevation={1} sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -370,39 +445,39 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                 <Table stickyHeader size="small">
                     <TableHead>
                         <TableRow sx={{ display: 'flex', width: '100%' }}>
-                            <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 60, flexShrink: 0, borderRight: 1, borderColor: 'divider', padding: '6px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }}>No</TableCell>
+                            <TableCell align="center" sx={{ bgcolor: '#e3f2fd', fontWeight: 'bold', width: 60, flexShrink: 0, borderRight: 0, borderColor: 'divider', padding: '6px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }}>No</TableCell>
                             {columns.map((column) => (
-                                <TableCell 
-                                    key={column.key}
-                                    sx={{ 
-                                        bgcolor: '#e3f2fd', 
-                                        fontWeight: 'bold', 
-                                        width: column.width, 
-                                        minWidth: column.minWidth,
-                                        flexShrink: column.key === 'selected' || column.type === 'number' || column.type === 'select' ? 0 : undefined,
-                                        flex: column.key !== 'selected' && column.type !== 'number' && column.type !== 'select' && !column.width ? 1 : undefined,
-                                        padding: '6px 16px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'flex-start',
-                                        whiteSpace: 'nowrap',
-                                        ...(column.key === 'selected' && { paddingLeft: '0px', borderLeft: 1, borderRight: 1, borderColor: 'divider', justifyContent: 'center' }),
-                                        ...(column.type === 'number' && column.disabled && { borderLeft: 1, borderRight: 1, borderColor: 'divider', justifyContent: 'center' }),
-                                        ...(column.type === 'text' && column.width && { borderRight: 1, borderColor: 'divider' })
-                                    }}
-                                >
-                                    {column.key === 'selected' ? (
-                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                            <DeleteIcon sx={{ fontSize: 16, mr: 0.5, color: '#e53935' }} />
+                            <TableCell 
+                                key={String(column.key)}
+                                sx={{ 
+                                    bgcolor: '#e3f2fd', 
+                                    fontWeight: 'bold', 
+                                    width: column.width, 
+                                    minWidth: column.minWidth,
+                                    flexShrink: column.key === 'selected' || column.type === 'number' || column.type === 'select' ? 0 : undefined,
+                                    flex: column.key !== 'selected' && column.type !== 'number' && column.type !== 'select' && !column.width ? 1 : undefined,
+                                    padding: '6px 16px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'flex-start',
+                                    whiteSpace: 'nowrap',
+                                    ...(column.key === 'selected' && { paddingLeft: '0px', borderLeft: 0, borderRight: 0, borderColor: 'divider', justifyContent: 'center' }),
+                                    ...(column.type === 'number' && column.disabled && { borderLeft: 0, borderRight: 0, borderColor: 'divider', justifyContent: 'center' }),
+                                    ...(column.type === 'text' && column.width && { borderRight: 0, borderColor: 'divider' })
+                                }}
+                            >
+                                {column.key === 'selected' ? (
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <DeleteIcon sx={{ fontSize: 16, mr: 0.5, color: '#e53935' }} />
                                             削除
-                                        </Box>
-                                    ) : (
-                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                            {renderIcon(column.icon)}
-                                            {column.label}
-                                        </Box>
-                                    )}
-                                </TableCell>
+                                    </Box>
+                                ) : (
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        {renderIcon(column.icon)}
+                                        {column.label}
+                                    </Box>
+                                )}
+                            </TableCell>
                             ))}
                         </TableRow>
                     </TableHead>
@@ -420,7 +495,7 @@ function FunctionTable<T extends FieldValues = FieldValues>(props: Props<T>) {
                     outerRef={scrollContainerRef}
                     itemKey={(index) => index === fields.length ? 'footer' : (fields[index]?.id || index)}
                 >
-                    {Row}
+                {Row}
                 </FixedSizeList>
             </Box>
         </Paper>

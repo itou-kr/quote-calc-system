@@ -22,63 +22,108 @@ paths:
               properties:
                 projectName:
                   type: string
+                  description: 案件名
                 autoProductivity:
                   type: boolean
-                autoProcessRatios:
-                  type: boolean
+                  description: 生産性自動計算フラグ
                 productivityFPPerMonth:
                   type: number
+                  description: 生産性（FP/月）
                 projectType:
                   type: string
+                  description: 案件種別
+                  enum:
+                    - 'N'
+                    - E
+                    - R
+                  x-enum-varnames:
+                    - NEW
+                    - ENHANCEMENT
+                    - REDEVELOPMENT
                 ipaValueType:
                   type: string
+                  description: 使用するIPA代表値
+                  enum:
+                    - M
+                    - A
+                  x-enum-varnames:
+                    - MEDIAN
+                    - AVERAGE
+                autoProcessRatios:
+                  type: boolean
+                  description: 開発工程比率自動入力フラグ
                 dataFunctions:
                   type: array
+                  description: ':データファンクション情報'
                   items:
                     type: object
                     properties:
-                      selected:
-                        type: boolean
                       name:
                         type: string
+                        description: 名称
                       updateType:
                         type: string
+                        enum: &ref_0
+                          - I
+                          - E
+                        x-enum-varnames: &ref_1
+                          - ILF
+                          - EIF
                       fpValue:
                         type: number
+                        description: FP
                       remarks:
                         type: string
+                        description: 備考
+                      selected:
+                        type: boolean
+                        description: 選択フラグ
                 transactionFunctions:
                   type: array
+                  description: トランザクションファンクション情報
                   items:
                     type: object
                     properties:
-                      selected:
-                        type: boolean
                       name:
                         type: string
+                        description: 名称
                       externalInput:
                         type: number
+                        description: 外部入力
                       externalOutput:
                         type: number
+                        description: 外部出力
                       externalInquiry:
                         type: number
+                        description: 外部照会
                       fpValue:
                         type: number
+                        description: FP
                       remarks:
                         type: string
+                        description: 備考
+                      selected:
+                        type: boolean
+                        description: 選択フラグ
                 processRatios:
                   type: object
+                  description: 開発工程比率
                   properties:
                     basicDesign:
                       type: number
+                      description: 基本設計
                     detailedDesign:
                       type: number
+                      description: 詳細設計
                     implementation:
                       type: number
+                      description: 製造
                     integrationTest:
                       type: number
+                      description: 結合テスト
                     systemTest:
                       type: number
+                      description: 総合テスト
       responses:
         '200':
           description: ...
@@ -90,102 +135,147 @@ paths:
                 properties:
                   projectName:
                     type: string
+                    description: 案件名
                   productivityFPPerMonth:
                     type: number
-                  totalFP:
-                    type: number
-                  totalManMonths:
-                    type: number
-                  standardDurationMonths:
-                    type: number
+                    description: 生産性（FP/月）
                   dataFunctions:
                     type: array
+                    description: ':データファンクション情報'
                     items:
                       type: object
                       properties:
-                        selected:
-                          type: boolean
                         name:
                           type: string
+                          description: 名称
                         updateType:
                           type: string
+                          enum: *ref_0
+                          x-enum-varnames: *ref_1
                         fpValue:
                           type: number
+                          description: FP
                         remarks:
                           type: string
+                          description: 備考
+                        selected:
+                          type: boolean
+                          description: 選択フラグ
                   transactionFunctions:
                     type: array
+                    description: トランザクションファンクション情報
                     items:
                       type: object
                       properties:
-                        selected:
-                          type: boolean
                         name:
                           type: string
+                          description: 名称
                         externalInput:
                           type: number
+                          description: 外部入力
                         externalOutput:
                           type: number
+                          description: 外部出力
                         externalInquiry:
                           type: number
+                          description: 外部照会
                         fpValue:
                           type: number
+                          description: FP
                         remarks:
                           type: string
+                          description: 備考
+                        selected:
+                          type: boolean
+                          description: 選択フラグ
+                  totalFP:
+                    type: number
+                    description: 総FP
+                  totalManMonths:
+                    type: number
+                    description: 工数（人月）
+                  standardDurationMonths:
+                    type: number
+                    description: 標準工期（月）
                   processRatios:
                     type: object
+                    description: 開発工程比率
                     properties:
                       basicDesign:
                         type: number
+                        description: 基本設計
                       detailedDesign:
                         type: number
+                        description: 詳細設計
                       implementation:
                         type: number
+                        description: 製造
                       integrationTest:
                         type: number
+                        description: 結合テスト
                       systemTest:
                         type: number
+                        description: 総合テスト
                   processFPs:
                     type: object
+                    description: 開発工程FP
                     properties:
                       basicDesign:
                         type: number
+                        description: 基本設計
                       detailedDesign:
                         type: number
+                        description: 詳細設計
                       implementation:
                         type: number
+                        description: 製造
                       integrationTest:
                         type: number
+                        description: 結合テスト
                       systemTest:
                         type: number
+                        description: 総合テスト
                   processManMonths:
                     type: object
+                    description: 開発工程工数（人月）
                     properties:
                       basicDesign:
                         type: number
+                        description: 基本設計
                       detailedDesign:
                         type: number
+                        description: 詳細設計
                       implementation:
                         type: number
+                        description: 製造
                       integrationTest:
                         type: number
+                        description: 結合テスト
                       systemTest:
                         type: number
+                        description: 総合テスト
                   processDurations:
                     type: object
+                    description: 開発工程標準工期（月）
                     properties:
                       basicDesign:
                         type: number
+                        description: 基本設計
                       detailedDesign:
                         type: number
+                        description: 詳細設計
                       implementation:
                         type: number
+                        description: 製造
                       integrationTest:
                         type: number
+                        description: 結合テスト
                       systemTest:
                         type: number
+                        description: 総合テスト
                   errorMessages:
                     type: array
+                    description: エラーメッセージ
                     items:
                       type: string
   /TEST/export:
@@ -201,72 +291,101 @@ paths:
         content:
           application/json:
             schema:
-              description: エクスポートリクエスト
               type: object
+              description: エクスポートリクエスト
               properties:
                 projectName:
                   type: string
+                  description: 案件名
                 productivityFPPerMonth:
                   type: number
+                  description: 生産性（FP/月）
                 projectType:
                   type: string
+                  description: 案件種別
+                  enum:
+                    - 'N'
+                    - E
+                    - R
+                  x-enum-varnames:
+                    - NEW
+                    - ENHANCEMENT
+                    - REDEVELOPMENT
                 ipaValueType:
                   type: string
+                  description: 使用するIPA代表値
+                  enum:
+                    - M
+                    - A
+                  x-enum-varnames:
+                    - MEDIAN
+                    - AVERAGE
                 totalFP:
                   type: number
+                  description: 総FP
                 totalManMonths:
                   type: number
+                  description: 工数（人月）
                 standardDurationMonths:
                   type: number
+                  description: 標準工期（月）
                 processRatios:
                   type: object
+                  description: 開発工程比率
                   properties:
                     basicDesign:
                       type: number
+                      description: 基本設計
                     detailedDesign:
                       type: number
+                      description: 詳細設計
                     implementation:
                       type: number
+                      description: 製造
                     integrationTest:
                       type: number
+                      description: 結合テスト
                     systemTest:
                       type: number
+                      description: 総合テスト
                 processManMonths:
                   type: object
+                  description: 開発工程工数（人月）
                   properties:
                     basicDesign:
                       type: number
+                      description: 基本設計
                     detailedDesign:
                       type: number
+                      description: 詳細設計
                     implementation:
                       type: number
+                      description: 製造
                     integrationTest:
                       type: number
+                      description: 結合テスト
                     systemTest:
                       type: number
+                      description: 総合テスト
                 processDurations:
                   type: object
+                  description: 開発工程標準工期（月）
                   properties:
                     basicDesign:
                       type: number
+                      description: 基本設計
                     detailedDesign:
                       type: number
+                      description: 詳細設計
                     implementation:
                       type: number
+                      description: 製造
                     integrationTest:
                       type: number
+                      description: 結合テスト
                     systemTest:
                       type: number
-                importFile:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                      description: ファイル名
-                    content:
-                      type: string
-                      format: byte
-                      description: ファイル内容
+                      description: 総合テスト
                 exportFile:
                   type: object
                   properties:
@@ -288,6 +407,8 @@ paths:
                         type: string
                       updateType:
                         type: string
+                        enum: *ref_0
+                        x-enum-varnames: *ref_1
                       fpValue:
                         type: number
                       remarks:
@@ -329,6 +450,8 @@ paths:
                           type: string
                         updateType:
                           type: string
+                          enum: *ref_0
+                          x-enum-varnames: *ref_1
                         fpValue:
                           type: number
                         remarks:
@@ -440,6 +563,8 @@ paths:
                           type: string
                         updateType:
                           type: string
+                          enum: *ref_0
+                          x-enum-varnames: *ref_1
                         fpValue:
                           type: number
                         remarks:
@@ -469,3 +594,9 @@ paths:
                     type: array
                     items:
                       type: string
+                required:
+                  - projectName
+                  - productivityFPPerMonth
+                  - projectType
+                  - ipaValueType
+                  - processRatios

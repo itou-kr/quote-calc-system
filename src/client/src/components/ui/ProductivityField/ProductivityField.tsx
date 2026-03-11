@@ -26,8 +26,8 @@ function ProductivityField<T extends FieldValues = any>(props: Props<T>) {
     const [autoProductivity, setAutoProductivity] = useState(true);
 
     // プルダウンの値を監視
-    const projectType = watch('projectType' as any) || '新規開発';
-    const ipaValueType = watch('ipaValueType' as any) || '中央値';
+    const projectType = watch('projectType' as any);
+    const ipaValueType = watch('ipaValueType' as any);
     const totalFP = watch('totalFP' as any);
 
     // 自動入力がONの場合、プルダウンの値またはtotalFPが変わったら自動的に更新

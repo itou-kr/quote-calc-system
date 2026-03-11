@@ -14,37 +14,37 @@
 
 
 /**
- * 
+ * 開発工程工数（人月）
  * @export
  * @interface CalcTestApplication200ResponseProcessManMonths
  */
 export interface CalcTestApplication200ResponseProcessManMonths {
     /**
-     * 
+     * 基本設計
      * @type {number}
      * @memberof CalcTestApplication200ResponseProcessManMonths
      */
     'basicDesign'?: number;
     /**
-     * 
+     * 詳細設計
      * @type {number}
      * @memberof CalcTestApplication200ResponseProcessManMonths
      */
     'detailedDesign'?: number;
     /**
-     * 
+     * 製造
      * @type {number}
      * @memberof CalcTestApplication200ResponseProcessManMonths
      */
     'implementation'?: number;
     /**
-     * 
+     * 結合テスト
      * @type {number}
      * @memberof CalcTestApplication200ResponseProcessManMonths
      */
     'integrationTest'?: number;
     /**
-     * 
+     * 総合テスト
      * @type {number}
      * @memberof CalcTestApplication200ResponseProcessManMonths
      */

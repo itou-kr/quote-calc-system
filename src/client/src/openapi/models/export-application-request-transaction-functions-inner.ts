@@ -21,6 +21,12 @@
 export interface ExportApplicationRequestTransactionFunctionsInner {
     /**
      * 
+     * @type {boolean}
+     * @memberof ExportApplicationRequestTransactionFunctionsInner
+     */
+    'selected'?: boolean;
+    /**
+     * 
      * @type {string}
      * @memberof ExportApplicationRequestTransactionFunctionsInner
      */

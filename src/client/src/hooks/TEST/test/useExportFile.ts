@@ -3,10 +3,7 @@ import { exportApi } from '@front/openapi';
 import { useClear as useClearAlertMessage, useSetAlertMessage } from '@front/hooks/alertMessage';
 import { viewId } from '@front/stores/TEST/test/testStore';
 
-// 不要？
 import type { ExportApplicationRequest } from '@front/openapi/models';
-
-
 
 export const useExportFile = () => {
   const setAlertMessage = useSetAlertMessage(viewId);
@@ -14,6 +11,7 @@ export const useExportFile = () => {
 
   return async (formData: ExportApplicationRequest) => {
     clearAlertMessage();
+
     const response = await exportApi.exportApplication(formData);
     console.log(response, 'response');
     const exportFileData = response.data;

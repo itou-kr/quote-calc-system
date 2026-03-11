@@ -17,6 +17,15 @@
 import type { CalcTestApplication200ResponseDataFunctionsInner } from './calc-test-application200-response-data-functions-inner';
 // May contain unused imports in some cases
 // @ts-ignore
+import type { CalcTestApplication200ResponseProcessDurations } from './calc-test-application200-response-process-durations';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { CalcTestApplication200ResponseProcessFPs } from './calc-test-application200-response-process-fps';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { CalcTestApplication200ResponseProcessManMonths } from './calc-test-application200-response-process-man-months';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { CalcTestApplication200ResponseProcessRatios } from './calc-test-application200-response-process-ratios';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -29,47 +38,47 @@ import type { CalcTestApplication200ResponseTransactionFunctionsInner } from './
  */
 export interface CalcTestApplication200Response {
     /**
-     * 
+     * 案件名
      * @type {string}
      * @memberof CalcTestApplication200Response
      */
     'projectName'?: string;
     /**
-     * 
+     * 生産性（FP/月）
      * @type {number}
      * @memberof CalcTestApplication200Response
      */
     'productivityFPPerMonth'?: number;
     /**
-     * 
-     * @type {number}
-     * @memberof CalcTestApplication200Response
-     */
-    'totalFP'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof CalcTestApplication200Response
-     */
-    'totalManMonths'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof CalcTestApplication200Response
-     */
-    'standardDurationMonths'?: number;
-    /**
-     * 
+     * :データファンクション情報
      * @type {Array<CalcTestApplication200ResponseDataFunctionsInner>}
      * @memberof CalcTestApplication200Response
      */
     'dataFunctions'?: Array<CalcTestApplication200ResponseDataFunctionsInner>;
     /**
-     * 
+     * トランザクションファンクション情報
      * @type {Array<CalcTestApplication200ResponseTransactionFunctionsInner>}
      * @memberof CalcTestApplication200Response
      */
     'transactionFunctions'?: Array<CalcTestApplication200ResponseTransactionFunctionsInner>;
+    /**
+     * 総FP
+     * @type {number}
+     * @memberof CalcTestApplication200Response
+     */
+    'totalFP'?: number;
+    /**
+     * 工数（人月）
+     * @type {number}
+     * @memberof CalcTestApplication200Response
+     */
+    'totalManMonths'?: number;
+    /**
+     * 標準工期（月）
+     * @type {number}
+     * @memberof CalcTestApplication200Response
+     */
+    'standardDurationMonths'?: number;
     /**
      * 
      * @type {CalcTestApplication200ResponseProcessRatios}
@@ -78,24 +87,24 @@ export interface CalcTestApplication200Response {
     'processRatios'?: CalcTestApplication200ResponseProcessRatios;
     /**
      * 
-     * @type {CalcTestApplication200ResponseProcessRatios}
+     * @type {CalcTestApplication200ResponseProcessFPs}
      * @memberof CalcTestApplication200Response
      */
-    'processFPs'?: CalcTestApplication200ResponseProcessRatios;
+    'processFPs'?: CalcTestApplication200ResponseProcessFPs;
     /**
      * 
-     * @type {CalcTestApplication200ResponseProcessRatios}
+     * @type {CalcTestApplication200ResponseProcessManMonths}
      * @memberof CalcTestApplication200Response
      */
-    'processManMonths'?: CalcTestApplication200ResponseProcessRatios;
+    'processManMonths'?: CalcTestApplication200ResponseProcessManMonths;
     /**
      * 
-     * @type {CalcTestApplication200ResponseProcessRatios}
+     * @type {CalcTestApplication200ResponseProcessDurations}
      * @memberof CalcTestApplication200Response
      */
-    'processDurations'?: CalcTestApplication200ResponseProcessRatios;
+    'processDurations'?: CalcTestApplication200ResponseProcessDurations;
     /**
-     * 
+     * エラーメッセージ
      * @type {Array<string>}
      * @memberof CalcTestApplication200Response
      */

@@ -14,37 +14,37 @@
 
 
 /**
- * 
+ * 開発工程比率
  * @export
  * @interface CalcTestApplication200ResponseProcessRatios
  */
 export interface CalcTestApplication200ResponseProcessRatios {
     /**
-     * 
+     * 基本設計
      * @type {number}
      * @memberof CalcTestApplication200ResponseProcessRatios
      */
     'basicDesign'?: number;
     /**
-     * 
+     * 詳細設計
      * @type {number}
      * @memberof CalcTestApplication200ResponseProcessRatios
      */
     'detailedDesign'?: number;
     /**
-     * 
+     * 製造
      * @type {number}
      * @memberof CalcTestApplication200ResponseProcessRatios
      */
     'implementation'?: number;
     /**
-     * 
+     * 結合テスト
      * @type {number}
      * @memberof CalcTestApplication200ResponseProcessRatios
      */
     'integrationTest'?: number;
     /**
-     * 
+     * 総合テスト
      * @type {number}
      * @memberof CalcTestApplication200ResponseProcessRatios
      */

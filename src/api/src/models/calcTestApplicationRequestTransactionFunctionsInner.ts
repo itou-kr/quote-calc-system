@@ -12,22 +12,38 @@
 
 
 export class CalcTestApplicationRequestTransactionFunctionsInner {
-    'selected'?: boolean;
+    /**
+    * 名称
+    */
     'name'?: string;
+    /**
+    * 外部入力
+    */
     'externalInput'?: number;
+    /**
+    * 外部出力
+    */
     'externalOutput'?: number;
+    /**
+    * 外部照会
+    */
     'externalInquiry'?: number;
+    /**
+    * FP
+    */
     'fpValue'?: number;
+    /**
+    * 備考
+    */
     'remarks'?: string;
+    /**
+    * 選択フラグ
+    */
+    'selected'?: boolean;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
-        {
-            "name": "selected",
-            "baseName": "selected",
-            "type": "boolean"
-        },
         {
             "name": "name",
             "baseName": "name",
@@ -57,6 +73,11 @@ export class CalcTestApplicationRequestTransactionFunctionsInner {
             "name": "remarks",
             "baseName": "remarks",
             "type": "string"
+        },
+        {
+            "name": "selected",
+            "baseName": "selected",
+            "type": "boolean"
         }    ];
 
     static getAttributeTypeMap() {

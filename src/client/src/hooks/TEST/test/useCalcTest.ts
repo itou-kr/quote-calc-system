@@ -19,6 +19,8 @@ export function useCalcTest(viewId: ViewIdType) {
     return useCallback(
         async (data: CalcTestApplicationRequest, _: UseFormSetError<FormType>) => {
             clearAlertMessage();
+            console.log('data', data);
+
             const response = await calcApi.calcTestApplication(data);
             const calcResultData = response.data;
 

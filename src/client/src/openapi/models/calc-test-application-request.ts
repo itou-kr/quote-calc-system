@@ -29,49 +29,49 @@ import type { CalcTestApplication200ResponseTransactionFunctionsInner } from './
  */
 export interface CalcTestApplicationRequest {
     /**
-     * 
+     * 案件名
      * @type {string}
      * @memberof CalcTestApplicationRequest
      */
     'projectName'?: string;
     /**
-     * 
+     * 生産性自動計算フラグ
      * @type {boolean}
      * @memberof CalcTestApplicationRequest
      */
     'autoProductivity'?: boolean;
     /**
-     * 
-     * @type {boolean}
-     * @memberof CalcTestApplicationRequest
-     */
-    'autoProcessRatios'?: boolean;
-    /**
-     * 
+     * 生産性（FP/月）
      * @type {number}
      * @memberof CalcTestApplicationRequest
      */
     'productivityFPPerMonth'?: number;
     /**
-     * 
+     * 案件種別
      * @type {string}
      * @memberof CalcTestApplicationRequest
      */
-    'projectType'?: string;
+    'projectType'?: CalcTestApplicationRequestProjectTypeEnum;
     /**
-     * 
+     * 使用するIPA代表値
      * @type {string}
      * @memberof CalcTestApplicationRequest
      */
-    'ipaValueType'?: string;
+    'ipaValueType'?: CalcTestApplicationRequestIpaValueTypeEnum;
     /**
-     * 
+     * 開発工程比率自動入力フラグ
+     * @type {boolean}
+     * @memberof CalcTestApplicationRequest
+     */
+    'autoProcessRatios'?: boolean;
+    /**
+     * :データファンクション情報
      * @type {Array<CalcTestApplication200ResponseDataFunctionsInner>}
      * @memberof CalcTestApplicationRequest
      */
     'dataFunctions'?: Array<CalcTestApplication200ResponseDataFunctionsInner>;
     /**
-     * 
+     * トランザクションファンクション情報
      * @type {Array<CalcTestApplication200ResponseTransactionFunctionsInner>}
      * @memberof CalcTestApplicationRequest
      */
@@ -83,3 +83,18 @@ export interface CalcTestApplicationRequest {
      */
     'processRatios'?: CalcTestApplication200ResponseProcessRatios;
 }
+
+export const CalcTestApplicationRequestProjectTypeEnum = {
+    NEW: 'N',
+    ENHANCEMENT: 'E',
+    REDEVELOPMENT: 'R'
+} as const;
+
+export type CalcTestApplicationRequestProjectTypeEnum = typeof CalcTestApplicationRequestProjectTypeEnum[keyof typeof CalcTestApplicationRequestProjectTypeEnum];
+export const CalcTestApplicationRequestIpaValueTypeEnum = {
+    MEDIAN: 'M',
+    AVERAGE: 'A'
+} as const;
+
+export type CalcTestApplicationRequestIpaValueTypeEnum = typeof CalcTestApplicationRequestIpaValueTypeEnum[keyof typeof CalcTestApplicationRequestIpaValueTypeEnum];
+

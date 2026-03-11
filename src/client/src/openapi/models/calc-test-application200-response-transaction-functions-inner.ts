@@ -20,45 +20,45 @@
  */
 export interface CalcTestApplication200ResponseTransactionFunctionsInner {
     /**
-     * 
-     * @type {boolean}
-     * @memberof CalcTestApplication200ResponseTransactionFunctionsInner
-     */
-    'selected'?: boolean;
-    /**
-     * 
+     * 名称
      * @type {string}
      * @memberof CalcTestApplication200ResponseTransactionFunctionsInner
      */
     'name'?: string;
     /**
-     * 
+     * 外部入力
      * @type {number}
      * @memberof CalcTestApplication200ResponseTransactionFunctionsInner
      */
     'externalInput'?: number;
     /**
-     * 
+     * 外部出力
      * @type {number}
      * @memberof CalcTestApplication200ResponseTransactionFunctionsInner
      */
     'externalOutput'?: number;
     /**
-     * 
+     * 外部照会
      * @type {number}
      * @memberof CalcTestApplication200ResponseTransactionFunctionsInner
      */
     'externalInquiry'?: number;
     /**
-     * 
+     * FP
      * @type {number}
      * @memberof CalcTestApplication200ResponseTransactionFunctionsInner
      */
     'fpValue'?: number;
     /**
-     * 
+     * 備考
      * @type {string}
      * @memberof CalcTestApplication200ResponseTransactionFunctionsInner
      */
     'remarks'?: string;
+    /**
+     * 選択フラグ
+     * @type {boolean}
+     * @memberof CalcTestApplication200ResponseTransactionFunctionsInner
+     */
+    'selected'?: boolean;
 }

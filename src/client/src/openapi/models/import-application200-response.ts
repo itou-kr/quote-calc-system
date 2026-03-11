@@ -14,13 +14,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { CalcTestApplication200ResponseProcessRatios } from './calc-test-application200-response-process-ratios';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { CalcTestApplication200ResponseTransactionFunctionsInner } from './calc-test-application200-response-transaction-functions-inner';
-// May contain unused imports in some cases
-// @ts-ignore
 import type { ExportApplication200ResponseDataFunctionsInner } from './export-application200-response-data-functions-inner';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ExportApplicationRequestTransactionFunctionsInner } from './export-application-request-transaction-functions-inner';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ImportApplication200ResponseProcessRatios } from './import-application200-response-process-ratios';
 
 /**
  * インポートレスポンス
@@ -33,25 +33,25 @@ export interface ImportApplication200Response {
      * @type {string}
      * @memberof ImportApplication200Response
      */
-    'projectName'?: string;
+    'projectName': string;
     /**
      * 
      * @type {number}
      * @memberof ImportApplication200Response
      */
-    'productivityFPPerMonth'?: number;
+    'productivityFPPerMonth': number;
     /**
      * 
      * @type {string}
      * @memberof ImportApplication200Response
      */
-    'projectType'?: string;
+    'projectType': string;
     /**
      * 
      * @type {string}
      * @memberof ImportApplication200Response
      */
-    'ipaValueType'?: string;
+    'ipaValueType': string;
     /**
      * 
      * @type {number}
@@ -72,22 +72,22 @@ export interface ImportApplication200Response {
     'standardDurationMonths'?: number;
     /**
      * 
-     * @type {CalcTestApplication200ResponseProcessRatios}
+     * @type {ImportApplication200ResponseProcessRatios}
      * @memberof ImportApplication200Response
      */
-    'processRatios'?: CalcTestApplication200ResponseProcessRatios;
+    'processRatios': ImportApplication200ResponseProcessRatios;
     /**
      * 
-     * @type {CalcTestApplication200ResponseProcessRatios}
+     * @type {ImportApplication200ResponseProcessRatios}
      * @memberof ImportApplication200Response
      */
-    'processManMonths'?: CalcTestApplication200ResponseProcessRatios;
+    'processManMonths'?: ImportApplication200ResponseProcessRatios;
     /**
      * 
-     * @type {CalcTestApplication200ResponseProcessRatios}
+     * @type {ImportApplication200ResponseProcessRatios}
      * @memberof ImportApplication200Response
      */
-    'processDurations'?: CalcTestApplication200ResponseProcessRatios;
+    'processDurations'?: ImportApplication200ResponseProcessRatios;
     /**
      * 
      * @type {Array<ExportApplication200ResponseDataFunctionsInner>}
@@ -96,10 +96,10 @@ export interface ImportApplication200Response {
     'dataFunctions'?: Array<ExportApplication200ResponseDataFunctionsInner>;
     /**
      * 
-     * @type {Array<CalcTestApplication200ResponseTransactionFunctionsInner>}
+     * @type {Array<ExportApplicationRequestTransactionFunctionsInner>}
      * @memberof ImportApplication200Response
      */
-    'transactionFunctions'?: Array<CalcTestApplication200ResponseTransactionFunctionsInner>;
+    'transactionFunctions'?: Array<ExportApplicationRequestTransactionFunctionsInner>;
     /**
      * 
      * @type {Array<string>}

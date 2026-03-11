@@ -9,6 +9,7 @@ import FlexBox from '@front/components/ui/FlexBox';
 import Text from '@front/components/ui/Text';
 import Button from '@front/components/ui/Button';
 import { getProcessRatios } from '@common/constants/processRatios';
+// import { ipaValueType, projectType, dataFunctionType } from '@front/consts';
 
 export type Props<T extends FieldValues = any> = {
     control: Control<T>;
@@ -28,8 +29,8 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
     const [autoProcessRatios, setAutoProcessRatios] = useState(true);
     
     // プルダウンの値を監視
-    const projectType = watch('projectType' as any) || '新規開発';
-    const ipaValueType = watch('ipaValueType' as any) || '中央値';
+    const projectType = watch('projectType' as any);
+    const ipaValueType = watch('ipaValueType' as any);
     
     // 各比率フィールドを個別に監視（リアルタイム更新のため）
     const basicDesign = watch('processRatios.basicDesign' as any);

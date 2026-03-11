@@ -19,55 +19,48 @@ export function yupSetting(_: unknown) {
     };
     yup.setLocale(locale);
 
-yup.addMethod(yup.number, 'rangeCheck', function rangeCheck(min: number, max: number) {
-    return this.test(
-        'rangeCheck',
-        function (value) {
-        const { path, schema } = this;
+    yup.addMethod(yup.number, 'rangeCheck', function rangeCheck(min: number, max: number) {
+        return this.test(
+            'rangeCheck',
+            function (value) {
+            const { path, schema } = this;
 
-        const label = (schema as any)?.spec?.label ?? path;
+            const label = (schema as any)?.spec?.label ?? path;
 
-        if (typeof value === 'number' && (value < min || value > max)) {
-            return this.createError({
-            message: `${label}は${min}〜${max}の間で入力してください`,
-            });
-        }
+            if (typeof value === 'number' && (value < min || value > max)) {
+                return this.createError({
+                message: `${label}は${min}〜${max}の間で入力してください`,
+                });
+            }
 
-        return true;
-        }
-    );
-});
+            return true;
+            }
+        );
+    });
 
-yup.addMethod(yup.object, 'transactionPairCheck', function () {
-    return this.test('transactionPairCheck', function (value) {
-        if (!value) return true;
+yup.addMethod(yup.object, 'dataPairCheck', function () {
+  return this.test('dataPairCheck', function (value) {
+    if (!value) return true;
 
-        const {
-        name,
-        externalInput,
-        externalOutput,
-        externalInquiry,
-        } = value;
+    const { name, updateType } = value;
 
-        const hasName = !!name?.trim();
-        const hasExternal =
-        externalInput != null ||
-        externalOutput != null ||
-        externalInquiry != null;
+    const hasName = !!name?.trim();
+    const hasUpdateType = !!updateType?.value;
 
-        if (!hasName && !hasExternal) return true;
+    if (!hasName && !hasUpdateType) return true;
 
-        if (hasName && !hasExternal) {
+    const match = this.path?.match(/\[(\d+)\]/);
+    const rowNumber = match ? Number(match[1]) + 1 : '';
+
+    if (!hasName && hasUpdateType) {
         return this.createError({
-            path: 'externalInput',
-            message: '外部入力・外部出力・外部照会のいずれかを入力してください',
+            message: `行${rowNumber}：データファンクションテーブルの名称を入力してください`,
         });
         }
 
-        if (!hasName && hasExternal) {
+        if (hasName && !hasUpdateType) {
         return this.createError({
-            path: 'name',
-            message: '名称を入力してください',
+            message: `行${rowNumber}：データファンクションの種類を入力してください`,
         });
         }
 
@@ -75,6 +68,43 @@ yup.addMethod(yup.object, 'transactionPairCheck', function () {
     });
 });
 
+yup.addMethod(yup.object, 'transactionPairCheck', function () {
+    return this.test('transactionPairCheck', function (value) {
+        if (!value) return true;
 
+        const {
+            name,
+            externalInput,
+            externalOutput,
+            externalInquiry,
+        } = value;
+
+        const hasName = !!name?.trim();
+        const hasExternal =
+            externalInput != null ||
+            externalOutput != null ||
+            externalInquiry != null;
+
+        if (!hasName && !hasExternal) return true;
+
+        // 行番号取得
+        const match = this.path.match(/\[(\d+)\]/);
+        const rowNumber = match ? Number(match[1]) + 1 : '';
+
+        if (hasName && !hasExternal) {
+            return this.createError({
+                message: `行${rowNumber}：外部入力・外部出力・外部照会のいずれかを入力してください`,
+            });
+        }
+
+        if (!hasName && hasExternal) {
+            return this.createError({
+                message: `行${rowNumber}：トランザクションファンクションテーブルの名称を入力してください`,
+            });
+        }
+
+        return true;
+    });
+});
 
 }

@@ -12,20 +12,27 @@
 
 
 export class CalcTestApplicationRequestDataFunctionsInner {
-    'selected'?: boolean;
+    /**
+    * 名称
+    */
     'name'?: string;
-    'updateType'?: string;
+    'updateType'?: CalcTestApplicationRequestDataFunctionsInner.UpdateTypeEnum;
+    /**
+    * FP
+    */
     'fpValue'?: number;
+    /**
+    * 備考
+    */
     'remarks'?: string;
+    /**
+    * 選択フラグ
+    */
+    'selected'?: boolean;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
-        {
-            "name": "selected",
-            "baseName": "selected",
-            "type": "boolean"
-        },
         {
             "name": "name",
             "baseName": "name",
@@ -34,7 +41,7 @@ export class CalcTestApplicationRequestDataFunctionsInner {
         {
             "name": "updateType",
             "baseName": "updateType",
-            "type": "string"
+            "type": "CalcTestApplicationRequestDataFunctionsInner.UpdateTypeEnum"
         },
         {
             "name": "fpValue",
@@ -45,6 +52,11 @@ export class CalcTestApplicationRequestDataFunctionsInner {
             "name": "remarks",
             "baseName": "remarks",
             "type": "string"
+        },
+        {
+            "name": "selected",
+            "baseName": "selected",
+            "type": "boolean"
         }    ];
 
     static getAttributeTypeMap() {
@@ -52,3 +64,9 @@ export class CalcTestApplicationRequestDataFunctionsInner {
     }
 }
 
+export namespace CalcTestApplicationRequestDataFunctionsInner {
+    export enum UpdateTypeEnum {
+        ILF = <any> 'I',
+        EIF = <any> 'E'
+    }
+}

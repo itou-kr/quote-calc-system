@@ -10,6 +10,9 @@
  * Do not edit the class manually.
  */
 
+import { CalcTestApplication200ResponseProcessDurations } from './calcTestApplication200ResponseProcessDurations';
+import { CalcTestApplication200ResponseProcessFPs } from './calcTestApplication200ResponseProcessFPs';
+import { CalcTestApplication200ResponseProcessManMonths } from './calcTestApplication200ResponseProcessManMonths';
 import { CalcTestApplicationRequestDataFunctionsInner } from './calcTestApplicationRequestDataFunctionsInner';
 import { CalcTestApplicationRequestProcessRatios } from './calcTestApplicationRequestProcessRatios';
 import { CalcTestApplicationRequestTransactionFunctionsInner } from './calcTestApplicationRequestTransactionFunctionsInner';
@@ -18,17 +21,41 @@ import { CalcTestApplicationRequestTransactionFunctionsInner } from './calcTestA
 * 工数計算レスポンス
 */
 export class CalcTestApplication200Response {
+    /**
+    * 案件名
+    */
     'projectName'?: string;
+    /**
+    * 生産性（FP/月）
+    */
     'productivityFPPerMonth'?: number;
-    'totalFP'?: number;
-    'totalManMonths'?: number;
-    'standardDurationMonths'?: number;
+    /**
+    * :データファンクション情報
+    */
     'dataFunctions'?: Array<CalcTestApplicationRequestDataFunctionsInner>;
+    /**
+    * トランザクションファンクション情報
+    */
     'transactionFunctions'?: Array<CalcTestApplicationRequestTransactionFunctionsInner>;
+    /**
+    * 総FP
+    */
+    'totalFP'?: number;
+    /**
+    * 工数（人月）
+    */
+    'totalManMonths'?: number;
+    /**
+    * 標準工期（月）
+    */
+    'standardDurationMonths'?: number;
     'processRatios'?: CalcTestApplicationRequestProcessRatios;
-    'processFPs'?: CalcTestApplicationRequestProcessRatios;
-    'processManMonths'?: CalcTestApplicationRequestProcessRatios;
-    'processDurations'?: CalcTestApplicationRequestProcessRatios;
+    'processFPs'?: CalcTestApplication200ResponseProcessFPs;
+    'processManMonths'?: CalcTestApplication200ResponseProcessManMonths;
+    'processDurations'?: CalcTestApplication200ResponseProcessDurations;
+    /**
+    * エラーメッセージ
+    */
     'errorMessages'?: Array<string>;
 
     static discriminator: string | undefined = undefined;
@@ -43,6 +70,16 @@ export class CalcTestApplication200Response {
             "name": "productivityFPPerMonth",
             "baseName": "productivityFPPerMonth",
             "type": "number"
+        },
+        {
+            "name": "dataFunctions",
+            "baseName": "dataFunctions",
+            "type": "Array<CalcTestApplicationRequestDataFunctionsInner>"
+        },
+        {
+            "name": "transactionFunctions",
+            "baseName": "transactionFunctions",
+            "type": "Array<CalcTestApplicationRequestTransactionFunctionsInner>"
         },
         {
             "name": "totalFP",
@@ -60,16 +97,6 @@ export class CalcTestApplication200Response {
             "type": "number"
         },
         {
-            "name": "dataFunctions",
-            "baseName": "dataFunctions",
-            "type": "Array<CalcTestApplicationRequestDataFunctionsInner>"
-        },
-        {
-            "name": "transactionFunctions",
-            "baseName": "transactionFunctions",
-            "type": "Array<CalcTestApplicationRequestTransactionFunctionsInner>"
-        },
-        {
             "name": "processRatios",
             "baseName": "processRatios",
             "type": "CalcTestApplicationRequestProcessRatios"
@@ -77,17 +104,17 @@ export class CalcTestApplication200Response {
         {
             "name": "processFPs",
             "baseName": "processFPs",
-            "type": "CalcTestApplicationRequestProcessRatios"
+            "type": "CalcTestApplication200ResponseProcessFPs"
         },
         {
             "name": "processManMonths",
             "baseName": "processManMonths",
-            "type": "CalcTestApplicationRequestProcessRatios"
+            "type": "CalcTestApplication200ResponseProcessManMonths"
         },
         {
             "name": "processDurations",
             "baseName": "processDurations",
-            "type": "CalcTestApplicationRequestProcessRatios"
+            "type": "CalcTestApplication200ResponseProcessDurations"
         },
         {
             "name": "errorMessages",

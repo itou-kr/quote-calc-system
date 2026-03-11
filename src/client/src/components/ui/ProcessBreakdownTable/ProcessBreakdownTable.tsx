@@ -11,27 +11,27 @@ export type ProcessRatios = {
 };
 
 export type ProcessManMonths = {
-    basicDesign: number;
-    detailedDesign: number;
-    implementation: number;
-    integrationTest: number;
-    systemTest: number;
+    basicDesign?: number;
+    detailedDesign?: number;
+    implementation?: number;
+    integrationTest?: number;
+    systemTest?: number;
 };
 
 export type ProcessFPs = {
-    basicDesign: number;
-    detailedDesign: number;
-    implementation: number;
-    integrationTest: number;
-    systemTest: number;
+    basicDesign?: number;
+    detailedDesign?: number;
+    implementation?: number;
+    integrationTest?: number;
+    systemTest?: number;
 };
 
 export type ProcessDurations = {
-    basicDesign: number;
-    detailedDesign: number;
-    implementation: number;
-    integrationTest: number;
-    systemTest: number;
+    basicDesign?: number;
+    detailedDesign?: number;
+    implementation?: number;
+    integrationTest?: number;
+    systemTest?: number;
 };
 
 export type Props = {
