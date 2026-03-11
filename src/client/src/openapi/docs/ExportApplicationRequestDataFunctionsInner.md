@@ -5,8 +5,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**selected** | **boolean** |  | [optional] [default to undefined]
 **name** | **string** |  | [optional] [default to undefined]
-**updateType** | **string** |  | [optional] [default to undefined]
+**updateType** | [**DataFunctionUpdateType**](DataFunctionUpdateType.md) |  | [optional] [default to undefined]
 **fpValue** | **number** |  | [optional] [default to undefined]
 **remarks** | **string** |  | [optional] [default to undefined]
 
@@ -16,6 +17,7 @@ Name | Type | Description | Notes
 import { ExportApplicationRequestDataFunctionsInner } from './api';
 
 const instance: ExportApplicationRequestDataFunctionsInner = {
+    selected,
     name,
     updateType,
     fpValue,

@@ -5,11 +5,11 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**selected** | **boolean** |  | [optional] [default to undefined]
-**name** | **string** |  | [optional] [default to undefined]
-**updateType** | **string** |  | [optional] [default to undefined]
-**fpValue** | **number** |  | [optional] [default to undefined]
-**remarks** | **string** |  | [optional] [default to undefined]
+**name** | **string** | 名称 | [optional] [default to undefined]
+**updateType** | [**DataFunctionUpdateType**](DataFunctionUpdateType.md) |  | [optional] [default to undefined]
+**fpValue** | **number** | FP | [optional] [default to undefined]
+**remarks** | **string** | 備考 | [optional] [default to undefined]
+**selected** | **boolean** | 選択フラグ | [optional] [default to undefined]
 
 ## Example
 
@@ -17,11 +17,11 @@ Name | Type | Description | Notes
 import { CalcTestApplication200ResponseDataFunctionsInner } from './api';
 
 const instance: CalcTestApplication200ResponseDataFunctionsInner = {
-    selected,
     name,
     updateType,
     fpValue,
     remarks,
+    selected,
 };
 ```
 

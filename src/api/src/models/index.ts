@@ -1,4 +1,7 @@
 export * from './calcTestApplication200Response';
+export * from './calcTestApplication200ResponseProcessDurations';
+export * from './calcTestApplication200ResponseProcessFPs';
+export * from './calcTestApplication200ResponseProcessManMonths';
 export * from './calcTestApplicationRequest';
 export * from './calcTestApplicationRequestDataFunctionsInner';
 export * from './calcTestApplicationRequestProcessRatios';
@@ -7,5 +10,8 @@ export * from './exportApplication200Response';
 export * from './exportApplication200ResponseDataFunctionsInner';
 export * from './exportApplication200ResponseExportFile';
 export * from './exportApplicationRequest';
-export * from './exportApplicationRequestImportFile';
+export * from './exportApplicationRequestDataFunctionsInner';
+export * from './exportApplicationRequestExportFile';
+export * from './exportApplicationRequestTransactionFunctionsInner';
 export * from './importApplication200Response';
+export * from './importApplication200ResponseProcessRatios';

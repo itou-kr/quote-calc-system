@@ -4,6 +4,7 @@
 import { importApi } from '@front/openapi';
 import { useClear as useClearAlertMessage, useSetAlertMessage } from '@front/hooks/alertMessage';
 import { viewId } from '@front/stores/TEST/test/testStore';
+import type { FormType } from '@front/components/pages/TEST/form/TestForm';
 
 // import { ImportApplicationRequest } from '@front/openapi/models';
 // import type {}
@@ -32,7 +33,7 @@ export const useImportFile = () => {
   const setAlertMessage = useSetAlertMessage(viewId);
   const clearAlertMessage = useClearAlertMessage(viewId);
 
-  return async (file: File) => {
+  return async (file: File): Promise<FormType | undefined> => {
     clearAlertMessage();
     console.log(file, 'file');
     const response = await importApi.importApplication(file);
@@ -47,7 +48,28 @@ export const useImportFile = () => {
     // 正常メッセージの表示
     setAlertMessage({ severity: 'success', message: 'インポートが完了しました。' });    
 
+    const formData: FormType = {
+      ...importFileData,
+      projectType: {
+        label: importFileData.projectType,
+        value: importFileData.projectType,         
+      },
+      ipaValueType: {
+        label: importFileData.ipaValueType,
+        value: importFileData.ipaValueType,  
+      },
+      dataFunctions: importFileData.dataFunctions?.map(df => ({
+        ...df,
+        updateType: {
+          label: df.updateType ?? '',
+          value: df.updateType ?? '',
+        }
+      })),
+    };
+
     console.log('response', response);
-    return importFileData;
+    return formData;
+
+    // return importFileData;
   }
 };

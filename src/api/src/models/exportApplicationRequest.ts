@@ -10,29 +10,51 @@
  * Do not edit the class manually.
  */
 
-import { CalcTestApplicationRequestDataFunctionsInner } from './calcTestApplicationRequestDataFunctionsInner';
+import { CalcTestApplication200ResponseProcessDurations } from './calcTestApplication200ResponseProcessDurations';
+import { CalcTestApplication200ResponseProcessManMonths } from './calcTestApplication200ResponseProcessManMonths';
 import { CalcTestApplicationRequestProcessRatios } from './calcTestApplicationRequestProcessRatios';
-import { CalcTestApplicationRequestTransactionFunctionsInner } from './calcTestApplicationRequestTransactionFunctionsInner';
-import { ExportApplicationRequestImportFile } from './exportApplicationRequestImportFile';
+import { ExportApplicationRequestDataFunctionsInner } from './exportApplicationRequestDataFunctionsInner';
+import { ExportApplicationRequestExportFile } from './exportApplicationRequestExportFile';
+import { ExportApplicationRequestTransactionFunctionsInner } from './exportApplicationRequestTransactionFunctionsInner';
 
 /**
 * エクスポートリクエスト
 */
 export class ExportApplicationRequest {
+    /**
+    * 案件名
+    */
     'projectName'?: string;
+    /**
+    * 生産性（FP/月）
+    */
     'productivityFPPerMonth'?: number;
-    'projectType'?: string;
-    'ipaValueType'?: string;
+    /**
+    * 案件種別
+    */
+    'projectType'?: ExportApplicationRequest.ProjectTypeEnum;
+    /**
+    * 使用するIPA代表値
+    */
+    'ipaValueType'?: ExportApplicationRequest.IpaValueTypeEnum;
+    /**
+    * 総FP
+    */
     'totalFP'?: number;
+    /**
+    * 工数（人月）
+    */
     'totalManMonths'?: number;
+    /**
+    * 標準工期（月）
+    */
     'standardDurationMonths'?: number;
     'processRatios'?: CalcTestApplicationRequestProcessRatios;
-    'processManMonths'?: CalcTestApplicationRequestProcessRatios;
-    'processDurations'?: CalcTestApplicationRequestProcessRatios;
-    'importFile'?: ExportApplicationRequestImportFile;
-    'exportFile'?: ExportApplicationRequestImportFile;
-    'dataFunctions'?: Array<CalcTestApplicationRequestDataFunctionsInner>;
-    'transactionFunctions'?: Array<CalcTestApplicationRequestTransactionFunctionsInner>;
+    'processManMonths'?: CalcTestApplication200ResponseProcessManMonths;
+    'processDurations'?: CalcTestApplication200ResponseProcessDurations;
+    'exportFile'?: ExportApplicationRequestExportFile;
+    'dataFunctions'?: Array<ExportApplicationRequestDataFunctionsInner>;
+    'transactionFunctions'?: Array<ExportApplicationRequestTransactionFunctionsInner>;
 
     static discriminator: string | undefined = undefined;
 
@@ -50,12 +72,12 @@ export class ExportApplicationRequest {
         {
             "name": "projectType",
             "baseName": "projectType",
-            "type": "string"
+            "type": "ExportApplicationRequest.ProjectTypeEnum"
         },
         {
             "name": "ipaValueType",
             "baseName": "ipaValueType",
-            "type": "string"
+            "type": "ExportApplicationRequest.IpaValueTypeEnum"
         },
         {
             "name": "totalFP",
@@ -80,32 +102,27 @@ export class ExportApplicationRequest {
         {
             "name": "processManMonths",
             "baseName": "processManMonths",
-            "type": "CalcTestApplicationRequestProcessRatios"
+            "type": "CalcTestApplication200ResponseProcessManMonths"
         },
         {
             "name": "processDurations",
             "baseName": "processDurations",
-            "type": "CalcTestApplicationRequestProcessRatios"
-        },
-        {
-            "name": "importFile",
-            "baseName": "importFile",
-            "type": "ExportApplicationRequestImportFile"
+            "type": "CalcTestApplication200ResponseProcessDurations"
         },
         {
             "name": "exportFile",
             "baseName": "exportFile",
-            "type": "ExportApplicationRequestImportFile"
+            "type": "ExportApplicationRequestExportFile"
         },
         {
             "name": "dataFunctions",
             "baseName": "dataFunctions",
-            "type": "Array<CalcTestApplicationRequestDataFunctionsInner>"
+            "type": "Array<ExportApplicationRequestDataFunctionsInner>"
         },
         {
             "name": "transactionFunctions",
             "baseName": "transactionFunctions",
-            "type": "Array<CalcTestApplicationRequestTransactionFunctionsInner>"
+            "type": "Array<ExportApplicationRequestTransactionFunctionsInner>"
         }    ];
 
     static getAttributeTypeMap() {
@@ -113,3 +130,14 @@ export class ExportApplicationRequest {
     }
 }
 
+export namespace ExportApplicationRequest {
+    export enum ProjectTypeEnum {
+        NEW = <any> 'N',
+        ENHANCEMENT = <any> 'E',
+        REDEVELOPMENT = <any> 'R'
+    }
+    export enum IpaValueTypeEnum {
+        MEDIAN = <any> 'M',
+        AVERAGE = <any> 'A'
+    }
+}

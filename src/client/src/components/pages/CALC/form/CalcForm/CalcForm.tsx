@@ -1,11 +1,15 @@
 import * as yup from 'yup';
-import { useCalc } from '@front/hooks/CALC/calc';
-import { useImportFile, useExportFile } from '@front/hooks/CALC/calc';
-import { viewId, ViewIdType } from '@front/stores/CALC/calc/calcStore';
+import { useFormState } from "react-hook-form";
+import { useCalcTest } from '@front/hooks/TEST/test';
+import { useImportFile, useExportFile } from '@front/hooks/TEST/test';
+import { viewId, ViewIdType } from '@front/stores/TEST/test/testStore/index';
+// import { useMemo, useState, useCallback, useEffect } from 'react';
 import { useMemo, useState, useCallback } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
+// import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Stack, Paper, Select, MenuItem, Typography } from '@mui/material';
+// import { Box, Stack, Paper, Select, MenuItem, Typography } from '@mui/material';
+import { Box, Stack, Paper, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import ImportButton from '@front/components/ui/Button/ImportButton';
@@ -23,139 +27,185 @@ import FunctionTable, { ColumnDefinition } from '@front/components/ui/FunctionTa
 import FlexBox from '@front/components/ui/FlexBox';
 import TabPanel from '@front/components/ui/TabPanel';
 import Text from '@front/components/ui/Text';
-import { createEmptyDataFunction, createEmptyTransactionFunction, createDataFunctions, createTransactionFunctions } from '@front/types/functionTypes';
-import { createAddRowAction, createDeleteSelectedAction } from '@front/components/ui/TableToolbar/actions/tableActions';
+// import { createEmptyDataFunction, createEmptyTransactionFunction, createDataFunctions, createTransactionFunctions } from '@front/types/functionTypes';
+import { createTransactionFunctions, DataFunction, TransactionFunction } from '@front/types/functionTypes';
+// import { createAddRowAction, createDeleteSelectedAction } from '@front/components/ui/TableToolbar/actions/tableActions';
 import { t } from 'i18next';
-import { getProcessRatios } from '@common/constants/processRatios';
+// import { getProcessRatios } from '@common/constants/processRatios';
+// import { useSetDirty } from '@front/hooks/TEST/test';
+// import FormPaperProvider from '@front/components/ui/Layout/Form/FormPaperProvider';
 import { FieldErrors } from 'react-hook-form';
 import { useSetAlertMessage } from '@front/hooks/alertMessage/useSetAlertMessage';
-import { useClear } from '@front/hooks/alertMessage/useClear';
 import FormContainerProvider from '@front/components/ui/Layout/Form/FormContainerProvider';
+import { useClear as useClearAlertMessage } from '@front/hooks/alertMessage';
+import UseProjectTypeField from '@front/components/ui/AutocompleteField/Master/UseProjectTypeField';
+import UseIpaValueTypeField from '@front/components/ui/AutocompleteField/Master/UseIpaValueTypeField';
+import UseUpdateTypeField from '@front/components/ui/AutocompleteField/Master/UseUpdateTypeField';
+// import { on } from 'events';
+// import { ipaValueType, projectType, dataFunctionType } from '@front/consts';
+import type { ExportApplicationRequest, ExportApplicationRequestProjectTypeEnum, ExportApplicationRequestIpaValueTypeEnum, ExportApplicationRequestDataFunctionsInner } from '@front/openapi/models';
+
+import type {
+    CalcTestApplicationRequest,
+    CalcTestApplicationRequestProjectTypeEnum,
+    CalcTestApplicationRequestIpaValueTypeEnum,
+    DataFunctionUpdateType,
+} from '@front/openapi/models';
+import { useConfirm } from '@front/hooks/ui/confirm';
+import { createEmptyDataFunction, createEmptyTransactionFunction } from '@front/types/functionTypes';
+import AddRowButton from '@front/components/ui/Button/AddRowButton/AddRowButton';
+import DeleteRowButton from '@front/components/ui/Button/DeleteRowButton/DeleteRowButton';
 
 const setupYupScheme = () => {
     return yup.object({
         /** 案件情報 */
         // 案件名
         projectName: yup.string().label('案件名').required(),
-        // 生産性自動入力チェック
-        autoProductivity: yup.boolean().label('生産性自動入力'),
+        // 生産性自動計算フラグ
+        autoProductivity: yup.boolean(),
         // 生産性(FP/月)
-        productivityFPPerMonth: yup.number().label('生産性(FP/月)').transform((value, originalValue) => originalValue === '' ? undefined : value).rangeCheck(1, 9999).required(),
-        // 開発工程比率自動入力チェック
-        autoProcessRatios: yup.boolean().label('開発工程比率自動入力'),
+        productivityFPPerMonth: yup.number().rangeCheck(1, 9999),
         // 案件種別
-        projectType: yup.string().label('案件種別'),
+        projectType: yup.object({ label: yup.string(), value: yup.string() }).default(undefined).label('案件種別').required(),
         // 使用するIPA代表値
-        ipaValueType: yup.string().label('使用するIPA代表値'),
-
+        ipaValueType: yup.object({ label: yup.string(), value: yup.string() }).default(undefined).label('使用するIPA代表値').required(),
+        // 開発工程比率自動入力フラグ
+        autoProcessRatios: yup.boolean(),
         // データファンクション情報
         dataFunctions: yup.array().of(
             yup.object({
-                selected: yup.boolean().label('選択行'),
-                name: yup.string().label('名称'),
-                updateType: yup.string().label('データファンクションの種類'),
-                fpValue: yup.number().label('FP').default(0),
-                remarks: yup.string().label('備考'),
-            }).dataFunctionPairCheck(),
+                selected: yup.boolean().label('データファンクションテーブルの削除有無'),
+                name: yup.string().label('データファンクションテーブルの名称'),
+                updateType: yup.object({ label: yup.string(), value: yup.string() }).default(undefined).label('データファンクションの種類').nullable(),
+                fpValue: yup.number().rangeCheck(0, 9999).label('データファンクションテーブルのFP値'),
+                remarks: yup.string().label('データファンクションテーブルの備考'),
+            }).dataPairCheck(),
         ),
         // トランザクションファンクション情報
         transactionFunctions: yup.array().of(
             yup.object({
-                selected: yup.boolean().label('選択行'),
-                name: yup.string().label('トランザクションファンクションテーブルの名称'),
+                selected: yup.boolean().label('トランザクションファンクションテーブルの削除有無'),
+                name: yup
+                    .string()
+                    .label('トランザクションファンクションテーブルの名称'),
                 externalInput: yup
                     .number()
-                    .label('外部入力')
-                    .transform((value, originalValue) => originalValue === "" ? undefined : value)   // 入力欄が空の場合はundefinedに変換
-                    .rangeCheck(0, 9999),
+                    .transform((value, originalValue) => originalValue === "" ? undefined : value)
+                    .rangeCheck(0, 9999)
+                    .label('外部入力'),
                 externalOutput: yup
                     .number()
-                    .label('外部出力')
-                    .transform((value, originalValue) => originalValue === "" ? undefined : value)   // 入力欄が空の場合はundefinedに変換
-                    .rangeCheck(0, 9999),
+                    .transform((value, originalValue) => originalValue === "" ? undefined : value)
+                    .rangeCheck(0, 9999)
+                    .label('外部出力'),
                 externalInquiry: yup
                     .number()
-                    .label('外部照会')
-                    .transform((value, originalValue) => originalValue === "" ? undefined : value)   // 入力欄が空の場合はundefinedに変換
-                    .rangeCheck(0, 9999),
-                fpValue: yup.number().label('FP').default(0),
-                remarks: yup.string().label('備考'),
-            }).transactionFunctionPairCheck(),
+                    .transform((value, originalValue) => originalValue === "" ? undefined : value)
+                    .rangeCheck(0, 9999)
+                    .label('外部照会'),
+                fpValue: yup.number().rangeCheck(0, 9999).label('トランザクションファンクションテーブルのFP値'),
+                remarks: yup.string().label('トランザクションファンクションテーブルの備考'),
+            }).transactionPairCheck(),
         ),
 
         // 総FP
-        totalFP: yup.number().label('総FP').default(0),
+        totalFP: yup.number(),
         // 総工数(人月)
-        totalManMonths: yup.number().label('総工数(人月)').default(0),
+        totalManMonths: yup.number(),
         // 標準工期(月)
-        standardDurationMonths: yup.number().label('標準工期(月)').default(0),
+        standardDurationMonths: yup.number(),
         // 工程別比率
         processRatios: yup.object({
-            basicDesign: yup.number().label('基本設計比率').default(0),
-            detailedDesign: yup.number().label('詳細設計比率').default(0),
-            implementation: yup.number().label('製造比率').default(0),
-            integrationTest: yup.number().label('統合テスト比率').default(0),
-            systemTest: yup.number().label('システムテスト比率').default(0),
+            basicDesign: yup.number().label('基本設計比率').rangeCheck(0.000, 1.000),
+            detailedDesign: yup.number().label('詳細設計比率').rangeCheck(0.000, 1.000),
+            implementation: yup.number().label('製造比率').rangeCheck(0.000, 1.000),
+            integrationTest: yup.number().label('統合テスト比率').rangeCheck(0.000, 1.000),
+            systemTest: yup.number().label('システムテスト比率').rangeCheck(0.000, 1.000),
         }),
         // 工程別FP
         processFPs: yup.object({
-            basicDesign: yup.number().label('基本設計FP').default(0),
-            detailedDesign: yup.number().label('詳細設計FP').default(0),
-            implementation: yup.number().label('製造FP').default(0),
-            integrationTest: yup.number().label('統合テストFP').default(0),
-            systemTest: yup.number().label('システムテストFP').default(0),
-        }),
+            basicDesign: yup.number().rangeCheck(0, 9999),
+            detailedDesign: yup.number().rangeCheck(0, 9999),
+            implementation: yup.number().rangeCheck(0, 9999),
+            integrationTest: yup.number().rangeCheck(0, 9999),
+            systemTest: yup.number().rangeCheck(0, 9999),
+        })
+        .optional(),
         // 工程別工数
         processManMonths: yup.object({
-            basicDesign: yup.number().label('基本設計工数').default(0),
-            detailedDesign: yup.number().label('詳細設計工数').default(0),
-            implementation: yup.number().label('製造工数').default(0),
-            integrationTest: yup.number().label('統合テスト工数').default(0),
-            systemTest: yup.number().label('システムテスト工数').default(0),
-        }),
+            basicDesign: yup.number().rangeCheck(0, 9999),
+            detailedDesign: yup.number().rangeCheck(0, 9999),
+            implementation: yup.number().rangeCheck(0, 9999),
+            integrationTest: yup.number().rangeCheck(0, 9999),
+            systemTest: yup.number().rangeCheck(0, 9999),
+        })
+        .optional(),
         // 工程別工期
         processDurations: yup.object({
-            basicDesign: yup.number().label('基本設計工期').default(0),
-            detailedDesign: yup.number().label('詳細設計工期').default(0),
-            implementation: yup.number().label('製造工期').default(0),
-            integrationTest: yup.number().label('統合テスト工期').default(0),
-            systemTest: yup.number().label('システムテスト工期').default(0),
-        }),
+            basicDesign: yup.number().rangeCheck(0, 9999),
+            detailedDesign: yup.number().rangeCheck(0, 9999),
+            implementation: yup.number().rangeCheck(0, 9999),
+            integrationTest: yup.number().rangeCheck(0, 9999),
+            systemTest: yup.number().rangeCheck(0, 9999),
+        })
+        .optional(),
     });
 };
 
 export type FormType = yup.InferType<ReturnType<typeof setupYupScheme>>;
 
+// type Props<T extends FieldValues = FieldValues, N extends FieldArrayPath<T> = FieldArrayPath<T>> = {
 type Props = {
-    viewId: ViewIdType | 'CALC';
+    label?: React.ReactNode;
+    maxLimit?: {
+        limit?: number;
+        label?: React.ReactNode;
+        message?: string;
+    }
+    viewId: ViewIdType | 'TEST';
     data?: FormType;
     isDirty: boolean;
+    // DataFunction: DataFunction;
+    // TransactionFunction: TransactionFunction;
+    // empty: NonNullable<FieldArray<T, N>>;
 };
 
 function CalcForm(props: Props) {
+    // const { maxLimit, name, control } = props;
+    const { maxLimit } = props;
+    
     const schema = useMemo(() => setupYupScheme(), []);
-    const calc = useCalc();
+    const calc = useCalcTest(viewId as ViewIdType);
     const importFile = useImportFile();
     const exportFile = useExportFile();
-    const setAlertMessage = useSetAlertMessage(viewId);
-    const clearAlertMessage = useClear(viewId);
+    const setAlertMessage = useSetAlertMessage('TEST');
+    const clearAlertMessage = useClearAlertMessage(viewId);
+    const confirm = useConfirm();
+
+    console.log('props.data?.dataFunctions length:',
+    props.data?.dataFunctions?.length
+    );
+    console.log('updateType', props.data?.dataFunctions?.[0]?.updateType);
+        // const setDirty = useSetDirty();
     const methods = useForm<FormType>({
         mode: 'onSubmit',
         reValidateMode: 'onSubmit',
-        resolver: yupResolver(schema),
+        resolver: yupResolver(schema, {
+            abortEarly: false,
+        }),
         defaultValues: {
             projectName: '',
             autoProductivity: true,
             autoProcessRatios: true,
             productivityFPPerMonth: 10,
-            projectType: '新規開発',
-            ipaValueType: '中央値',
+            projectType: { label: '新規開発', value: 'NEW' },
+            ipaValueType: { label: '中央値', value: 'MEDIAN' },
             totalFP: 0,
             totalManMonths: 0,
             standardDurationMonths: 0,
-            dataFunctions: createDataFunctions(50),
+            // dataFunctions: createDataFunctions(50),
             transactionFunctions: createTransactionFunctions(50),
-            processRatios: getProcessRatios('新規開発', '中央値'),
+            // processRatios: getProcessRatios(projectType, ipaValueType),
             processFPs: {
                 basicDesign: 0,
                 detailedDesign: 0,
@@ -180,7 +230,8 @@ function CalcForm(props: Props) {
             ...props.data,
         },
     });
-    const { control, trigger, watch, setValue, getValues, clearErrors } = methods;
+    const { control, trigger, watch, setValue, getValues, handleSubmit, clearErrors
+    } = methods;
     const { fields: dataFields, append: appendData, remove: removeData } = useFieldArray({
         control,
         name: 'dataFunctions',
@@ -188,6 +239,9 @@ function CalcForm(props: Props) {
     const { fields: transactionFields, append: appendTransaction, remove: removeTransaction } = useFieldArray({
         control,
         name: 'transactionFunctions',
+    });
+    const { errors } = useFormState({
+    control: methods.control
     });
     const [tableTabValue, setTableTabValue] = useState(0);
     const [processBreakdownOpen, setProcessBreakdownOpen] = useState(false);
@@ -203,102 +257,74 @@ function CalcForm(props: Props) {
     });
 
     // データファンクションテーブルのカラム定義
-    const dataColumns: ColumnDefinition[] = useMemo(() => [
+    const dataColumns: ColumnDefinition<DataFunction>[] = useMemo(() => [
         { key: 'name', label: '名称', minWidth: 200, maxWidth: 400, icon: 'edit', type: 'text', maxLength: 50 },
-        { key: 'updateType', label: 'データファンクションの種類', width: 360, icon: 'edit', type: 'select', options: [
-            { value: '内部論理ファイル', label: '内部論理ファイル' },
-            { value: '外部インタフェースファイル', label: '外部インタフェースファイル' }
-        ]},
-        { key: 'fpValue', label: 'FP', minWidth: 90, maxWidth: 100, icon: 'auto', type: 'number', disabled: true },
+        {
+            key: 'updateType',
+            label: 'データファンクションの種類',
+            width: 360,
+            icon: 'edit',
+            render: (index: number) => (
+                <UseUpdateTypeField name={`dataFunctions.${index}.updateType`} t={t}/>
+            )
+        },
+        { key: 'fpValue', label: 'FP', minWidth: 80, maxWidth: 100, icon: 'auto', type: 'number', disabled: true },
         { key: 'remarks', label: '備考', minWidth: 200, maxWidth: 300, icon: 'edit', type: 'text' , maxLength: 200},
         { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
     ], []);
 
     // トランザクションファンクションテーブルのカラム定義
-    const transactionColumns: ColumnDefinition[] = useMemo(() => [
+    const transactionColumns: ColumnDefinition<TransactionFunction>[] = useMemo(() => [
         { key: 'name', label: '名称', minWidth: 200, maxWidth: 400, icon: 'edit', type: 'text', maxLength: 50 },
         { key: 'externalInput', label: '外部入力', width: 120, icon: 'edit', type: 'number', min: 0, max: 9999 },
         { key: 'externalOutput', label: '外部出力', width: 120, icon: 'edit', type: 'number', min: 0, max: 9999 },
         { key: 'externalInquiry', label: '外部照会', width: 120, icon: 'edit', type: 'number', min: 0, max: 9999 },
-        { key: 'fpValue', label: 'FP', minWidth: 90, maxWidth: 100, icon: 'auto', type: 'number', disabled: true },
+        { key: 'fpValue', label: 'FP', minWidth: 80, maxWidth: 100, icon: 'auto', type: 'number', disabled: true },
         { key: 'remarks', label: '備考', minWidth: 200, maxWidth: 300, icon: 'edit', type: 'text', maxLength: 200 },
         { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
     ], []);
-    
-    // データファンクションのエラー表示制御
-    const dataFieldErrors = useMemo(() => {
-        const errors = methods.formState.errors?.dataFunctions;
-        if (!errors || !Array.isArray(errors)) return undefined;
 
-        const result: Record<number, Record<string, boolean>> = {};
+const transactionFieldErrors: Record<number, Record<string, boolean>> = {};
 
-        errors.forEach((rowError, index) => {
-            if (!rowError) return;
+transactionFields.forEach((_, index) => {
+    const rowError = errors.transactionFunctions?.[index];
 
-            const rowFlags: Record<string, boolean> = {};
-            
-            // 各フィールドのエラーをマーク
-            if ((rowError as any).name) rowFlags.name = true;
-            if ((rowError as any).updateType) rowFlags.updateType = true;
+    if (!rowError) return;
 
-            if (Object.keys(rowFlags).length > 0) {
-                result[index] = rowFlags;
-            }
-        });
+    transactionFieldErrors[index] = {};
 
-        return Object.keys(result).length > 0 ? result : undefined;
-    }, [methods.formState.errors?.dataFunctions]);
+    if (rowError.externalInput) {
+        transactionFieldErrors[index].externalInput = true;
+        transactionFieldErrors[index].externalOutput = true;
+        transactionFieldErrors[index].externalInquiry = true;
+    }
 
-    // トランザクションファンクションのエラー表示制御
-    const transactionFieldErrors = useMemo(() => {
-        const errors = methods.formState.errors?.transactionFunctions;
-        if (!errors || !Array.isArray(errors)) return undefined;
-
-        const result: Record<number, Record<string, boolean>> = {};
-
-        errors.forEach((rowError, index) => {
-            if (!rowError) return;
-
-            const rowFlags: Record<string, boolean> = {};
-            
-            // 各フィールドのエラーをチェック
-            const hasName = !!(rowError as any).name;
-            const hasExternalInput = !!(rowError as any).externalInput;
-            const hasExternalOutput = !!(rowError as any).externalOutput;
-            const hasExternalInquiry = !!(rowError as any).externalInquiry;
-
-            if (hasName) rowFlags.name = true;
-            
-            // externalInputにのみエラーがある場合は、3つ全てを赤枠表示
-            if (hasExternalInput && !hasExternalOutput && !hasExternalInquiry) {
-                rowFlags.externalInput = true;
-                rowFlags.externalOutput = true;
-                rowFlags.externalInquiry = true;
-            } else {
-                // それ以外の場合は通常通り個別のエラーを表示
-                if (hasExternalInput) rowFlags.externalInput = true;
-                if (hasExternalOutput) rowFlags.externalOutput = true;
-                if (hasExternalInquiry) rowFlags.externalInquiry = true;
-            }
-
-            if (Object.keys(rowFlags).length > 0) {
-                result[index] = rowFlags;
-            }
-        });
-
-        return Object.keys(result).length > 0 ? result : undefined;
-    }, [methods.formState.errors?.transactionFunctions]);
-
-    // /** ▼ 工数計算実行（バリデーショントリガー） */
+    if (rowError.name) {
+        transactionFieldErrors[index].name = true;
+    }
+}); 
+    /** ▼ 工数計算実行（バリデーショントリガー） */
     const handleCalcClick = async (onValid: FormType) => {
-        const result = await calc(onValid, methods.setError);
+        // サーバエラーメッセージをリセット
+        clearAlertMessage();
+
+        const data: CalcTestApplicationRequest = {
+            ...onValid,
+            projectType: onValid.projectType?.value as CalcTestApplicationRequestProjectTypeEnum,
+            ipaValueType: onValid.ipaValueType?.value as CalcTestApplicationRequestIpaValueTypeEnum,
+            dataFunctions: onValid.dataFunctions?.map(df => ({
+                selected: df.selected,
+                name: df.name,
+                updateType: df.updateType?.value as DataFunctionUpdateType,
+                fpValue: df.fpValue,
+                remarks: df.remarks,
+            })) || [],
+        };
+
+        const result = await calc(data, methods.setError);
 
         if(!result) return;
 
-        methods.reset({
-            ...onValid,
-            ...result,
-        });
         
         // 工程別内訳表に表示する比率を更新
         if (result.processRatios) {
@@ -322,18 +348,33 @@ function CalcForm(props: Props) {
     const processManMonths = watch('processManMonths');
     const processDurations = watch('processDurations');
 
+    // let { fields, append, remove, update } = useFieldArray({ control, name: 'dataFunctions' });
+
     /** ▼ データファンクション行追加 */
-    const onAddDataRow = useCallback(() => {
-        appendData(createEmptyDataFunction());
-    }, [appendData]);
+    const handleAddDataRow = async () => {
+        if(!maxLimit?.limit || dataFields.length < maxLimit.limit) {
+            appendData(createEmptyDataFunction());
+        } else {
+            if (maxLimit.message) {
+                await confirm({ message: "200行までしか追加できません", yes: true, close: true });
+            }
+        }
+    };
 
+    
     /** ▼ トランザクションファンクション行追加 */
-    const onAddTransactionRow = useCallback(() => {
-        appendTransaction(createEmptyTransactionFunction());
-    }, [appendTransaction]);
-
+    const handleAddTransactionRow = async () => {
+        if(!maxLimit?.limit || transactionFields.length < maxLimit.limit) {
+            appendTransaction(createEmptyTransactionFunction());
+        } else {
+            if (maxLimit.message) {
+                await confirm({ message: "200行までしか追加できません", yes: true, close: true });
+            }
+        }
+    };
+    
     /** ▼ データファンクション選択削除 */
-    const onDeleteDataSelected = useCallback(() => {
+    const handleDeleteDataRow = useCallback(() => {
         const values = getValues('dataFunctions');
         if (!values) return;
         const indicesToRemove = values
@@ -344,8 +385,9 @@ function CalcForm(props: Props) {
         setDataSelectedCount(0);
     }, [getValues, removeData]);
 
+
     /** ▼ トランザクションファンクション選択削除 */
-    const onDeleteTransactionSelected = useCallback(() => {
+    const handleDeleteTransactionRow = useCallback(() => {
         const values = getValues('transactionFunctions');
         if (!values) return;
         const indicesToRemove = values
@@ -368,10 +410,23 @@ function CalcForm(props: Props) {
 
     /** ▼ エクスポート処理 */
     const onExportButtonClick = async () => {
-        const latestValues = getValues();
-        await exportFile(latestValues);
+    const latestValues = getValues();
+
+    const request: ExportApplicationRequest = {
+        ...latestValues,
+        projectType: latestValues.projectType?.value as ExportApplicationRequestProjectTypeEnum,
+        ipaValueType: latestValues.ipaValueType?.value as ExportApplicationRequestIpaValueTypeEnum,
+        dataFunctions: latestValues.dataFunctions?.map(df => ({
+            selected: df.selected,
+            name: df.name,
+            updateType: df.updateType?.value as ExportApplicationRequestDataFunctionsInner['updateType'],
+            fpValue: df.fpValue,
+            remarks: df.remarks,
+        })) || [],
     };
 
+    await exportFile(request);
+    };
     /** ▼ バリデーションエラー時処理 */
     const handleInvalid = (errors: FieldErrors<FormType>) => {
         clearAlertMessage();
@@ -398,6 +453,7 @@ function CalcForm(props: Props) {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
             <FormContainerProvider blockNavigation={methods.formState.isDirty} {...methods}>
+                {/* <FormProvider {...methods}> */}
                 {/* メインコンテンツエリア */}
                 <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
                     {/* 左サイドバー - 案件情報 */}
@@ -436,20 +492,13 @@ function CalcForm(props: Props) {
                             <ProductivityField control={control} trigger={trigger} setValue={setValue} watch={watch} clearErrors={clearErrors} t={t} />
 
                             {/* 案件種別 */}
-                            <FormSection label="案件種別">
-                                <Select value={watch('projectType') || '新規開発'} onChange={(e) => setValue('projectType', e.target.value)} fullWidth size="small" sx={{ bgcolor: 'white' }}>
-                                    <MenuItem value="新規開発">新規開発</MenuItem>
-                                    <MenuItem value="改良開発">改良開発</MenuItem>
-                                    <MenuItem value="再開発">再開発</MenuItem>
-                                </Select>
+                            <FormSection label="案件種別" required>
+                                <UseProjectTypeField name="projectType" t={t}/>
                             </FormSection>
 
                             {/* 使用するIPA代表値 */}
-                            <FormSection label="使用するIPA代表値" mb={3}>
-                                <Select value={watch('ipaValueType') || '中央値'} onChange={(e) => setValue('ipaValueType', e.target.value)} size="small" fullWidth sx={{ bgcolor: 'white' }}>
-                                    <MenuItem value="中央値">中央値</MenuItem>
-                                    <MenuItem value="平均値">平均値</MenuItem>
-                                </Select>
+                            <FormSection label="使用するIPA代表値" required>
+                                <UseIpaValueTypeField name="ipaValueType" t={t}/>
                             </FormSection>
 
                             {/* 開発工程比率入力 */}
@@ -480,18 +529,29 @@ function CalcForm(props: Props) {
                             ]}
                             activeTab={tableTabValue}
                             onTabChange={setTableTabValue}
-                            actions={
-                                tableTabValue === 0
-                                    ? [
-                                        createAddRowAction(onAddDataRow),
-                                        createDeleteSelectedAction(onDeleteDataSelected, dataSelectedCount)
-                                    ]
-                                    : [
-                                        createAddRowAction(onAddTransactionRow),
-                                        createDeleteSelectedAction(onDeleteTransactionSelected, transactionSelectedCount)
-                                    ]
-                            }
-                        />
+                            actions={[
+                                {
+                                    component: (
+                                        <AddRowButton
+                                            onClick={() => {
+                                                if (tableTabValue === 0) handleAddDataRow();
+                                                else handleAddTransactionRow();
+                                            }}
+                                        />
+                                    )
+                                },
+                                {
+                                    component: (
+                                        <DeleteRowButton
+                                            onClick={() => {
+                                                if (tableTabValue === 0) handleDeleteDataRow();
+                                                else handleDeleteTransactionRow();
+                                            }}
+                                        />
+                                    )
+                                }
+                            ]}
+                        />                        
 
                         {/* ファンクション情報入力テーブル */}
                         <Box sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
@@ -503,8 +563,8 @@ function CalcForm(props: Props) {
                                     control={control}
                                     trigger={trigger}
                                     t={t}
-                                    onRowAdd={onAddDataRow}
-                                    onDeleteSelected={onDeleteDataSelected}
+                                    handleAddDataRow={handleAddDataRow}
+                                    handleDeleteDataRow={handleDeleteDataRow}
                                     selectedCount={dataSelectedCount}
                                     onSelectedCountChange={setDataSelectedCount}
                                     fieldErrors={dataFieldErrors}
@@ -519,43 +579,43 @@ function CalcForm(props: Props) {
                                     control={control}
                                     trigger={trigger}
                                     t={t}
-                                    onRowAdd={onAddTransactionRow}
-                                    onDeleteSelected={onDeleteTransactionSelected}
+                                    handleAddDataRow={handleAddTransactionRow}
+                                    handleDeleteDataRow={handleDeleteTransactionRow}
                                     selectedCount={transactionSelectedCount}
                                     onSelectedCountChange={setTransactionSelectedCount}
                                     fieldErrors={transactionFieldErrors}
                                     maxHeight="100%"
+                                    fieldErrors={transactionFieldErrors}
                                 />
                             </TabPanel>
                         </Box>
 
                         {/* 計算結果 */}
-                        <Box sx={{ overflowY: 'auto' }}>
-                            <CalculationResultsPanel
-                                isOpen={processBreakdownOpen}
-                                onToggle={useCallback(() => setProcessBreakdownOpen(prev => !prev), [])}
-                                summaryContent={
-                                    <Paper elevation={0} sx={{ p: 2, bgcolor: 'white' }}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, pl: 0 }}>
-                                            <AutoAwesomeIcon sx={{ fontSize: 18, mr: 0.5, color: 'text.secondary' }} />
-                                            <Typography variant="body2" sx={{ fontWeight: 'bold', fontSize: '0.95rem' }}>サマリー</Typography>
-                                        </Box>
-                                        <SummaryCard2 label="FP" value={totalFP} colorVariant="periwinkle" />
-                                        <SummaryCard2 label="工数(人月)" value={manMonths} colorVariant="green" />
-                                        <SummaryCard2 label="標準工期(月)" value={standardDuration} colorVariant="orange" />
-                                    </Paper>
-                                }
-                            >
-                                <ProcessBreakdownTable
-                                    processRatios={displayedProcessRatios}
-                                    processFPs={processFPs}
-                                    processManMonths={processManMonths}
-                                    processDurations={processDurations}
-                                />
-                            </CalculationResultsPanel>
-                        </Box>
+                        <CalculationResultsPanel
+                            isOpen={processBreakdownOpen}
+                            onToggle={useCallback(() => setProcessBreakdownOpen(prev => !prev), [])}
+                            summaryContent={
+                                <Paper elevation={0} sx={{ p: 2, bgcolor: 'white' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, pl: 0 }}>
+                                        <AutoAwesomeIcon sx={{ fontSize: 18, mr: 0.5, color: 'text.secondary' }} />
+                                        <Typography variant="body2" sx={{ fontWeight: 'bold', fontSize: '0.95rem' }}>サマリー</Typography>
+                                    </Box>
+                                    <SummaryCard2 label="FP" value={totalFP} colorVariant="periwinkle" />
+                                    <SummaryCard2 label="工数(人月)" value={manMonths} colorVariant="green" />
+                                    <SummaryCard2 label="標準工期(月)" value={standardDuration} colorVariant="orange" />
+                                </Paper>
+                            }
+                        >
+                            <ProcessBreakdownTable
+                                processRatios={displayedProcessRatios}
+                                processFPs={processFPs}
+                                processManMonths={processManMonths}
+                                processDurations={processDurations}
+                            />
+                        </CalculationResultsPanel>
                     </Box>
                 </Box>
+                {/* </FormPaperProvider> */}
             </FormContainerProvider>
         </Box>
     );

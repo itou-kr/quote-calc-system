@@ -1,0 +1,26 @@
+{
+    "label": {
+        "projectType": {
+            "label": "案件種別",
+            "const": {
+                "new": "新規開発",
+                "enhancement": "改良追加",
+                "redevelopment": "再開発"
+            }
+        },
+        "ipaValueType": {
+            "label": "使用するIPA代表値",
+            "const": {
+                "median": "中央値",
+                "average": "平均値"
+            }
+        },
+        "updateType": {
+            "label": "データファンクションの種類",
+            "const": {
+                "ilf": "内部論理ファイル",
+                "eif": "外部インターフェースファイル"
+            }
+        }
+    }
+}

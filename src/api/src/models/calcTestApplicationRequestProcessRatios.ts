@@ -11,11 +11,29 @@
  */
 
 
+/**
+* 開発工程比率
+*/
 export class CalcTestApplicationRequestProcessRatios {
+    /**
+    * 基本設計
+    */
     'basicDesign'?: number;
+    /**
+    * 詳細設計
+    */
     'detailedDesign'?: number;
+    /**
+    * 製造
+    */
     'implementation'?: number;
+    /**
+    * 結合テスト
+    */
     'integrationTest'?: number;
+    /**
+    * 総合テスト
+    */
     'systemTest'?: number;
 
     static discriminator: string | undefined = undefined;

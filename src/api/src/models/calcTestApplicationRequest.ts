@@ -18,13 +18,37 @@ import { CalcTestApplicationRequestTransactionFunctionsInner } from './calcTestA
 * 工数計算リクエスト
 */
 export class CalcTestApplicationRequest {
+    /**
+    * 案件名
+    */
     'projectName'?: string;
+    /**
+    * 生産性自動計算フラグ
+    */
     'autoProductivity'?: boolean;
-    'autoProcessRatios'?: boolean;
+    /**
+    * 生産性（FP/月）
+    */
     'productivityFPPerMonth'?: number;
-    'projectType'?: string;
-    'ipaValueType'?: string;
+    /**
+    * 案件種別
+    */
+    'projectType'?: CalcTestApplicationRequest.ProjectTypeEnum;
+    /**
+    * 使用するIPA代表値
+    */
+    'ipaValueType'?: CalcTestApplicationRequest.IpaValueTypeEnum;
+    /**
+    * 開発工程比率自動入力フラグ
+    */
+    'autoProcessRatios'?: boolean;
+    /**
+    * :データファンクション情報
+    */
     'dataFunctions'?: Array<CalcTestApplicationRequestDataFunctionsInner>;
+    /**
+    * トランザクションファンクション情報
+    */
     'transactionFunctions'?: Array<CalcTestApplicationRequestTransactionFunctionsInner>;
     'processRatios'?: CalcTestApplicationRequestProcessRatios;
 
@@ -42,11 +66,6 @@ export class CalcTestApplicationRequest {
             "type": "boolean"
         },
         {
-            "name": "autoProcessRatios",
-            "baseName": "autoProcessRatios",
-            "type": "boolean"
-        },
-        {
             "name": "productivityFPPerMonth",
             "baseName": "productivityFPPerMonth",
             "type": "number"
@@ -54,12 +73,17 @@ export class CalcTestApplicationRequest {
         {
             "name": "projectType",
             "baseName": "projectType",
-            "type": "string"
+            "type": "CalcTestApplicationRequest.ProjectTypeEnum"
         },
         {
             "name": "ipaValueType",
             "baseName": "ipaValueType",
-            "type": "string"
+            "type": "CalcTestApplicationRequest.IpaValueTypeEnum"
+        },
+        {
+            "name": "autoProcessRatios",
+            "baseName": "autoProcessRatios",
+            "type": "boolean"
         },
         {
             "name": "dataFunctions",
@@ -82,3 +106,14 @@ export class CalcTestApplicationRequest {
     }
 }
 
+export namespace CalcTestApplicationRequest {
+    export enum ProjectTypeEnum {
+        NEW = <any> 'N',
+        ENHANCEMENT = <any> 'E',
+        REDEVELOPMENT = <any> 'R'
+    }
+    export enum IpaValueTypeEnum {
+        MEDIAN = <any> 'M',
+        AVERAGE = <any> 'A'
+    }
+}

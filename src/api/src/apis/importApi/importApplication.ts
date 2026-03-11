@@ -1,9 +1,12 @@
 import * as Excel from 'exceljs';
-import { ImportApplication200Response } from '@quote-calc-system/models';
+import { CalcTestApplicationRequestDataFunctionsInner, ImportApplication200Response } from '@quote-calc-system/models';
 import path from 'path';
 // import * as ImportApi from './types';
 
 let errorMessage: string[];
+type UpdateTypeEnum =
+  CalcTestApplicationRequestDataFunctionsInner.UpdateTypeEnum;
+
 
 export const importApplication = async (
   fileBuffer: Buffer,
@@ -11,6 +14,7 @@ export const importApplication = async (
 ): Promise<ImportApplication200Response> => {
   
   const response = new ImportApplication200Response();
+  // const { UpdateTypeEnum } = CalcTestApplicationRequestDataFunctionsInner;
   
   errorMessage = [];
 
@@ -75,10 +79,11 @@ export const importApplication = async (
       for (let row = startRow; row <= ws2.rowCount; row++) {
         const name = ws2.getCell(`B${row}`).value?.toString();
         if (!name) break; // 空行で終了
-
+        
+        const raw = ws2.getCell(`C${row}`).value?.toString();
         response.dataFunctions.push({
           name,
-          updateType: ws2.getCell(`C${row}`).value?.toString() ?? '',
+          updateType: isUpdateTypeEnum(raw) ? raw : undefined,
           fpValue: Number(ws2.getCell(`D${row}`).value ?? 0),
           remarks: ws2.getCell(`E${row}`).value?.toString() ?? '',
         });
@@ -450,4 +455,18 @@ async function validateConsistencyDetail(
   }
 
   return;
+}
+
+// function toUpdateTypeEnum(value?: string): UpdateTypeEnum | undefined {
+//   if (!value) return undefined;
+
+//   return Object.values(UpdateTypeEnum).includes(value as UpdateTypeEnum)
+//     ? (value as UpdateTypeEnum)
+//     : undefined;
+// }
+function isUpdateTypeEnum(value: unknown): value is UpdateTypeEnum {
+  return (
+    value === '内部論理ファイル' ||
+    value === '外部インタフェースファイル'
+  );
 }

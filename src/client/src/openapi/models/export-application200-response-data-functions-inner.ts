@@ -12,6 +12,9 @@
  * Do not edit the class manually.
  */
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { DataFunctionUpdateType } from './data-function-update-type';
 
 /**
  * 
@@ -27,10 +30,10 @@ export interface ExportApplication200ResponseDataFunctionsInner {
     'name'?: string;
     /**
      * 
-     * @type {string}
+     * @type {DataFunctionUpdateType}
      * @memberof ExportApplication200ResponseDataFunctionsInner
      */
-    'updateType'?: string;
+    'updateType'?: DataFunctionUpdateType;
     /**
      * 
      * @type {number}
@@ -50,3 +53,5 @@ export interface ExportApplication200ResponseDataFunctionsInner {
      */
     'selected'?: boolean;
 }
+
+

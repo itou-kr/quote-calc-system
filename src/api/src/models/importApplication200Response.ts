@@ -10,26 +10,26 @@
  * Do not edit the class manually.
  */
 
-import { CalcTestApplicationRequestProcessRatios } from './calcTestApplicationRequestProcessRatios';
-import { CalcTestApplicationRequestTransactionFunctionsInner } from './calcTestApplicationRequestTransactionFunctionsInner';
 import { ExportApplication200ResponseDataFunctionsInner } from './exportApplication200ResponseDataFunctionsInner';
+import { ExportApplicationRequestTransactionFunctionsInner } from './exportApplicationRequestTransactionFunctionsInner';
+import { ImportApplication200ResponseProcessRatios } from './importApplication200ResponseProcessRatios';
 
 /**
 * インポートレスポンス
 */
 export class ImportApplication200Response {
-    'projectName'?: string;
-    'productivityFPPerMonth'?: number;
-    'projectType'?: string;
-    'ipaValueType'?: string;
+    'projectName': string;
+    'productivityFPPerMonth': number;
+    'projectType': string;
+    'ipaValueType': string;
     'totalFP'?: number;
     'totalManMonths'?: number;
     'standardDurationMonths'?: number;
-    'processRatios'?: CalcTestApplicationRequestProcessRatios;
-    'processManMonths'?: CalcTestApplicationRequestProcessRatios;
-    'processDurations'?: CalcTestApplicationRequestProcessRatios;
+    'processRatios': ImportApplication200ResponseProcessRatios;
+    'processManMonths'?: ImportApplication200ResponseProcessRatios;
+    'processDurations'?: ImportApplication200ResponseProcessRatios;
     'dataFunctions'?: Array<ExportApplication200ResponseDataFunctionsInner>;
-    'transactionFunctions'?: Array<CalcTestApplicationRequestTransactionFunctionsInner>;
+    'transactionFunctions'?: Array<ExportApplicationRequestTransactionFunctionsInner>;
     'errorMessages'?: Array<string>;
 
     static discriminator: string | undefined = undefined;
@@ -73,17 +73,17 @@ export class ImportApplication200Response {
         {
             "name": "processRatios",
             "baseName": "processRatios",
-            "type": "CalcTestApplicationRequestProcessRatios"
+            "type": "ImportApplication200ResponseProcessRatios"
         },
         {
             "name": "processManMonths",
             "baseName": "processManMonths",
-            "type": "CalcTestApplicationRequestProcessRatios"
+            "type": "ImportApplication200ResponseProcessRatios"
         },
         {
             "name": "processDurations",
             "baseName": "processDurations",
-            "type": "CalcTestApplicationRequestProcessRatios"
+            "type": "ImportApplication200ResponseProcessRatios"
         },
         {
             "name": "dataFunctions",
@@ -93,7 +93,7 @@ export class ImportApplication200Response {
         {
             "name": "transactionFunctions",
             "baseName": "transactionFunctions",
-            "type": "Array<CalcTestApplicationRequestTransactionFunctionsInner>"
+            "type": "Array<ExportApplicationRequestTransactionFunctionsInner>"
         },
         {
             "name": "errorMessages",

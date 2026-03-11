@@ -6,18 +6,18 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**projectName** | **string** |  | [optional] [default to undefined]
-**productivityFPPerMonth** | **number** |  | [optional] [default to undefined]
-**projectType** | **string** |  | [optional] [default to undefined]
-**ipaValueType** | **string** |  | [optional] [default to undefined]
+**projectName** | **string** |  | [default to undefined]
+**productivityFPPerMonth** | **number** |  | [default to undefined]
+**projectType** | **string** |  | [default to undefined]
+**ipaValueType** | **string** |  | [default to undefined]
 **totalFP** | **number** |  | [optional] [default to undefined]
 **totalManMonths** | **number** |  | [optional] [default to undefined]
 **standardDurationMonths** | **number** |  | [optional] [default to undefined]
-**processRatios** | [**CalcTestApplication200ResponseProcessRatios**](CalcTestApplication200ResponseProcessRatios.md) |  | [optional] [default to undefined]
-**processManMonths** | [**CalcTestApplication200ResponseProcessRatios**](CalcTestApplication200ResponseProcessRatios.md) |  | [optional] [default to undefined]
-**processDurations** | [**CalcTestApplication200ResponseProcessRatios**](CalcTestApplication200ResponseProcessRatios.md) |  | [optional] [default to undefined]
+**processRatios** | [**ImportApplication200ResponseProcessRatios**](ImportApplication200ResponseProcessRatios.md) |  | [default to undefined]
+**processManMonths** | [**ImportApplication200ResponseProcessRatios**](ImportApplication200ResponseProcessRatios.md) |  | [optional] [default to undefined]
+**processDurations** | [**ImportApplication200ResponseProcessRatios**](ImportApplication200ResponseProcessRatios.md) |  | [optional] [default to undefined]
 **dataFunctions** | [**Array&lt;ExportApplication200ResponseDataFunctionsInner&gt;**](ExportApplication200ResponseDataFunctionsInner.md) |  | [optional] [default to undefined]
-**transactionFunctions** | [**Array&lt;CalcTestApplication200ResponseTransactionFunctionsInner&gt;**](CalcTestApplication200ResponseTransactionFunctionsInner.md) |  | [optional] [default to undefined]
+**transactionFunctions** | [**Array&lt;ExportApplicationRequestTransactionFunctionsInner&gt;**](ExportApplicationRequestTransactionFunctionsInner.md) |  | [optional] [default to undefined]
 **errorMessages** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
 
 ## Example

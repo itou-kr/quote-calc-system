@@ -6,7 +6,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **name** | **string** |  | [optional] [default to undefined]
-**updateType** | **string** |  | [optional] [default to undefined]
+**updateType** | [**DataFunctionUpdateType**](DataFunctionUpdateType.md) |  | [optional] [default to undefined]
 **fpValue** | **number** |  | [optional] [default to undefined]
 **remarks** | **string** |  | [optional] [default to undefined]
 **selected** | **boolean** |  | [optional] [default to undefined]

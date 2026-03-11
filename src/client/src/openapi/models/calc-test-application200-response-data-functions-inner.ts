@@ -12,6 +12,9 @@
  * Do not edit the class manually.
  */
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { DataFunctionUpdateType } from './data-function-update-type';
 
 /**
  * 
@@ -20,33 +23,35 @@
  */
 export interface CalcTestApplication200ResponseDataFunctionsInner {
     /**
-     * 
-     * @type {boolean}
-     * @memberof CalcTestApplication200ResponseDataFunctionsInner
-     */
-    'selected'?: boolean;
-    /**
-     * 
+     * 名称
      * @type {string}
      * @memberof CalcTestApplication200ResponseDataFunctionsInner
      */
     'name'?: string;
     /**
      * 
-     * @type {string}
+     * @type {DataFunctionUpdateType}
      * @memberof CalcTestApplication200ResponseDataFunctionsInner
      */
-    'updateType'?: string;
+    'updateType'?: DataFunctionUpdateType;
     /**
-     * 
+     * FP
      * @type {number}
      * @memberof CalcTestApplication200ResponseDataFunctionsInner
      */
     'fpValue'?: number;
     /**
-     * 
+     * 備考
      * @type {string}
      * @memberof CalcTestApplication200ResponseDataFunctionsInner
      */
     'remarks'?: string;
+    /**
+     * 選択フラグ
+     * @type {boolean}
+     * @memberof CalcTestApplication200ResponseDataFunctionsInner
+     */
+    'selected'?: boolean;
 }
+
+

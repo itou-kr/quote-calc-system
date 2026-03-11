@@ -5,6 +5,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**selected** | **boolean** |  | [optional] [default to undefined]
 **name** | **string** |  | [optional] [default to undefined]
 **externalInput** | **number** |  | [optional] [default to undefined]
 **externalOutput** | **number** |  | [optional] [default to undefined]
@@ -18,6 +19,7 @@ Name | Type | Description | Notes
 import { ExportApplicationRequestTransactionFunctionsInner } from './api';
 
 const instance: ExportApplicationRequestTransactionFunctionsInner = {
+    selected,
     name,
     externalInput,
     externalOutput,

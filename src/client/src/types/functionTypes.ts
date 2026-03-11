@@ -4,7 +4,7 @@
 export type DataFunction = {
     selected: boolean;
     name: string;
-    updateType: string;
+    updateType: { label: string; value: string };
     fpValue: number;
     remarks: string;
 };
@@ -28,7 +28,7 @@ export type TransactionFunction = {
 export const createEmptyDataFunction = (): DataFunction => ({
     selected: false,
     name: '',
-    updateType: '',
+    updateType: { label: '', value: '' },
     fpValue: 0,
     remarks: '',
 });

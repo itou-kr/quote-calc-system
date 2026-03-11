@@ -1,0 +1,1 @@
+export type AutocompleteLabelAndValue = {label?: string, value: string};

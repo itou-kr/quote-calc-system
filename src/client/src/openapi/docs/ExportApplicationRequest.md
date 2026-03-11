@@ -6,20 +6,19 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**projectName** | **string** |  | [optional] [default to undefined]
-**productivityFPPerMonth** | **number** |  | [optional] [default to undefined]
-**projectType** | **string** |  | [optional] [default to undefined]
-**ipaValueType** | **string** |  | [optional] [default to undefined]
-**totalFP** | **number** |  | [optional] [default to undefined]
-**totalManMonths** | **number** |  | [optional] [default to undefined]
-**standardDurationMonths** | **number** |  | [optional] [default to undefined]
+**projectName** | **string** | 案件名 | [optional] [default to undefined]
+**productivityFPPerMonth** | **number** | 生産性（FP/月） | [optional] [default to undefined]
+**projectType** | **string** | 案件種別 | [optional] [default to undefined]
+**ipaValueType** | **string** | 使用するIPA代表値 | [optional] [default to undefined]
+**totalFP** | **number** | 総FP | [optional] [default to undefined]
+**totalManMonths** | **number** | 工数（人月） | [optional] [default to undefined]
+**standardDurationMonths** | **number** | 標準工期（月） | [optional] [default to undefined]
 **processRatios** | [**CalcTestApplication200ResponseProcessRatios**](CalcTestApplication200ResponseProcessRatios.md) |  | [optional] [default to undefined]
-**processManMonths** | [**CalcTestApplication200ResponseProcessRatios**](CalcTestApplication200ResponseProcessRatios.md) |  | [optional] [default to undefined]
-**processDurations** | [**CalcTestApplication200ResponseProcessRatios**](CalcTestApplication200ResponseProcessRatios.md) |  | [optional] [default to undefined]
-**importFile** | [**ExportApplicationRequestImportFile**](ExportApplicationRequestImportFile.md) |  | [optional] [default to undefined]
-**exportFile** | [**ExportApplicationRequestImportFile**](ExportApplicationRequestImportFile.md) |  | [optional] [default to undefined]
-**dataFunctions** | [**Array&lt;CalcTestApplication200ResponseDataFunctionsInner&gt;**](CalcTestApplication200ResponseDataFunctionsInner.md) |  | [optional] [default to undefined]
-**transactionFunctions** | [**Array&lt;CalcTestApplication200ResponseTransactionFunctionsInner&gt;**](CalcTestApplication200ResponseTransactionFunctionsInner.md) |  | [optional] [default to undefined]
+**processManMonths** | [**CalcTestApplication200ResponseProcessManMonths**](CalcTestApplication200ResponseProcessManMonths.md) |  | [optional] [default to undefined]
+**processDurations** | [**CalcTestApplication200ResponseProcessDurations**](CalcTestApplication200ResponseProcessDurations.md) |  | [optional] [default to undefined]
+**exportFile** | [**ExportApplicationRequestExportFile**](ExportApplicationRequestExportFile.md) |  | [optional] [default to undefined]
+**dataFunctions** | [**Array&lt;ExportApplicationRequestDataFunctionsInner&gt;**](ExportApplicationRequestDataFunctionsInner.md) |  | [optional] [default to undefined]
+**transactionFunctions** | [**Array&lt;ExportApplicationRequestTransactionFunctionsInner&gt;**](ExportApplicationRequestTransactionFunctionsInner.md) |  | [optional] [default to undefined]
 
 ## Example
 
@@ -37,7 +36,6 @@ const instance: ExportApplicationRequest = {
     processRatios,
     processManMonths,
     processDurations,
-    importFile,
     exportFile,
     dataFunctions,
     transactionFunctions,

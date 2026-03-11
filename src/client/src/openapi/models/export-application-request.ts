@@ -14,16 +14,22 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { CalcTestApplication200ResponseDataFunctionsInner } from './calc-test-application200-response-data-functions-inner';
+import type { CalcTestApplication200ResponseProcessDurations } from './calc-test-application200-response-process-durations';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { CalcTestApplication200ResponseProcessManMonths } from './calc-test-application200-response-process-man-months';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { CalcTestApplication200ResponseProcessRatios } from './calc-test-application200-response-process-ratios';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { CalcTestApplication200ResponseTransactionFunctionsInner } from './calc-test-application200-response-transaction-functions-inner';
+import type { ExportApplicationRequestDataFunctionsInner } from './export-application-request-data-functions-inner';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { ExportApplicationRequestImportFile } from './export-application-request-import-file';
+import type { ExportApplicationRequestExportFile } from './export-application-request-export-file';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ExportApplicationRequestTransactionFunctionsInner } from './export-application-request-transaction-functions-inner';
 
 /**
  * エクスポートリクエスト
@@ -32,43 +38,43 @@ import type { ExportApplicationRequestImportFile } from './export-application-re
  */
 export interface ExportApplicationRequest {
     /**
-     * 
+     * 案件名
      * @type {string}
      * @memberof ExportApplicationRequest
      */
     'projectName'?: string;
     /**
-     * 
+     * 生産性（FP/月）
      * @type {number}
      * @memberof ExportApplicationRequest
      */
     'productivityFPPerMonth'?: number;
     /**
-     * 
+     * 案件種別
      * @type {string}
      * @memberof ExportApplicationRequest
      */
-    'projectType'?: string;
+    'projectType'?: ExportApplicationRequestProjectTypeEnum;
     /**
-     * 
+     * 使用するIPA代表値
      * @type {string}
      * @memberof ExportApplicationRequest
      */
-    'ipaValueType'?: string;
+    'ipaValueType'?: ExportApplicationRequestIpaValueTypeEnum;
     /**
-     * 
+     * 総FP
      * @type {number}
      * @memberof ExportApplicationRequest
      */
     'totalFP'?: number;
     /**
-     * 
+     * 工数（人月）
      * @type {number}
      * @memberof ExportApplicationRequest
      */
     'totalManMonths'?: number;
     /**
-     * 
+     * 標準工期（月）
      * @type {number}
      * @memberof ExportApplicationRequest
      */
@@ -81,38 +87,47 @@ export interface ExportApplicationRequest {
     'processRatios'?: CalcTestApplication200ResponseProcessRatios;
     /**
      * 
-     * @type {CalcTestApplication200ResponseProcessRatios}
+     * @type {CalcTestApplication200ResponseProcessManMonths}
      * @memberof ExportApplicationRequest
      */
-    'processManMonths'?: CalcTestApplication200ResponseProcessRatios;
+    'processManMonths'?: CalcTestApplication200ResponseProcessManMonths;
     /**
      * 
-     * @type {CalcTestApplication200ResponseProcessRatios}
+     * @type {CalcTestApplication200ResponseProcessDurations}
      * @memberof ExportApplicationRequest
      */
-    'processDurations'?: CalcTestApplication200ResponseProcessRatios;
+    'processDurations'?: CalcTestApplication200ResponseProcessDurations;
     /**
      * 
-     * @type {ExportApplicationRequestImportFile}
+     * @type {ExportApplicationRequestExportFile}
      * @memberof ExportApplicationRequest
      */
-    'importFile'?: ExportApplicationRequestImportFile;
+    'exportFile'?: ExportApplicationRequestExportFile;
     /**
      * 
-     * @type {ExportApplicationRequestImportFile}
+     * @type {Array<ExportApplicationRequestDataFunctionsInner>}
      * @memberof ExportApplicationRequest
      */
-    'exportFile'?: ExportApplicationRequestImportFile;
+    'dataFunctions'?: Array<ExportApplicationRequestDataFunctionsInner>;
     /**
      * 
-     * @type {Array<CalcTestApplication200ResponseDataFunctionsInner>}
+     * @type {Array<ExportApplicationRequestTransactionFunctionsInner>}
      * @memberof ExportApplicationRequest
      */
-    'dataFunctions'?: Array<CalcTestApplication200ResponseDataFunctionsInner>;
-    /**
-     * 
-     * @type {Array<CalcTestApplication200ResponseTransactionFunctionsInner>}
-     * @memberof ExportApplicationRequest
-     */
-    'transactionFunctions'?: Array<CalcTestApplication200ResponseTransactionFunctionsInner>;
+    'transactionFunctions'?: Array<ExportApplicationRequestTransactionFunctionsInner>;
 }
+
+export const ExportApplicationRequestProjectTypeEnum = {
+    NEW: 'N',
+    ENHANCEMENT: 'E',
+    REDEVELOPMENT: 'R'
+} as const;
+
+export type ExportApplicationRequestProjectTypeEnum = typeof ExportApplicationRequestProjectTypeEnum[keyof typeof ExportApplicationRequestProjectTypeEnum];
+export const ExportApplicationRequestIpaValueTypeEnum = {
+    MEDIAN: 'M',
+    AVERAGE: 'A'
+} as const;
+
+export type ExportApplicationRequestIpaValueTypeEnum = typeof ExportApplicationRequestIpaValueTypeEnum[keyof typeof ExportApplicationRequestIpaValueTypeEnum];
+

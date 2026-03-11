@@ -13,7 +13,7 @@
 
 export class ExportApplication200ResponseDataFunctionsInner {
     'name'?: string;
-    'updateType'?: string;
+    'updateType'?: ExportApplication200ResponseDataFunctionsInner.UpdateTypeEnum;
     'fpValue'?: number;
     'remarks'?: string;
     'selected'?: boolean;
@@ -29,7 +29,7 @@ export class ExportApplication200ResponseDataFunctionsInner {
         {
             "name": "updateType",
             "baseName": "updateType",
-            "type": "string"
+            "type": "ExportApplication200ResponseDataFunctionsInner.UpdateTypeEnum"
         },
         {
             "name": "fpValue",
@@ -52,3 +52,9 @@ export class ExportApplication200ResponseDataFunctionsInner {
     }
 }
 
+export namespace ExportApplication200ResponseDataFunctionsInner {
+    export enum UpdateTypeEnum {
+        ILF = <any> 'I',
+        EIF = <any> 'E'
+    }
+}

@@ -1,4 +1,4 @@
-import { CalcTestApplication200Response, CalcTestApplicationRequest } from '@quote-calc-system/models';
+import { CalcTestApplication200Response, CalcTestApplicationRequest, CalcTestApplicationRequestDataFunctionsInner } from '@quote-calc-system/models';
 import * as CalcApi from './types';
 import { getProcessRatios } from '@common/constants/processRatios';
 import { getProductivity } from '@common/constants/productivity';
@@ -55,7 +55,7 @@ const validateInputData = (calcTestApplicationRequest: CalcTestApplicationReques
     const errorRows: number[] = [];
     calcTestApplicationRequest.dataFunctions.forEach((df, index) => {
       const hasName = df.name && df.name.trim() !== '';
-      const hasUpdateType = df.updateType && df.updateType !== '';
+      const hasUpdateType = df.updateType && df.updateType !== null && df.updateType !== undefined;
       // 名称と種類の組み合わせが不正（片方だけ入力されている）
       if ((hasName && !hasUpdateType) || (!hasName && hasUpdateType)) {
         errorRows.push(index + 1);
@@ -91,8 +91,10 @@ const validateInputData = (calcTestApplicationRequest: CalcTestApplicationReques
 export const calcTestApplication: CalcApi.calcTestApplication = async ({
   calcTestApplicationRequest = {},
 }) => {
-  
-  const response = new CalcTestApplication200Response();
+
+const response: CalcTestApplication200Response = {
+};
+  // const response = new CalcTestApplication200Response();
 
   // エラーメッセージ配列の初期化
   errorMessage = [];
@@ -119,19 +121,22 @@ response.productivityFPPerMonth = calcTestApplicationRequest.productivityFPPerMo
 // データファンクションFP値計算
 response.dataFunctions = calcTestApplicationRequest.dataFunctions?.map(df => {
   let fpValue; 
-  //-----小山記載 ここから----- 
+  const { UpdateTypeEnum } = CalcTestApplicationRequestDataFunctionsInner;
+  // eslint-disable-next-line no-console
+  console.log('updateTypeeeeeeeeeee:', df, df.updateType?.valueOf);
   //TODO：名称に文字列が入っている場合のみ計算する分岐を入れる
-  //-----小山記載 ここまで----- 
   switch (df.updateType) {
-    case '内部論理ファイル':
+    case UpdateTypeEnum.ILF:
       fpValue = 7;
       break;
-    case '外部インタフェースファイル':
+    case UpdateTypeEnum.EIF:
       fpValue = 5;
       break;
     default:
       fpValue = 0;
   }
+   // eslint-disable-next-line no-console
+  console.log('fpValue:', fpValue); 
 
   return {
     ...df,
@@ -179,8 +184,8 @@ response.transactionFunctions =
   }
 
   // 案件種別とIPA代表値の取得
-  const projectType = calcTestApplicationRequest.projectType || '新規開発';
-  const ipaValueType = calcTestApplicationRequest.ipaValueType || '中央値';
+  const projectType = calcTestApplicationRequest.projectType ?? CalcTestApplicationRequest.ProjectTypeEnum.NEW;
+  const ipaValueType = calcTestApplicationRequest.ipaValueType ?? CalcTestApplicationRequest.IpaValueTypeEnum.MEDIAN;
 
   // 生産性(FP/月)
   if (calcTestApplicationRequest.autoProductivity) {

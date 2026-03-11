@@ -16,7 +16,7 @@ export default [
         rules: {
             '@typescript-eslint/no-unused-vars': [
                 'error',
-                 { 
+                { 
                     argsIgnorePattern: '^_', 
                     caughtErrorsIgnorePattern: '^_' 
                 }
@@ -30,6 +30,7 @@ export default [
             '**/src/apis/*Api/types.ts',
             '**/src/apis/*Api/index.ts',
             '**/src/module/*.ts',
+            '**/src/models/**', 
         ],
     },
 ];
