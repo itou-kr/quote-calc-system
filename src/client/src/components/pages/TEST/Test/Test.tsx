@@ -5,6 +5,8 @@ import TestForm from '@front/components/pages/TEST/form/TestForm'
 // import { Container } from '@mui/system';
 // import { FormType } from '@front/components/pages/TEST/form/TestForm';
 import { createDataFunctions } from '@front/types/functionTypes';
+import { useGetUpdateType } from '@front/hooks/consts';
+import { useTranslation } from 'react-i18next';
 
 
 const Test = memo (() => {
@@ -47,18 +49,19 @@ const Test = memo (() => {
     //     }
     // }));
 
+    const { t } = useTranslation();
+    const getUpdateTypes = useGetUpdateType(t);
+    const updateTypeOptions = getUpdateTypes();
+    
     const mappedDataFunctions =
     data?.dataFunctions?.map(df => ({
         name: df.name,
         fpValue: df.fpValue,
         remarks: df.remarks,
         selected: df.selected ?? false,
-        updateType: df.updateType
-        ? {
-            label: df.updateType,
-            value: df.updateType,
-            }
-        : null,
+        updateType: updateTypeOptions.find(
+        option => option.value === df.updateType
+        ) ?? null,
     }));
 
     return (

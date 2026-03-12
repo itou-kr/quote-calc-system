@@ -3,7 +3,8 @@ import { memo } from 'react';
 import { useTypedSelector } from '@front/stores';
 import CalcForm from '@front/components/pages/CALC/form/CalcForm'
 import { createDataFunctions } from '@front/types/functionTypes';
-
+import { useGetUpdateType } from '@front/hooks/consts';
+import { useTranslation } from 'react-i18next';
 
 const Calc = memo (() => {
     const data = useTypedSelector((state) => state.calc.data)
@@ -44,6 +45,9 @@ const Calc = memo (() => {
     //     value: df.updateType ?? '',
     //     }
     // }));
+    const { t } = useTranslation();
+    const getUpdateTypes = useGetUpdateType(t);
+    const updateTypeOptions = getUpdateTypes();
 
     const mappedDataFunctions =
     data?.dataFunctions?.map(df => ({
@@ -51,12 +55,9 @@ const Calc = memo (() => {
         fpValue: df.fpValue,
         remarks: df.remarks,
         selected: df.selected ?? false,
-        updateType: df.updateType
-        ? {
-            label: df.updateType,
-            value: df.updateType,
-            }
-        : null,
+        updateType: updateTypeOptions.find(
+        option => option.value === df.updateType
+        ) ?? null,
     }));
 
     return (
