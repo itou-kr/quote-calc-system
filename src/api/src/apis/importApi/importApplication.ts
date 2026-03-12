@@ -134,6 +134,7 @@ async function validateConsistencyDetail(
   const mustCheckMessage = 'を入力してください。'
   const rangeCheckMessage = 'の範囲で入力してください。';
   const numberCheckMessage = 'は半角数字で入力してください。';
+  const integerCheckMessage = 'は整数で入力してください。';
   const pullDownCheckMessage = 'はプルダウンから選択してください。';
   // ===== 1シート目のラベル定義 =====
   const projectNameLabel = "案件名";
@@ -158,14 +159,13 @@ async function validateConsistencyDetail(
   const readOnly = "外部インターフェースファイル";
   const dataFunctionName = "データファンクション名";
   const dataFunctionType = "データファンクションの種類";
-  const sheet2 = 'データファンクションシート 列';
+  const sheet2 = 'データファンクションシート 行';
   // ===== 3シート目のラベル定義 =====
   const externalInputLabel = "外部入力";
   const externalOutputLabel = "外部出力";
   const externalInquiryLabel = "外部照会";
   const transactionFunctionName = "トランザクションファンクション名";
-  const transactionFunctionType = "トランザクションファンクションの種類";
-  const sheet3 = 'トランザクションファンクションシート 列';
+  const sheet3 = 'トランザクションファンクションシート 行';
   // ===== その他共通定義 =====
   const min_0 = 0;
   const min_1 = 1;
@@ -205,17 +205,19 @@ async function validateConsistencyDetail(
   }
 
   //===== 生産性のチェック =====
-  //必須チェック
   const productivityFPPerMonth = ws1.getCell('C4').value;
-  if (!productivityFPPerMonth) {
+  const productivityValue = productivityFPPerMonth?.toString().trim() ?? '';
+  //必須チェック
+  if (productivityValue === '') {
     errorMessage.push(productivityFPPerMonthLabel + mustCheckMessage);
-  }
-  //属性チェック
-  if (isNaN(Number(productivityFPPerMonth))) {
+  } else if (isNaN(Number(productivityValue))) {
+    //属性チェック
     errorMessage.push(productivityFPPerMonthLabel + numberCheckMessage);
-  }
-  //範囲チェック
-  if (Number(productivityFPPerMonth) < min_1 || Number(productivityFPPerMonth) > max_9999) {
+  } else if (!Number.isInteger(Number(productivityValue))) {
+    //整数チェック
+    errorMessage.push(productivityFPPerMonthLabel + integerCheckMessage);
+  } else if (Number(productivityValue) < min_1 || Number(productivityValue) > max_9999) {
+    //範囲チェック
     errorMessage.push(`${productivityFPPerMonthLabel}は${min_1}～${max_9999}${rangeCheckMessage}`);
   }
   
@@ -399,7 +401,7 @@ async function validateConsistencyDetail(
     if(name){
       if (!externalInput && !externalOutput && !externalInquiry) { 
         //トランザクション名があるが、TF種別がない場合は必須チェックでエラー
-        errorMessage.push(sheet3 + outputRow + ':' +transactionFunctionType + mustCheckMessage);
+        errorMessage.push(sheet3 + outputRow + ':' +`${externalInputLabel}または${externalOutputLabel}または${externalInquiryLabel}` + mustCheckMessage);
       }
     }
     if (!name) { 
@@ -418,10 +420,14 @@ async function validateConsistencyDetail(
     if(externalInput){
       if (isNaN(Number(externalInput))) {
         errorMessage.push(sheet3 + outputRow + ':' +externalInputLabel + numberCheckMessage);
-      }
-    //範囲チェック
-      if (Number(externalInput) < min_1 || Number(externalInput) > max_9999) {
-        errorMessage.push(sheet3 + outputRow + ':' +externalInputLabel +`は${min_0}～${max_9999}${rangeCheckMessage}`);
+      //整数チェック
+      } else if (!Number.isInteger(Number(externalInput))) {
+        errorMessage.push(sheet3 + outputRow + ':' +externalInputLabel + integerCheckMessage);
+      } else {
+      //範囲チェック
+        if (Number(externalInput) < min_1 || Number(externalInput) > max_9999) {
+          errorMessage.push(sheet3 + outputRow + ':' +externalInputLabel +`は${min_0}～${max_9999}${rangeCheckMessage}`);
+        }
       }
     }
 
@@ -430,10 +436,14 @@ async function validateConsistencyDetail(
     if(externalOutput){
       if (isNaN(Number(externalOutput))) {
         errorMessage.push(sheet3 + outputRow + ':' +externalOutputLabel + numberCheckMessage);
-      }
-    //範囲チェック
-      if (Number(externalOutput) < min_1 || Number(externalOutput) > max_9999) {
-        errorMessage.push(sheet3 + outputRow + ':' +externalOutputLabel + `は${min_0}～${max_9999}${rangeCheckMessage}`);
+      //整数チェック
+      } else if (!Number.isInteger(Number(externalOutput))) {
+        errorMessage.push(sheet3 + outputRow + ':' +externalOutputLabel + integerCheckMessage);
+      } else {
+      //範囲チェック
+        if (Number(externalOutput) < min_1 || Number(externalOutput) > max_9999) {
+          errorMessage.push(sheet3 + outputRow + ':' +externalOutputLabel + `は${min_0}～${max_9999}${rangeCheckMessage}`);
+        }
       }
     }
 
@@ -442,10 +452,14 @@ async function validateConsistencyDetail(
     if(externalInquiry){
       if (isNaN(Number(externalInquiry))) {
         errorMessage.push(sheet3 + outputRow + ':' +externalInquiryLabel + numberCheckMessage);
-      }
-    //範囲チェック
-      if (Number(externalInquiry) < min_1 || Number(externalInquiry) > max_9999) {
-        errorMessage.push(sheet3 + outputRow + ':' +externalInquiryLabel + `は${min_0}～${max_9999}${rangeCheckMessage}`);
+      //整数チェック
+      } else if (!Number.isInteger(Number(externalInquiry))) {
+        errorMessage.push(sheet3 + outputRow + ':' +externalInquiryLabel + integerCheckMessage);
+      } else {
+        //範囲チェック
+        if (Number(externalInquiry) < min_1 || Number(externalInquiry) > max_9999) {
+          errorMessage.push(sheet3 + outputRow + ':' +externalInquiryLabel + `は${min_0}～${max_9999}${rangeCheckMessage}`);
+        }
       }
     }
     //備考

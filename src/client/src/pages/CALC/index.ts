@@ -1,1 +1,1 @@
-// export { default } from '@front/components/pages/CALC/Calc';
+export { default } from '@front/components/pages/CALC/Calc';
