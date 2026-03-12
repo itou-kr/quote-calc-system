@@ -230,7 +230,7 @@ function CalcForm(props: Props) {
             // ...props.data,
         },
     });
-    const { control, trigger, watch, setValue, getValues, handleSubmit, clearErrors
+    const { control, trigger, watch, setValue, getValues, clearErrors
     } = methods;
     const { fields: dataFields, append: appendData, remove: removeData } = useFieldArray({
         control,
