@@ -1,26 +1,16 @@
-// import { useGetProjectType, useGetIpaValueType, useGetDataFunctionType } from '@front/hooks/consts';
-// import { useTranslation } from 'react-i18next';
-// import { useAppDispatch } from '@front/stores';
+// import { useCallback } from 'react';
 
-import { ViewIdType } from '@front/stores/TEST/test/testStore';
-import { useClear as useClearAlertMessage, useSetAlertMessage } from '@front/hooks/alertMessage';
+// import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
 import { importApi } from '@front/openapi';
+import { useClear as useClearAlertMessage, useSetAlertMessage } from '@front/hooks/alertMessage';
+import { viewId } from '@front/stores/TEST/test/testStore';
+import type { FormType } from '@front/components/pages/TEST/form/TestForm';
 
-/**
- * CALC画面用のインポートフック
- * viewIdをcalcStoreから取得
- */
-export const useImportFile = (viewId: ViewIdType) => {
-  
-  // const dispatch = useAppDispatch();
-  const clearAlertMessage = useClearAlertMessage(viewId);
+export const useImportFile = () => {
   const setAlertMessage = useSetAlertMessage(viewId);
-  // const { t } = useTranslation();
-  // const getProjectTypeOptions = useGetProjectType(t);
-  // const getIpaValueTypeOptions = useGetIpaValueType(t);
-  // const getDataFunctionTypeOptions = useGetDataFunctionType(t);  
+  const clearAlertMessage = useClearAlertMessage(viewId);
 
-  return async (file: File) => {
+  return async (file: File): Promise<FormType | undefined> => {
     clearAlertMessage();
     console.log(file, 'file');
     const response = await importApi.importApplication(file);
@@ -32,15 +22,31 @@ export const useImportFile = (viewId: ViewIdType) => {
       return;
     }
 
-    // // 案件種別を取得
-    // const projectTypeLabel = getProjectTypeOptions().find((option) => option.value === calcResultData.projectType)?.label;
-    // // 使用するIPA代表値を取得
-    // const ipaValueLabel = getIpaValueTypeOptions().find((option) => option.value === calcResultData.ipaValue)?.label;
-    // // データファンクションの種類を取得
-    // const dataFunctionTypeLabel = getDataFunctionTypeOptions().find((option) => option.value === calcResultData.dataFunctionType)?.label;
+    // 正常メッセージの表示
+    setAlertMessage({ severity: 'success', message: 'インポートが完了しました。' });    
 
+    const formData: FormType = {
+      ...importFileData,
+      projectType: {
+        label: importFileData.projectType,
+        value: importFileData.projectType,         
+      },
+      ipaValueType: {
+        label: importFileData.ipaValueType,
+        value: importFileData.ipaValueType,  
+      },
+      dataFunctions: importFileData.dataFunctions?.map(df => ({
+        ...df,
+        updateType: {
+          label: df.updateType ?? '',
+          value: df.updateType ?? '',
+        }
+      })),
+    };
 
     console.log('response', response);
-    return importFileData;
+    return formData;
+
+    // return importFileData;
   }
 };

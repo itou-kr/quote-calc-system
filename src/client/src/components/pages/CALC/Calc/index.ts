@@ -1,3 +1,3 @@
-// import Calc from './Calc';
+import Calc from './Calc';
 
-// export default Calc;
+export default Calc;

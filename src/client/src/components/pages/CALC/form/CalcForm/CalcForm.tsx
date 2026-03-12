@@ -1,10 +1,10 @@
 import * as yup from 'yup';
 import { useFormState } from "react-hook-form";
-import { useCalcTest } from '@front/hooks/TEST/test';
-import { useImportFile, useExportFile } from '@front/hooks/TEST/test';
-import { viewId, ViewIdType } from '@front/stores/TEST/test/testStore/index';
+import { useCalc } from '@front/hooks/CALC/calc';
+import { useImportFile, useExportFile } from '@front/hooks/CALC/calc';
+import { viewId, ViewIdType } from '@front/stores/CALC/calc/calcStore/index';
 // import { useMemo, useState, useCallback, useEffect } from 'react';
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 // import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -162,7 +162,7 @@ type Props = {
         label?: React.ReactNode;
         message?: string;
     }
-    viewId: ViewIdType | 'TEST';
+    viewId: ViewIdType | 'CALC';
     data?: FormType;
     isDirty: boolean;
     // DataFunction: DataFunction;
@@ -175,10 +175,10 @@ function CalcForm(props: Props) {
     const { maxLimit } = props;
     
     const schema = useMemo(() => setupYupScheme(), []);
-    const calc = useCalcTest(viewId as ViewIdType);
+    const calc = useCalc(viewId as ViewIdType);
     const importFile = useImportFile();
     const exportFile = useExportFile();
-    const setAlertMessage = useSetAlertMessage('TEST');
+    const setAlertMessage = useSetAlertMessage('CALC');
     const clearAlertMessage = useClearAlertMessage(viewId);
     const confirm = useConfirm();
 
@@ -227,7 +227,7 @@ function CalcForm(props: Props) {
                 integrationTest: 0,
                 systemTest: 0,
             },
-            ...props.data,
+            // ...props.data,
         },
     });
     const { control, trigger, watch, setValue, getValues, handleSubmit, clearErrors
@@ -255,6 +255,16 @@ function CalcForm(props: Props) {
         integrationTest: 0,
         systemTest: 0,
     });
+    const { reset } = methods;
+
+    useEffect(() => {
+    if (props.data) {
+        reset({
+        ...methods.getValues(),
+        ...props.data,
+        });
+    }
+    }, [props.data, reset]);
 
     // データファンクションテーブルのカラム定義
     const dataColumns: ColumnDefinition<DataFunction>[] = useMemo(() => [
@@ -440,14 +450,11 @@ transactionFields.forEach((_, index) => {
     };
 
     const flattenErrors = (errors: any): string[] => {
-        const messages = Object.values(errors).flatMap((error: any) => {
+        return Object.values(errors).flatMap((error: any) => {
             if (error?.message) return [error.message];
             if (typeof error === 'object') return flattenErrors(error);
             return [];
         });
-        
-        // 重複しているメッセージを削除
-        return Array.from(new Set(messages));
     };
 
     return (
@@ -479,7 +486,7 @@ transactionFields.forEach((_, index) => {
                                 <Text variant="subsectionTitle">インポート / エクスポート</Text>
                                 <Stack direction="row" spacing={1}>
                                     <ImportButton onFileSelect={onImportButtonClick} onClick={() => {}} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }}>インポート</ImportButton>
-                                    <ExportButton onClick={onExportButtonClick} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }} />
+                                    <ExportButton onClick={handleSubmit(onExportButtonClick)} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }} />
                                 </Stack>
                             </Box>
 
@@ -567,7 +574,6 @@ transactionFields.forEach((_, index) => {
                                     handleDeleteDataRow={handleDeleteDataRow}
                                     selectedCount={dataSelectedCount}
                                     onSelectedCountChange={setDataSelectedCount}
-                                    fieldErrors={dataFieldErrors}
                                     maxHeight="100%"
                                 />
                             </TabPanel>
@@ -583,7 +589,6 @@ transactionFields.forEach((_, index) => {
                                     handleDeleteDataRow={handleDeleteTransactionRow}
                                     selectedCount={transactionSelectedCount}
                                     onSelectedCountChange={setTransactionSelectedCount}
-                                    fieldErrors={transactionFieldErrors}
                                     maxHeight="100%"
                                     fieldErrors={transactionFieldErrors}
                                 />
