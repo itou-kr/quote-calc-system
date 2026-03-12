@@ -326,7 +326,7 @@ async function validateConsistencyDetail(
   if (ws2.getCell('A2').value?.toString() !== 'No' ||
       ws2.getCell('B2').value?.toString() !== '名称' ||
       ws2.getCell('C2').value?.toString() !== dataFunctionType ||
-      ws2.getCell('D2').value?.toString() !== 'FP値') {
+      ws2.getCell('D2').value?.toString() !== 'FP') {
     errorMessage.push('ファイルの内容が異なるため、インポートに失敗しました。');
     return;
   }
@@ -467,6 +467,6 @@ async function validateConsistencyDetail(
 function isUpdateTypeEnum(value: unknown): value is UpdateTypeEnum {
   return (
     value === '内部論理ファイル' ||
-    value === '外部インタフェースファイル'
+    value === '外部インターフェースファイル'
   );
 }

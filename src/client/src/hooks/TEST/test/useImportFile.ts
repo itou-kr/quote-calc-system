@@ -38,6 +38,7 @@ export const useImportFile = () => {
     console.log(file, 'file');
     const response = await importApi.importApplication(file);
     const importFileData = response.data;
+    console.log(importFileData, 'importFileData')
 
     if ((importFileData.errorMessages ?? []).length > 0) {
       setAlertMessage({ severity: 'error', message: (importFileData.errorMessages ?? []).join('\n').replaceAll('<br>', '\n') });

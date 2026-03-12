@@ -14,6 +14,7 @@ Name | Type | Description | Notes
 **totalManMonths** | **number** |  | [optional] [default to undefined]
 **standardDurationMonths** | **number** |  | [optional] [default to undefined]
 **processRatios** | [**ImportApplication200ResponseProcessRatios**](ImportApplication200ResponseProcessRatios.md) |  | [default to undefined]
+**processFPs** | [**CalcTestApplication200ResponseProcessFPs**](CalcTestApplication200ResponseProcessFPs.md) |  | [optional] [default to undefined]
 **processManMonths** | [**ImportApplication200ResponseProcessRatios**](ImportApplication200ResponseProcessRatios.md) |  | [optional] [default to undefined]
 **processDurations** | [**ImportApplication200ResponseProcessRatios**](ImportApplication200ResponseProcessRatios.md) |  | [optional] [default to undefined]
 **dataFunctions** | [**Array&lt;ExportApplication200ResponseDataFunctionsInner&gt;**](ExportApplication200ResponseDataFunctionsInner.md) |  | [optional] [default to undefined]
@@ -34,6 +35,7 @@ const instance: ImportApplication200Response = {
     totalManMonths,
     standardDurationMonths,
     processRatios,
+    processFPs,
     processManMonths,
     processDurations,
     dataFunctions,
