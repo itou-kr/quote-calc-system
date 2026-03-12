@@ -348,6 +348,25 @@ paths:
                     systemTest:
                       type: number
                       description: 総合テスト
+                processFPs:
+                  type: object
+                  description: 開発工程FP
+                  properties:
+                    basicDesign:
+                      type: number
+                      description: 基本設計
+                    detailedDesign:
+                      type: number
+                      description: 詳細設計
+                    implementation:
+                      type: number
+                      description: 製造
+                    integrationTest:
+                      type: number
+                      description: 結合テスト
+                    systemTest:
+                      type: number
+                      description: 総合テスト
                 processManMonths:
                   type: object
                   description: 開発工程工数（人月）

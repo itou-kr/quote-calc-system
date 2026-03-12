@@ -198,8 +198,8 @@ function CalcForm(props: Props) {
             autoProductivity: true,
             autoProcessRatios: true,
             productivityFPPerMonth: 10,
-            projectType: { label: '新規開発', value: 'NEW' },
-            ipaValueType: { label: '中央値', value: 'MEDIAN' },
+            projectType: { label: '新規開発', value: 'N' },
+            ipaValueType: { label: '中央値', value: 'M' },
             totalFP: 0,
             totalManMonths: 0,
             standardDurationMonths: 0,
@@ -486,7 +486,7 @@ transactionFields.forEach((_, index) => {
                                 <Text variant="subsectionTitle">インポート / エクスポート</Text>
                                 <Stack direction="row" spacing={1}>
                                     <ImportButton onFileSelect={onImportButtonClick} onClick={() => {}} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }}>インポート</ImportButton>
-                                    <ExportButton onClick={handleSubmit(onExportButtonClick)} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }} />
+                                    <ExportButton onClick={onExportButtonClick} size="small" sx={{ bgcolor: '#42a5f5', '&:hover': { bgcolor: '#2196f3' }, flex: 1 }} />
                                 </Stack>
                             </Box>
 

@@ -72,8 +72,8 @@ const Calc = memo (() => {
                     processRatios: processRatios,
                     processManMonths: processManMonths,
                     processDurations: processDurations,
-                    projectType: { label: '新規開発', value: 'NEW' },
-                    ipaValueType: { label: '中央値', value: 'MEDIAN' },
+                    projectType: { label: '新規開発', value: 'N' },
+                    ipaValueType: { label: '中央値', value: 'M' },
                     dataFunctions: mappedDataFunctions ?? createDataFunctions(50),
                 }}
             />
