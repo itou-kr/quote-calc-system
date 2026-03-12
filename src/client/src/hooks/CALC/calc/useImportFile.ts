@@ -3,8 +3,8 @@
 // import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
 import { importApi } from '@front/openapi';
 import { useClear as useClearAlertMessage, useSetAlertMessage } from '@front/hooks/alertMessage';
-import { viewId } from '@front/stores/TEST/test/testStore';
-import type { FormType } from '@front/components/pages/TEST/form/TestForm';
+import { viewId } from '@front/stores/CALC/calc/calcStore';
+import type { FormType } from '@front/components/pages/CALC/form/CalcForm';
 
 export const useImportFile = () => {
   const setAlertMessage = useSetAlertMessage(viewId);
