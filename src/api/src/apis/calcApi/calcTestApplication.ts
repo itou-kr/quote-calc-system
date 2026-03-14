@@ -50,41 +50,43 @@ const validateInputData = (calcTestApplicationRequest: CalcTestApplicationReques
     }
   }
 
+
+  // 以下、クライアント側で行っているため、コメントアウト
   // データファンクションのチェック
-  if (calcTestApplicationRequest.dataFunctions) {
-    const errorRows: number[] = [];
-    calcTestApplicationRequest.dataFunctions.forEach((df, index) => {
-      const hasName = df.name && df.name.trim() !== '';
-      const hasUpdateType = df.updateType && df.updateType !== null && df.updateType !== undefined;
-      // 名称と種類の組み合わせが不正（片方だけ入力されている）
-      if ((hasName && !hasUpdateType) || (!hasName && hasUpdateType)) {
-        errorRows.push(index + 1);
-      }
-    });
+  // if (calcTestApplicationRequest.dataFunctions) {
+  //   const errorRows: number[] = [];
+  //   calcTestApplicationRequest.dataFunctions.forEach((df, index) => {
+  //     const hasName = df.name && df.name.trim() !== '';
+  //     const hasUpdateType = df.updateType && df.updateType !== null && df.updateType !== undefined;
+  //     // 名称と種類の組み合わせが不正（片方だけ入力されている）
+  //     if ((hasName && !hasUpdateType) || (!hasName && hasUpdateType)) {
+  //       errorRows.push(index + 1);
+  //     }
+  //   });
     
-    if (errorRows.length > 0) {
-      errorMessage.push(`データファンクションの名称もしくはデータファンクションの種類が不足しています。(No.${errorRows.join(', ')})`);
-    }
-  }
+  //   if (errorRows.length > 0) {
+  //     errorMessage.push(`データファンクションの名称もしくはデータファンクションの種類が不足しています。(No.${errorRows.join(', ')})`);
+  //   }
+  // }
 
   // トランザクションファンクションのチェック
-  if (calcTestApplicationRequest.transactionFunctions) {
-    const errorRows: number[] = [];
-    calcTestApplicationRequest.transactionFunctions.forEach((tf, index) => {
-      const hasName = tf.name && tf.name.trim() !== '';
-      const total = (tf.externalInput ?? 0) + (tf.externalOutput ?? 0) + (tf.externalInquiry ?? 0);
+//   if (calcTestApplicationRequest.transactionFunctions) {
+//     const errorRows: number[] = [];
+//     calcTestApplicationRequest.transactionFunctions.forEach((tf, index) => {
+//       const hasName = tf.name && tf.name.trim() !== '';
+//       const total = (tf.externalInput ?? 0) + (tf.externalOutput ?? 0) + (tf.externalInquiry ?? 0);
       
-      // 名称が入力されているが外部入力・出力・参照の合計が0
-      // または名称が空で外部入力・出力・参照の合計が0より大きい
-      if ((hasName && total === 0) || (!hasName && total > 0)) {
-        errorRows.push(index + 1);
-      }
-    });
+//       // 名称が入力されているが外部入力・出力・参照の合計が0
+//       // または名称が空で外部入力・出力・参照の合計が0より大きい
+//       if ((hasName && total === 0) || (!hasName && total > 0)) {
+//         errorRows.push(index + 1);
+//       }
+//     });
     
-    if (errorRows.length > 0) {
-      errorMessage.push(`トランザクションファンクションの名称もしくは外部入力・外部出力・外部参照の入力が不足しています。(No.${errorRows.join(', ')})`);
-    }
-  }
+//     if (errorRows.length > 0) {
+//       errorMessage.push(`トランザクションファンクションの名称もしくは外部入力・外部出力・外部参照の入力が不足しています。(No.${errorRows.join(', ')})`);
+//     }
+//   }
 
 };
 
@@ -122,8 +124,7 @@ response.productivityFPPerMonth = calcTestApplicationRequest.productivityFPPerMo
 response.dataFunctions = calcTestApplicationRequest.dataFunctions?.map(df => {
   let fpValue; 
   const { UpdateTypeEnum } = CalcTestApplicationRequestDataFunctionsInner;
-  // eslint-disable-next-line no-console
-  console.log('updateTypeeeeeeeeeee:', df, df.updateType?.valueOf);
+
   //TODO：名称に文字列が入っている場合のみ計算する分岐を入れる
   switch (df.updateType) {
     case UpdateTypeEnum.ILF:
@@ -214,6 +215,7 @@ response.transactionFunctions =
 
   // レスポンスに工程別比率を設定
   response.processRatios = processRatios;
+  response.displayedProcessRatios = processRatios
 
   // 総工数(人月)計算
   response.totalManMonths = Math.ceil((response.totalFP / (response.productivityFPPerMonth || 1)) * 100) / 100;
@@ -331,6 +333,3 @@ async function validateConsistencyDetail(
     return;
   }
 }
-
-
-

@@ -14,6 +14,7 @@ Name | Type | Description | Notes
 **totalManMonths** | **number** | 工数（人月） | [optional] [default to undefined]
 **standardDurationMonths** | **number** | 標準工期（月） | [optional] [default to undefined]
 **processRatios** | [**CalcTestApplication200ResponseProcessRatios**](CalcTestApplication200ResponseProcessRatios.md) |  | [optional] [default to undefined]
+**displayedProcessRatios** | [**CalcTestApplication200ResponseDisplayedProcessRatios**](CalcTestApplication200ResponseDisplayedProcessRatios.md) |  | [optional] [default to undefined]
 **processFPs** | [**CalcTestApplication200ResponseProcessFPs**](CalcTestApplication200ResponseProcessFPs.md) |  | [optional] [default to undefined]
 **processManMonths** | [**CalcTestApplication200ResponseProcessManMonths**](CalcTestApplication200ResponseProcessManMonths.md) |  | [optional] [default to undefined]
 **processDurations** | [**CalcTestApplication200ResponseProcessDurations**](CalcTestApplication200ResponseProcessDurations.md) |  | [optional] [default to undefined]
@@ -33,6 +34,7 @@ const instance: CalcTestApplication200Response = {
     totalManMonths,
     standardDurationMonths,
     processRatios,
+    displayedProcessRatios,
     processFPs,
     processManMonths,
     processDurations,

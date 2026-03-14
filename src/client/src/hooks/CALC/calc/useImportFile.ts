@@ -38,12 +38,13 @@ export const useImportFile = () => {
       dataFunctions: importFileData.dataFunctions?.map(df => ({
         ...df,
         updateType: {
-          label: df.updateType ?? '',
-          value: df.updateType ?? '',
+          label: df.updateType,
+          value: df.updateType,
         }
       })),
     };
 
+    console.log('import直後', response.data?.dataFunctions?.[0]?.updateType)
     console.log('response', response);
     return formData;
 

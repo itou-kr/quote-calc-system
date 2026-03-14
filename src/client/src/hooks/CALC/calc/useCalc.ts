@@ -34,9 +34,14 @@ export function useCalc(viewId: ViewIdType) {
             }
 
             console.log('response', response);
-            dispatch(calcStore.actions.setCalc(calcResultData));
+            dispatch(
+                calcStore.actions.setCalc({
+                    ...data,
+                    ...calcResultData,
+                })
+            );
             // 正常メッセージの表示
-            setAlertMessage({ severity: 'success', message: 'エクスポートに成功しました。' });   
+            setAlertMessage({ severity: 'success', message: '工数を出力しました。' });   
 
             return calcResultData;
         },

@@ -60,7 +60,7 @@ const Test = memo (() => {
         remarks: df.remarks,
         selected: df.selected ?? false,
         updateType: updateTypeOptions.find(
-        option => option.value === df.updateType
+            option => option.value === df.updateType
         ) ?? null,
     }));
 

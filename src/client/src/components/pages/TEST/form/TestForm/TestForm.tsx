@@ -185,7 +185,7 @@ function CalcForm(props: Props) {
     console.log('props.data?.dataFunctions length:',
     props.data?.dataFunctions?.length
     );
-    console.log('updateType', props.data?.dataFunctions?.[0]?.updateType);
+    console.log('FormのupdateType', props.data?.dataFunctions?.[0]?.updateType);
         // const setDirty = useSetDirty();
     const methods = useForm<FormType>({
         mode: 'onSubmit',

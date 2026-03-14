@@ -299,7 +299,26 @@ components:
               description: 結合テスト
             systemTest:
               type: number
-              description: 総合テスト      
+              description: 総合テスト
+        displayedProcessRatios:
+          type: object
+          description: 工程別比率表示用
+          properties:
+            basicDesign:
+              type: number
+              description: 基本設計
+            detailedDesign:
+              type: number
+              description: 詳細設計
+            implementation:
+              type: number
+              description: 製造
+            integrationTest:
+              type: number
+              description: 結合テスト
+            systemTest:
+              type: number
+              description: 総合テスト              
         processFPs:
           type: object
           description: 開発工程FP

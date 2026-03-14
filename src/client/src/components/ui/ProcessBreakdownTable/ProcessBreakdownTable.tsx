@@ -3,11 +3,11 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import { memo } from 'react';
 
 export type ProcessRatios = {
-    basicDesign: number;
-    detailedDesign: number;
-    implementation: number;
-    integrationTest: number;
-    systemTest: number;
+    basicDesign?: number;
+    detailedDesign?: number;
+    implementation?: number;
+    integrationTest?: number;
+    systemTest?: number;
 };
 
 export type ProcessManMonths = {
@@ -62,20 +62,17 @@ function ProcessBreakdownTable(props: Props) {
     };
     
     // 合計値を計算
-    const totalRatio =
-        normalizedRatios.basicDesign +
-        normalizedRatios.detailedDesign +
-        normalizedRatios.implementation +
-        normalizedRatios.integrationTest +
-        normalizedRatios.systemTest;
+    const totalRatio = normalizedRatios
+        ? (normalizedRatios.basicDesign ?? 0) + (normalizedRatios.detailedDesign ?? 0) + (normalizedRatios.implementation ?? 0) + (normalizedRatios.integrationTest ?? 0) + (normalizedRatios.systemTest ?? 0) 
+        : 0;
     const totalFPValue = processFPs
-        ? (processFPs.basicDesign || 0) + (processFPs.detailedDesign || 0) + (processFPs.implementation || 0) + (processFPs.integrationTest || 0) + (processFPs.systemTest || 0)
+        ? (processFPs.basicDesign ?? 0) + (processFPs.detailedDesign ?? 0) + (processFPs.implementation ?? 0) + (processFPs.integrationTest ?? 0) + (processFPs.systemTest ?? 0)
         : 0;
     const totalManMonths = processManMonths
-        ? (processManMonths.basicDesign || 0) + (processManMonths.detailedDesign || 0) + (processManMonths.implementation || 0) + (processManMonths.integrationTest || 0) + (processManMonths.systemTest || 0)
+        ? (processManMonths.basicDesign ?? 0) + (processManMonths.detailedDesign ?? 0) + (processManMonths.implementation ?? 0) + (processManMonths.integrationTest ?? 0) + (processManMonths.systemTest ?? 0)
         : 0;
     const totalDuration = processDurations
-        ? (processDurations.basicDesign || 0) + (processDurations.detailedDesign || 0) + (processDurations.implementation || 0) + (processDurations.integrationTest || 0) + (processDurations.systemTest || 0)
+        ? (processDurations.basicDesign ?? 0) + (processDurations.detailedDesign ?? 0) + (processDurations.implementation ?? 0) + (processDurations.integrationTest ?? 0) + (processDurations.systemTest ?? 0)
         : 0;
     
     return (
@@ -105,27 +102,27 @@ function ProcessBreakdownTable(props: Props) {
                         </TableCell>
                         <TableCell align="center" sx={{ bgcolor: '#fafafa', borderRight: 1, borderColor: 'divider', verticalAlign: 'middle' }}>
                             <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#212121' }}>
-                                {normalizedRatios.basicDesign.toFixed(3)}
+                                {normalizedRatios?.basicDesign !== undefined ? normalizedRatios.basicDesign.toFixed(3): '0.000'}
                             </Typography>
                         </TableCell>
                         <TableCell align="center" sx={{ bgcolor: '#fafafa', borderRight: 1, borderColor: 'divider', verticalAlign: 'middle' }}>
                             <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#212121' }}>
-                                {normalizedRatios.detailedDesign.toFixed(3)}
+                                {normalizedRatios?.detailedDesign !== undefined ? normalizedRatios.detailedDesign.toFixed(3): '0.000'}
                             </Typography>
                         </TableCell>
                         <TableCell align="center" sx={{ bgcolor: '#fafafa', borderRight: 1, borderColor: 'divider', verticalAlign: 'middle' }}>
                             <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#212121' }}>
-                                {normalizedRatios.implementation.toFixed(3)}
+                                {normalizedRatios?.implementation !== undefined ? normalizedRatios.implementation.toFixed(3): '0.000'}
                             </Typography>
                         </TableCell>
                         <TableCell align="center" sx={{ bgcolor: '#fafafa', borderRight: 1, borderColor: 'divider', verticalAlign: 'middle' }}>
                             <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#212121' }}>
-                                {normalizedRatios.integrationTest.toFixed(3)}
+                                {normalizedRatios?.integrationTest !== undefined ? normalizedRatios.integrationTest.toFixed(3): '0.000'}
                             </Typography>
                         </TableCell>
                         <TableCell align="center" sx={{ bgcolor: '#fafafa', borderRight: 1, borderColor: 'divider', verticalAlign: 'middle' }}>
                             <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#212121' }}>
-                                {normalizedRatios.systemTest.toFixed(3)}
+                                {normalizedRatios?.systemTest !== undefined ? normalizedRatios.systemTest.toFixed(3): '0.000'}
                             </Typography>
                         </TableCell>
                         <TableCell align="center" sx={{ 

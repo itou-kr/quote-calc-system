@@ -1,4 +1,5 @@
 export * from './calcTestApplication200Response';
+export * from './calcTestApplication200ResponseDisplayedProcessRatios';
 export * from './calcTestApplication200ResponseProcessDurations';
 export * from './calcTestApplication200ResponseProcessFPs';
 export * from './calcTestApplication200ResponseProcessManMonths';

@@ -2,10 +2,12 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { LoadingStatus } from '@front/types';
 import { CalcTestApplication200Response } from '@front/openapi';
+import { CalcTestApplicationRequest } from '@front/openapi';
+
 
 export type CalcState = {
   loading: LoadingStatus;
-  data: CalcTestApplication200Response | undefined;
+  data: CalcTestApplication200Response & CalcTestApplicationRequest| undefined;
   isDirty: boolean;
 };
 

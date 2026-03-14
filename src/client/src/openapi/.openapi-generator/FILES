@@ -8,6 +8,7 @@ configuration.ts
 docs/CalcApi.md
 docs/CalcTestApplication200Response.md
 docs/CalcTestApplication200ResponseDataFunctionsInner.md
+docs/CalcTestApplication200ResponseDisplayedProcessRatios.md
 docs/CalcTestApplication200ResponseProcessDurations.md
 docs/CalcTestApplication200ResponseProcessFPs.md
 docs/CalcTestApplication200ResponseProcessManMonths.md
@@ -29,6 +30,7 @@ docs/ImportApplication200ResponseProcessRatios.md
 index.ts
 models/calc-test-application-request.ts
 models/calc-test-application200-response-data-functions-inner.ts
+models/calc-test-application200-response-displayed-process-ratios.ts
 models/calc-test-application200-response-process-durations.ts
 models/calc-test-application200-response-process-fps.ts
 models/calc-test-application200-response-process-man-months.ts

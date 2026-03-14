@@ -1,5 +1,6 @@
 export * from './calc-test-application200-response';
 export * from './calc-test-application200-response-data-functions-inner';
+export * from './calc-test-application200-response-displayed-process-ratios';
 export * from './calc-test-application200-response-process-durations';
 export * from './calc-test-application200-response-process-fps';
 export * from './calc-test-application200-response-process-man-months';

@@ -17,6 +17,9 @@
 import type { CalcTestApplication200ResponseDataFunctionsInner } from './calc-test-application200-response-data-functions-inner';
 // May contain unused imports in some cases
 // @ts-ignore
+import type { CalcTestApplication200ResponseDisplayedProcessRatios } from './calc-test-application200-response-displayed-process-ratios';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { CalcTestApplication200ResponseProcessDurations } from './calc-test-application200-response-process-durations';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -85,6 +88,12 @@ export interface CalcTestApplication200Response {
      * @memberof CalcTestApplication200Response
      */
     'processRatios'?: CalcTestApplication200ResponseProcessRatios;
+    /**
+     * 
+     * @type {CalcTestApplication200ResponseDisplayedProcessRatios}
+     * @memberof CalcTestApplication200Response
+     */
+    'displayedProcessRatios'?: CalcTestApplication200ResponseDisplayedProcessRatios;
     /**
      * 
      * @type {CalcTestApplication200ResponseProcessFPs}

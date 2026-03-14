@@ -22,7 +22,7 @@ import ProductivityField from '@front/components/ui/ProductivityField';
 import ProcessRatiosField from '@front/components/ui/ProcessRatiosField';
 import TableToolbar from '@front/components/ui/TableToolbar';
 import CalculationResultsPanel from '@front/components/ui/CalculationResultsPanel';
-import ProcessBreakdownTable, { ProcessRatios } from '@front/components/ui/ProcessBreakdownTable';
+import ProcessBreakdownTable from '@front/components/ui/ProcessBreakdownTable';
 import FunctionTable, { ColumnDefinition } from '@front/components/ui/FunctionTable';
 import FlexBox from '@front/components/ui/FlexBox';
 import TabPanel from '@front/components/ui/TabPanel';
@@ -122,6 +122,16 @@ const setupYupScheme = () => {
             integrationTest: yup.number().label('統合テスト比率').rangeCheck(0.000, 1.000),
             systemTest: yup.number().label('システムテスト比率').rangeCheck(0.000, 1.000),
         }),
+
+        // 工程別比率表示用
+        displayedProcessRatios: yup.object({
+            basicDesign: yup.number().rangeCheck(0.000, 1.000),
+            detailedDesign: yup.number().rangeCheck(0.000, 1.000),
+            implementation: yup.number().rangeCheck(0.000, 1.000),
+            integrationTest: yup.number().rangeCheck(0.000, 1.000),
+            systemTest: yup.number().rangeCheck(0.000, 1.000),
+        })
+        .optional(),
         // 工程別FP
         processFPs: yup.object({
             basicDesign: yup.number().rangeCheck(0, 9999),
@@ -206,6 +216,13 @@ function CalcForm(props: Props) {
             // dataFunctions: createDataFunctions(50),
             transactionFunctions: createTransactionFunctions(50),
             // processRatios: getProcessRatios(projectType, ipaValueType),
+            displayedProcessRatios: {
+                basicDesign: 0,
+                detailedDesign: 0,
+                implementation: 0,
+                integrationTest: 0,
+                systemTest: 0,
+            },
             processFPs: {
                 basicDesign: 0,
                 detailedDesign: 0,
@@ -248,13 +265,13 @@ function CalcForm(props: Props) {
     const [dataSelectedCount, setDataSelectedCount] = useState(0);
     const [transactionSelectedCount, setTransactionSelectedCount] = useState(0);
     // 工程別内訳表に表示する比率（計算ボタン押下時のみ更新）
-    const [displayedProcessRatios, setDisplayedProcessRatios] = useState<ProcessRatios>({
-        basicDesign: 0,
-        detailedDesign: 0,
-        implementation: 0,
-        integrationTest: 0,
-        systemTest: 0,
-    });
+    // const [displayedProcessRatios, setDisplayedProcessRatios] = useState<ProcessRatios>({
+    //     basicDesign: 0,
+    //     detailedDesign: 0,
+    //     implementation: 0,
+    //     integrationTest: 0,
+    //     systemTest: 0,
+    // });
     const { reset } = methods;
 
     useEffect(() => {
@@ -337,15 +354,15 @@ transactionFields.forEach((_, index) => {
 
         
         // 工程別内訳表に表示する比率を更新
-        if (result.processRatios) {
-            setDisplayedProcessRatios({
-                basicDesign: result.processRatios.basicDesign ?? 0,
-                detailedDesign: result.processRatios.detailedDesign ?? 0,
-                implementation: result.processRatios.implementation ?? 0,
-                integrationTest: result.processRatios.integrationTest ?? 0,
-                systemTest: result.processRatios.systemTest ?? 0,
-            });
-        }
+        // if (result.processRatios) {
+        //     setDisplayedProcessRatios({
+        //         basicDesign: result.processRatios.basicDesign ?? 0,
+        //         detailedDesign: result.processRatios.detailedDesign ?? 0,
+        //         implementation: result.processRatios.implementation ?? 0,
+        //         integrationTest: result.processRatios.integrationTest ?? 0,
+        //         systemTest: result.processRatios.systemTest ?? 0,
+        //     });
+        // }
         
         // 工程別比率の表を自動で表示
         setProcessBreakdownOpen(true);
@@ -354,6 +371,7 @@ transactionFields.forEach((_, index) => {
     const totalFP = watch('totalFP');
     const manMonths = watch('totalManMonths');
     const standardDuration = watch('standardDurationMonths');
+    const displayedProcessRatios = watch('displayedProcessRatios');
     const processFPs = watch('processFPs');
     const processManMonths = watch('processManMonths');
     const processDurations = watch('processDurations');
