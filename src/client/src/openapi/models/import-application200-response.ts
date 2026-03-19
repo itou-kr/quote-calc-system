@@ -14,6 +14,9 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { CalcTestApplication200ResponseDisplayedProcessRatios } from './calc-test-application200-response-displayed-process-ratios';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { CalcTestApplication200ResponseProcessFPs } from './calc-test-application200-response-process-fps';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -79,6 +82,12 @@ export interface ImportApplication200Response {
      * @memberof ImportApplication200Response
      */
     'processRatios': ImportApplication200ResponseProcessRatios;
+    /**
+     * 
+     * @type {CalcTestApplication200ResponseDisplayedProcessRatios}
+     * @memberof ImportApplication200Response
+     */
+    'displayedProcessRatios'?: CalcTestApplication200ResponseDisplayedProcessRatios;
     /**
      * 
      * @type {CalcTestApplication200ResponseProcessFPs}

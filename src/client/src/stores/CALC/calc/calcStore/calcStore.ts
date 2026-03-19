@@ -3,6 +3,11 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { LoadingStatus } from '@front/types';
 import { CalcTestApplication200Response } from '@front/openapi';
 import { CalcTestApplicationRequest } from '@front/openapi';
+import type {
+    CalcTestApplicationRequestProjectTypeEnum,
+    CalcTestApplicationRequestIpaValueTypeEnum,
+    DataFunctionUpdateType,
+} from '@front/openapi/models';
 
 
 export type CalcState = {
@@ -33,6 +38,29 @@ const calcStore = createSlice({
     },
     setDirty: (draftState: CalcState, action: PayloadAction<boolean>) => {
       draftState.isDirty = action.payload;
+    },
+    setProjectType: (
+      draftState,
+      action: PayloadAction<CalcTestApplicationRequestProjectTypeEnum>
+    ) => {
+      if (!draftState.data) return;
+      draftState.data.projectType = action.payload;
+    },
+    setIpaValueType: (
+      draftState,
+      action: PayloadAction<CalcTestApplicationRequestIpaValueTypeEnum>
+    ) => {
+      if (!draftState.data) return;
+      draftState.data.ipaValueType = action.payload;
+    },
+    setDataFunctions: (
+      draftState,
+      action: PayloadAction<
+        { updateType: DataFunctionUpdateType }[]
+      >
+    ) => {
+      if (!draftState.data) return;
+      draftState.data.dataFunctions = action.payload;
     },
   },
 });

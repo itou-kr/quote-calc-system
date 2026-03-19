@@ -4,7 +4,7 @@
             "label": "案件種別",
             "const": {
                 "new": "新規開発",
-                "enhancement": "改良追加",
+                "enhancement": "改良開発",
                 "redevelopment": "再開発"
             }
         },

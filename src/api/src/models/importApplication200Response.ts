@@ -10,6 +10,7 @@
  * Do not edit the class manually.
  */
 
+import { CalcTestApplication200ResponseDisplayedProcessRatios } from './calcTestApplication200ResponseDisplayedProcessRatios';
 import { CalcTestApplication200ResponseProcessFPs } from './calcTestApplication200ResponseProcessFPs';
 import { ExportApplication200ResponseDataFunctionsInner } from './exportApplication200ResponseDataFunctionsInner';
 import { ExportApplicationRequestTransactionFunctionsInner } from './exportApplicationRequestTransactionFunctionsInner';
@@ -27,6 +28,7 @@ export class ImportApplication200Response {
     'totalManMonths'?: number;
     'standardDurationMonths'?: number;
     'processRatios': ImportApplication200ResponseProcessRatios;
+    'displayedProcessRatios'?: CalcTestApplication200ResponseDisplayedProcessRatios;
     'processFPs'?: CalcTestApplication200ResponseProcessFPs;
     'processManMonths'?: ImportApplication200ResponseProcessRatios;
     'processDurations'?: ImportApplication200ResponseProcessRatios;
@@ -76,6 +78,11 @@ export class ImportApplication200Response {
             "name": "processRatios",
             "baseName": "processRatios",
             "type": "ImportApplication200ResponseProcessRatios"
+        },
+        {
+            "name": "displayedProcessRatios",
+            "baseName": "displayedProcessRatios",
+            "type": "CalcTestApplication200ResponseDisplayedProcessRatios"
         },
         {
             "name": "processFPs",

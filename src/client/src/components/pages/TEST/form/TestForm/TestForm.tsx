@@ -257,13 +257,24 @@ function CalcForm(props: Props) {
     });
     const { reset } = methods;
 
+    // useEffect(() => {
+    // if (props.data) {
+    //     reset({
+    //     ...methods.getValues(),
+    //     ...props.data,
+    //     });
+    // }
+    // }, [props.data, reset]);
+
     useEffect(() => {
-    if (props.data) {
-        reset({
-        ...methods.getValues(),
-        ...props.data,
-        });
-    }
+        console.log('props.data', props.data)
+        if (props.data) {
+            reset({
+                ...props.data,
+                projectType: toProjectTypeOption(props.data.projectType.value),
+                ipaValueType: toIpaValueTypeOption(props.data.ipaValueType.value),
+            });
+        }
     }, [props.data, reset]);
 
     // データファンクションテーブルのカラム定義
@@ -358,7 +369,34 @@ transactionFields.forEach((_, index) => {
     const processManMonths = watch('processManMonths');
     const processDurations = watch('processDurations');
 
-    // let { fields, append, remove, update } = useFieldArray({ control, name: 'dataFunctions' });
+const toProjectTypeOption = (value?: string) => {
+    switch (value) {
+        case 'N':
+        case '新規開発':
+            return { label: '新規開発', value: 'N' };
+        case 'E':
+        case '改良開発':
+            return { label: '改良開発', value: 'E' };
+        case 'R':
+        case '再開発':
+            return { label: '再開発', value: 'R' };
+        default:
+            return { label: '新規開発', value: 'N' };
+    }
+};
+
+const toIpaValueTypeOption = (value?: string) => {
+    switch (value) {
+        case 'M':
+        case '中央値':
+            return { label: '中央値', value: 'M' };
+        case 'A':
+        case '平均値':
+            return { label: '平均値', value: 'A' };
+        default:
+            return { label: '中央値', value: 'M' };
+    }
+};
 
     /** ▼ データファンクション行追加 */
     const handleAddDataRow = async () => {
@@ -409,14 +447,31 @@ transactionFields.forEach((_, index) => {
     }, [getValues, removeTransaction]);
 
     /** ▼ インポート処理 */
-    const onImportButtonClick = async (file: File) => {
-        try {
-            const json = await importFile(file);
-            methods.reset(json);
-        } catch (e) {
-            console.error(e);
-        }
-    };
+const onImportButtonClick = async (file: File) => {
+    try {
+        const json = await importFile(file);
+        if(!json) return;
+
+        const convertedData = {
+            ...json,
+
+            projectType: toProjectTypeOption(json.projectType?.value),
+            ipaValueType: toIpaValueTypeOption(json.ipaValueType?.value),
+
+            // dataFunctions: json.dataFunctions?.map(df => ({
+            //     ...df,
+            //     updateType: df.updateType
+            //         ? { label: df.updateType, value: df.updateType }
+            //         : null,
+            // })),
+        };
+
+        methods.reset(convertedData);
+
+    } catch (e) {
+        console.error(e);
+    }
+};
 
     /** ▼ エクスポート処理 */
     const onExportButtonClick = async () => {

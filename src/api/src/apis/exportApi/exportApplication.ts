@@ -13,7 +13,7 @@ export const exportApplication: ExportApi.exportApplication = async ({
 
 const projectTypeLabelMap: Record<string, string> = {
   N: '新規開発',
-  E: '改良追加',
+  E: '改良開発',
   R: '再開発',
 };
 

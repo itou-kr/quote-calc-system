@@ -7,6 +7,7 @@ import { viewId, ViewIdType } from '@front/stores/CALC/calc/calcStore/index';
 import { useMemo, useState, useCallback, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 // import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers/yup';
 // import { Box, Stack, Paper, Select, MenuItem, Typography } from '@mui/material';
 import { Box, Stack, Paper, Typography } from '@mui/material';
@@ -27,8 +28,7 @@ import FunctionTable, { ColumnDefinition } from '@front/components/ui/FunctionTa
 import FlexBox from '@front/components/ui/FlexBox';
 import TabPanel from '@front/components/ui/TabPanel';
 import Text from '@front/components/ui/Text';
-// import { createEmptyDataFunction, createEmptyTransactionFunction, createDataFunctions, createTransactionFunctions } from '@front/types/functionTypes';
-import { createTransactionFunctions, DataFunction, TransactionFunction } from '@front/types/functionTypes';
+import { createDataFunctions, createTransactionFunctions, DataFunction, TransactionFunction } from '@front/types/functionTypes';
 // import { createAddRowAction, createDeleteSelectedAction } from '@front/components/ui/TableToolbar/actions/tableActions';
 import { t } from 'i18next';
 // import { getProcessRatios } from '@common/constants/processRatios';
@@ -55,6 +55,8 @@ import { useConfirm } from '@front/hooks/ui/confirm';
 import { createEmptyDataFunction, createEmptyTransactionFunction } from '@front/types/functionTypes';
 import AddRowButton from '@front/components/ui/Button/AddRowButton/AddRowButton';
 import DeleteRowButton from '@front/components/ui/Button/DeleteRowButton/DeleteRowButton';
+import { useTypedSelector } from '@front/stores';
+import { useGetProjectType, useGetIpaValueType, useGetUpdateType } from '@front/hooks/consts';
 
 const setupYupScheme = () => {
     return yup.object({
@@ -191,11 +193,19 @@ function CalcForm(props: Props) {
     const setAlertMessage = useSetAlertMessage('CALC');
     const clearAlertMessage = useClearAlertMessage(viewId);
     const confirm = useConfirm();
+    const { t } = useTranslation();
+    const getUpdateTypes = useGetUpdateType(t);
+    const getProjectTypes = useGetProjectType(t);
+    const getIpaValueType = useGetIpaValueType(t);
 
-    console.log('props.data?.dataFunctions length:',
-    props.data?.dataFunctions?.length
-    );
-    console.log('updateType', props.data?.dataFunctions?.[0]?.updateType);
+    const updateTypeOptions = useMemo(() => getUpdateTypes(), [getUpdateTypes]);
+    const projectTypeOptions = useMemo(() => getProjectTypes(), [getProjectTypes]);
+    const ipaValueTypeOptions = useMemo(() => getIpaValueType(), [getIpaValueType]);
+    // const updateTypeOptions = getUpdateTypes();
+    // const projectTypeOptions = getProjectTypes();
+    // const ipaValueTypeOptions = getIpaValueType();
+
+    console.log('props.data', props.data)
         // const setDirty = useSetDirty();
     const methods = useForm<FormType>({
         mode: 'onSubmit',
@@ -213,9 +223,9 @@ function CalcForm(props: Props) {
             totalFP: 0,
             totalManMonths: 0,
             standardDurationMonths: 0,
-            // dataFunctions: createDataFunctions(50),
+            dataFunctions: createDataFunctions(50),
             transactionFunctions: createTransactionFunctions(50),
-            // processRatios: getProcessRatios(projectType, ipaValueType),
+            // processRatios: getProcsessRatios(projectType, ipaValueType),
             displayedProcessRatios: {
                 basicDesign: 0,
                 detailedDesign: 0,
@@ -257,6 +267,7 @@ function CalcForm(props: Props) {
         control,
         name: 'transactionFunctions',
     });
+
     const { errors } = useFormState({
     control: methods.control
     });
@@ -264,52 +275,77 @@ function CalcForm(props: Props) {
     const [processBreakdownOpen, setProcessBreakdownOpen] = useState(false);
     const [dataSelectedCount, setDataSelectedCount] = useState(0);
     const [transactionSelectedCount, setTransactionSelectedCount] = useState(0);
-    // 工程別内訳表に表示する比率（計算ボタン押下時のみ更新）
-    // const [displayedProcessRatios, setDisplayedProcessRatios] = useState<ProcessRatios>({
-    //     basicDesign: 0,
-    //     detailedDesign: 0,
-    //     implementation: 0,
-    //     integrationTest: 0,
-    //     systemTest: 0,
-    // });
+    const { data } = useTypedSelector((state) => state.calc);
     const { reset } = methods;
 
-    useEffect(() => {
-    if (props.data) {
-        reset({
-        ...methods.getValues(),
-        ...props.data,
-        });
-    }
-    }, [props.data, reset]);
-
-    // データファンクションテーブルのカラム定義
-    const dataColumns: ColumnDefinition<DataFunction>[] = useMemo(() => [
-        { key: 'name', label: '名称', minWidth: 200, maxWidth: 400, icon: 'edit', type: 'text', maxLength: 50 },
-        {
-            key: 'updateType',
-            label: 'データファンクションの種類',
-            width: 360,
-            icon: 'edit',
-            render: (index: number) => (
-                <UseUpdateTypeField name={`dataFunctions.${index}.updateType`} t={t}/>
-            )
+useEffect(() => {
+    if (!data) return;
+    console.log('dataaaaa', data)
+//     const projectTypeLabel =
+//         projectTypeOptions.find(
+//             (v) => v.value === calcData.data?.projectType
+//         )?.label ?? '新規開発';
+    console.log('比較①', data.projectType)
+    console.log('比較②', projectTypeOptions)
+    const convertedData = {
+        ...data,
+        projectType: {
+            label:
+                projectTypeOptions.find(v => v.value === data.projectType)?.label
+                ?? data.projectType,
+            value: data.projectType,
         },
-        { key: 'fpValue', label: 'FP', minWidth: 80, maxWidth: 100, icon: 'auto', type: 'number', disabled: true },
-        { key: 'remarks', label: '備考', minWidth: 200, maxWidth: 300, icon: 'edit', type: 'text' , maxLength: 200},
-        { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
-    ], []);
+        ipaValueType: {
+            label:
+                ipaValueTypeOptions.find(v => v.value === data.ipaValueType)?.label
+                ?? data.ipaValueType,
+            value: data.ipaValueType,
+        },
 
-    // トランザクションファンクションテーブルのカラム定義
-    const transactionColumns: ColumnDefinition<TransactionFunction>[] = useMemo(() => [
-        { key: 'name', label: '名称', minWidth: 200, maxWidth: 400, icon: 'edit', type: 'text', maxLength: 50 },
-        { key: 'externalInput', label: '外部入力', width: 120, icon: 'edit', type: 'number', min: 0, max: 9999 },
-        { key: 'externalOutput', label: '外部出力', width: 120, icon: 'edit', type: 'number', min: 0, max: 9999 },
-        { key: 'externalInquiry', label: '外部照会', width: 120, icon: 'edit', type: 'number', min: 0, max: 9999 },
-        { key: 'fpValue', label: 'FP', minWidth: 80, maxWidth: 100, icon: 'auto', type: 'number', disabled: true },
-        { key: 'remarks', label: '備考', minWidth: 200, maxWidth: 300, icon: 'edit', type: 'text', maxLength: 200 },
-        { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
-    ], []);
+        dataFunctions: data.dataFunctions?.map(df => ({
+            name: df.name,
+            fpValue: df.fpValue,
+            remarks: df.remarks,
+            selected: df.selected ?? false,
+            updateType: {
+                label:
+                    updateTypeOptions.find(v => v.value === df.updateType)?.label
+                    ?? df.updateType,
+                value: df.updateType,
+            }
+        })),
+    };
+
+    reset(convertedData);
+}, [data, reset, projectTypeOptions, ipaValueTypeOptions, updateTypeOptions]);
+
+// データファンクションテーブルのカラム定義
+const dataColumns: ColumnDefinition<DataFunction>[] = useMemo(() => [
+    { key: 'name', label: '名称', minWidth: 200, maxWidth: 400, icon: 'edit', type: 'text', maxLength: 50 },
+    {
+        key: 'updateType',
+        label: 'データファンクションの種類',
+        width: 360,
+        icon: 'edit',
+        render: (index: number) => (
+            <UseUpdateTypeField name={`dataFunctions.${index}.updateType`} t={t}/>
+        )
+    },
+    { key: 'fpValue', label: 'FP', minWidth: 80, maxWidth: 100, icon: 'auto', type: 'number', disabled: true },
+    { key: 'remarks', label: '備考', minWidth: 200, maxWidth: 300, icon: 'edit', type: 'text' , maxLength: 200},
+    { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
+], []);
+
+// トランザクションファンクションテーブルのカラム定義
+const transactionColumns: ColumnDefinition<TransactionFunction>[] = useMemo(() => [
+    { key: 'name', label: '名称', minWidth: 200, maxWidth: 400, icon: 'edit', type: 'text', maxLength: 50 },
+    { key: 'externalInput', label: '外部入力', width: 120, icon: 'edit', type: 'number', min: 0, max: 9999 },
+    { key: 'externalOutput', label: '外部出力', width: 120, icon: 'edit', type: 'number', min: 0, max: 9999 },
+    { key: 'externalInquiry', label: '外部照会', width: 120, icon: 'edit', type: 'number', min: 0, max: 9999 },
+    { key: 'fpValue', label: 'FP', minWidth: 80, maxWidth: 100, icon: 'auto', type: 'number', disabled: true },
+    { key: 'remarks', label: '備考', minWidth: 200, maxWidth: 300, icon: 'edit', type: 'text', maxLength: 200 },
+    { key: 'selected', label: '削除', minWidth: 80, align: 'center' as const, type: 'checkbox' },
+], []);
 
 const transactionFieldErrors: Record<number, Record<string, boolean>> = {};
 

@@ -53,6 +53,14 @@ export const importApplication = async (
       systemTest: Number(ws1.getCell('G12').value ?? 0),
     };
 
+    response.displayedProcessRatios = {
+      basicDesign: Number(ws1.getCell('C12').value ?? 0),
+      detailedDesign: Number(ws1.getCell('D12').value ?? 0),
+      implementation: Number(ws1.getCell('E12').value ?? 0),
+      integrationTest: Number(ws1.getCell('F12').value ?? 0),
+      systemTest: Number(ws1.getCell('G12').value ?? 0),
+    };
+
     response.processFPs = {
       basicDesign: Number(ws1.getCell('C13').value ?? 0),
       detailedDesign: Number(ws1.getCell('D13').value ?? 0),

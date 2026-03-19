@@ -136,8 +136,6 @@ response.dataFunctions = calcTestApplicationRequest.dataFunctions?.map(df => {
     default:
       fpValue = 0;
   }
-   // eslint-disable-next-line no-console
-  console.log('fpValue:', fpValue); 
 
   return {
     ...df,
