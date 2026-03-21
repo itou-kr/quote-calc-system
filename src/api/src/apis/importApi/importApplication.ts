@@ -174,13 +174,13 @@ async function validateConsistencyDetail(
   const readOnly = "外部インターフェースファイル";
   const dataFunctionName = "データファンクション名";
   const dataFunctionType = "データファンクションの種類";
-  const sheet2 = 'データファンクションシート 行';
+  const sheet2 = 'データファンクションシート ';
   // ===== 3シート目のラベル定義 =====
   const externalInputLabel = "外部入力";
   const externalOutputLabel = "外部出力";
   const externalInquiryLabel = "外部照会";
   const transactionFunctionName = "トランザクションファンクション名";
-  const sheet3 = 'トランザクションファンクションシート 行';
+  const sheet3 = 'トランザクションファンクションシート ';
   // ===== その他共通定義 =====
   const min_0 = 0;
   const min_1 = 1;
@@ -189,6 +189,7 @@ async function validateConsistencyDetail(
   const maxDataName = 50;
   const maxNote = 200;
   const noteLabel = '備考';
+  const rowLabel = '行';
 
   /** ===== 1シート目（共通項目） ===== */
   //=====シート存在チェック=====
@@ -358,27 +359,27 @@ async function validateConsistencyDetail(
     //===== 必須チェック =====
     //ファンクション名
     if (!name) {
-      errorMessage.push(sheet2 + outputRow + ':' + dataFunctionName + mustCheckMessage);
+      errorMessage.push(rowLabel + outputRow + ': ' + sheet2 + dataFunctionName + mustCheckMessage);
     }
     //データファンクションの種類
     if (!type) { 
-      errorMessage.push(sheet2 + outputRow + ':' +dataFunctionType + mustCheckMessage);
+      errorMessage.push(rowLabel + outputRow + ': ' + sheet2 + dataFunctionType + mustCheckMessage);
     }
     //===== 整合性チェック =====
     //データファンクションの種類
     if(type){
       if (type !== write && type !== readOnly) {
-        errorMessage.push(sheet2 + outputRow + ':' +dataFunctionType + pullDownCheckMessage);
+        errorMessage.push(rowLabel + outputRow + ': ' + sheet2 + dataFunctionType + pullDownCheckMessage);
       }
     }
     //===== 桁数チェック =====
     //ファンクション名
     if (name && name.length > maxDataName) {
-      errorMessage.push(sheet2 + outputRow + ':' +dataFunctionName + `は最大${maxDataName}文字で入力してください。`);
+      errorMessage.push(rowLabel + outputRow + ': ' + sheet2 + dataFunctionName + `は最大${maxDataName}文字で入力してください。`);
     }
     //備考
     if (note && note.length > maxNote) {
-      errorMessage.push(sheet2 + outputRow + ':' +noteLabel + `は最大${maxNote}文字で入力してください。`);
+      errorMessage.push(rowLabel + outputRow + ': ' + sheet2 + noteLabel + `は最大${maxNote}文字で入力してください。`);
     }
   }
 
@@ -416,32 +417,32 @@ async function validateConsistencyDetail(
     if(name){
       if (!externalInput && !externalOutput && !externalInquiry) { 
         //トランザクション名があるが、TF種別がない場合は必須チェックでエラー
-        errorMessage.push(sheet3 + outputRow + ':' +`${externalInputLabel}または${externalOutputLabel}または${externalInquiryLabel}` + mustCheckMessage);
+        errorMessage.push(rowLabel + outputRow + ': ' + sheet3 + `${externalInputLabel}または${externalOutputLabel}または${externalInquiryLabel}` + mustCheckMessage);
       }
     }
     if (!name) { 
       //TF種別はあるがトランザクション名がない場合は必須チェックでエラー
-      errorMessage.push(sheet3 + outputRow + ':' +transactionFunctionName + mustCheckMessage);
+      errorMessage.push(rowLabel + outputRow + ': ' + sheet3 + transactionFunctionName + mustCheckMessage);
     }
 
     //===== ファンクション名のチェック =====
     //桁数チェック
     if (name && name.length > maxDataName) {
-      errorMessage.push(sheet3 + outputRow + ':' +`${transactionFunctionName}は最大${maxDataName}文字で入力してください。`);
+      errorMessage.push(rowLabel + outputRow + ': ' + sheet3 + `${transactionFunctionName}は最大${maxDataName}文字で入力してください。`);
     }
 
     //===== 外部入力に関するチェック =====
     //属性チェック
     if(externalInput){
       if (isNaN(Number(externalInput))) {
-        errorMessage.push(sheet3 + outputRow + ':' +externalInputLabel + numberCheckMessage);
+        errorMessage.push(rowLabel + outputRow + ': ' + sheet3 + externalInputLabel + numberCheckMessage);
       //整数チェック
       } else if (!Number.isInteger(Number(externalInput))) {
-        errorMessage.push(sheet3 + outputRow + ':' +externalInputLabel + integerCheckMessage);
+        errorMessage.push(rowLabel + outputRow + ': ' + sheet3 + externalInputLabel + integerCheckMessage);
       } else {
       //範囲チェック
         if (Number(externalInput) < min_1 || Number(externalInput) > max_9999) {
-          errorMessage.push(sheet3 + outputRow + ':' +externalInputLabel +`は${min_0}～${max_9999}${rangeCheckMessage}`);
+          errorMessage.push(rowLabel + outputRow + ': ' + sheet3 + externalInputLabel +`は${min_0}～${max_9999}${rangeCheckMessage}`);
         }
       }
     }
@@ -450,14 +451,14 @@ async function validateConsistencyDetail(
     //属性チェック
     if(externalOutput){
       if (isNaN(Number(externalOutput))) {
-        errorMessage.push(sheet3 + outputRow + ':' +externalOutputLabel + numberCheckMessage);
+        errorMessage.push(rowLabel + outputRow + ': ' + sheet3 + externalOutputLabel + numberCheckMessage);
       //整数チェック
       } else if (!Number.isInteger(Number(externalOutput))) {
-        errorMessage.push(sheet3 + outputRow + ':' +externalOutputLabel + integerCheckMessage);
+        errorMessage.push(rowLabel + outputRow + ': ' + sheet3 + externalOutputLabel + integerCheckMessage);
       } else {
       //範囲チェック
         if (Number(externalOutput) < min_1 || Number(externalOutput) > max_9999) {
-          errorMessage.push(sheet3 + outputRow + ':' +externalOutputLabel + `は${min_0}～${max_9999}${rangeCheckMessage}`);
+          errorMessage.push(rowLabel + outputRow + ': ' + sheet3 + externalOutputLabel + `は${min_0}～${max_9999}${rangeCheckMessage}`);
         }
       }
     }
@@ -466,20 +467,20 @@ async function validateConsistencyDetail(
     //属性チェック
     if(externalInquiry){
       if (isNaN(Number(externalInquiry))) {
-        errorMessage.push(sheet3 + outputRow + ':' +externalInquiryLabel + numberCheckMessage);
+        errorMessage.push(rowLabel + outputRow + ': ' + sheet3 + externalInquiryLabel + numberCheckMessage);
       //整数チェック
       } else if (!Number.isInteger(Number(externalInquiry))) {
-        errorMessage.push(sheet3 + outputRow + ':' +externalInquiryLabel + integerCheckMessage);
+        errorMessage.push(rowLabel + outputRow + ': ' + sheet3 + externalInquiryLabel + integerCheckMessage);
       } else {
         //範囲チェック
         if (Number(externalInquiry) < min_1 || Number(externalInquiry) > max_9999) {
-          errorMessage.push(sheet3 + outputRow + ':' +externalInquiryLabel + `は${min_0}～${max_9999}${rangeCheckMessage}`);
+          errorMessage.push(rowLabel + outputRow + ': ' + sheet3 + externalInquiryLabel + `は${min_0}～${max_9999}${rangeCheckMessage}`);
         }
       }
     }
     //備考
     if (note && note.length > maxNote) {
-      errorMessage.push(sheet2 + outputRow + ':' +noteLabel + `は最大${maxNote}文字で入力してください。`);
+      errorMessage.push(rowLabel + outputRow + ': ' + sheet2 + noteLabel + `は最大${maxNote}文字で入力してください。`);
     }
   }
 

@@ -30,7 +30,7 @@ import TabPanel from '@front/components/ui/TabPanel';
 import Text from '@front/components/ui/Text';
 import { createDataFunctions, createTransactionFunctions, DataFunction, TransactionFunction } from '@front/types/functionTypes';
 // import { createAddRowAction, createDeleteSelectedAction } from '@front/components/ui/TableToolbar/actions/tableActions';
-import { t } from 'i18next';
+// import { t } from 'i18next';
 // import { getProcessRatios } from '@common/constants/processRatios';
 // import { useSetDirty } from '@front/hooks/TEST/test';
 // import FormPaperProvider from '@front/components/ui/Layout/Form/FormPaperProvider';
