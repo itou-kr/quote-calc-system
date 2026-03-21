@@ -169,6 +169,7 @@ export type FormType = yup.InferType<ReturnType<typeof setupYupScheme>>;
 // type Props<T extends FieldValues = FieldValues, N extends FieldArrayPath<T> = FieldArrayPath<T>> = {
 type Props = {
     label?: React.ReactNode;
+    // maxLimit?: number;
     maxLimit?: {
         limit?: number;
         label?: React.ReactNode;
@@ -184,8 +185,7 @@ type Props = {
 
 function CalcForm(props: Props) {
     // const { maxLimit, name, control } = props;
-    const { maxLimit } = props;
-    
+    const { maxLimit } = props;    
     const schema = useMemo(() => setupYupScheme(), []);
     const calc = useCalc(viewId as ViewIdType);
     const importFile = useImportFile();
@@ -280,13 +280,12 @@ function CalcForm(props: Props) {
 
 useEffect(() => {
     if (!data) return;
-    console.log('dataaaaa', data)
+
 //     const projectTypeLabel =
 //         projectTypeOptions.find(
 //             (v) => v.value === calcData.data?.projectType
 //         )?.label ?? '新規開発';
-    console.log('比較①', data.projectType)
-    console.log('比較②', projectTypeOptions)
+
     const convertedData = {
         ...data,
         projectType: {
@@ -318,6 +317,10 @@ useEffect(() => {
 
     reset(convertedData);
 }, [data, reset, projectTypeOptions, ipaValueTypeOptions, updateTypeOptions]);
+
+useEffect (() => {
+
+}, [])
 
 // データファンクションテーブルのカラム定義
 const dataColumns: ColumnDefinition<DataFunction>[] = useMemo(() => [
@@ -420,7 +423,7 @@ transactionFields.forEach((_, index) => {
             appendData(createEmptyDataFunction());
         } else {
             if (maxLimit.message) {
-                await confirm({ message: "200行までしか追加できません", yes: true, close: true });
+                await confirm({ message: maxLimit.message, yes: true, close: true });
             }
         }
     };
@@ -432,7 +435,7 @@ transactionFields.forEach((_, index) => {
             appendTransaction(createEmptyTransactionFunction());
         } else {
             if (maxLimit.message) {
-                await confirm({ message: "200行までしか追加できません", yes: true, close: true });
+                await confirm({ message: maxLimit.message, yes: true, close: true });
             }
         }
     };

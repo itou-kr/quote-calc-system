@@ -87,7 +87,8 @@ const Calc = memo (() => {
         // <Container disableGutters sx={{ height: '100%' }}>
             <CalcForm 
                 viewId="CALC" 
-                isDirty={isDirty} 
+                isDirty={isDirty}
+                maxLimit={{ limit: 200, message: "200行までしか追加できません" }} 
             />
         // </Container>
     );
