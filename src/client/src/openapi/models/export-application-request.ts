@@ -14,6 +14,9 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { CalcTestApplication200ResponseDisplayedProcessRatios } from './calc-test-application200-response-displayed-process-ratios';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { CalcTestApplication200ResponseProcessDurations } from './calc-test-application200-response-process-durations';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -21,9 +24,6 @@ import type { CalcTestApplication200ResponseProcessFPs } from './calc-test-appli
 // May contain unused imports in some cases
 // @ts-ignore
 import type { CalcTestApplication200ResponseProcessManMonths } from './calc-test-application200-response-process-man-months';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { CalcTestApplication200ResponseProcessRatios } from './calc-test-application200-response-process-ratios';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { ExportApplicationRequestDataFunctionsInner } from './export-application-request-data-functions-inner';
@@ -84,10 +84,10 @@ export interface ExportApplicationRequest {
     'standardDurationMonths'?: number;
     /**
      * 
-     * @type {CalcTestApplication200ResponseProcessRatios}
+     * @type {CalcTestApplication200ResponseDisplayedProcessRatios}
      * @memberof ExportApplicationRequest
      */
-    'processRatios'?: CalcTestApplication200ResponseProcessRatios;
+    'displayedProcessRatios'?: CalcTestApplication200ResponseDisplayedProcessRatios;
     /**
      * 
      * @type {CalcTestApplication200ResponseProcessFPs}

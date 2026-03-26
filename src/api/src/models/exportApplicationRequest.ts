@@ -10,10 +10,10 @@
  * Do not edit the class manually.
  */
 
+import { CalcTestApplication200ResponseDisplayedProcessRatios } from './calcTestApplication200ResponseDisplayedProcessRatios';
 import { CalcTestApplication200ResponseProcessDurations } from './calcTestApplication200ResponseProcessDurations';
 import { CalcTestApplication200ResponseProcessFPs } from './calcTestApplication200ResponseProcessFPs';
 import { CalcTestApplication200ResponseProcessManMonths } from './calcTestApplication200ResponseProcessManMonths';
-import { CalcTestApplicationRequestProcessRatios } from './calcTestApplicationRequestProcessRatios';
 import { ExportApplicationRequestDataFunctionsInner } from './exportApplicationRequestDataFunctionsInner';
 import { ExportApplicationRequestExportFile } from './exportApplicationRequestExportFile';
 import { ExportApplicationRequestTransactionFunctionsInner } from './exportApplicationRequestTransactionFunctionsInner';
@@ -50,7 +50,7 @@ export class ExportApplicationRequest {
     * 標準工期（月）
     */
     'standardDurationMonths'?: number;
-    'processRatios'?: CalcTestApplicationRequestProcessRatios;
+    'displayedProcessRatios'?: CalcTestApplication200ResponseDisplayedProcessRatios;
     'processFPs'?: CalcTestApplication200ResponseProcessFPs;
     'processManMonths'?: CalcTestApplication200ResponseProcessManMonths;
     'processDurations'?: CalcTestApplication200ResponseProcessDurations;
@@ -97,9 +97,9 @@ export class ExportApplicationRequest {
             "type": "number"
         },
         {
-            "name": "processRatios",
-            "baseName": "processRatios",
-            "type": "CalcTestApplicationRequestProcessRatios"
+            "name": "displayedProcessRatios",
+            "baseName": "displayedProcessRatios",
+            "type": "CalcTestApplication200ResponseDisplayedProcessRatios"
         },
         {
             "name": "processFPs",

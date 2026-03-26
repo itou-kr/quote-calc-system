@@ -41,11 +41,11 @@ const updateTypeLabelMap: Record<string, string> = {
   ows.getCell(`C8`).value = exportApplicationRequest.totalManMonths || 0;
   ows.getCell(`C9`).value = exportApplicationRequest.standardDurationMonths || 0;
   
-  ows.getCell(`C12`).value = exportApplicationRequest.processRatios?.basicDesign || 0;
-  ows.getCell(`D12`).value = exportApplicationRequest.processRatios?.detailedDesign || 0;
-  ows.getCell(`E12`).value = exportApplicationRequest.processRatios?.implementation || 0;
-  ows.getCell(`F12`).value = exportApplicationRequest.processRatios?.integrationTest || 0;
-  ows.getCell(`G12`).value = exportApplicationRequest.processRatios?.systemTest || 0;
+  ows.getCell(`C12`).value = exportApplicationRequest.displayedProcessRatios?.basicDesign || 0;
+  ows.getCell(`D12`).value = exportApplicationRequest.displayedProcessRatios?.detailedDesign || 0;
+  ows.getCell(`E12`).value = exportApplicationRequest.displayedProcessRatios?.implementation || 0;
+  ows.getCell(`F12`).value = exportApplicationRequest.displayedProcessRatios?.integrationTest || 0;
+  ows.getCell(`G12`).value = exportApplicationRequest.displayedProcessRatios?.systemTest || 0;
   
   ows.getCell(`C13`).value = exportApplicationRequest.processFPs?.basicDesign || 0;
   ows.getCell(`D13`).value = exportApplicationRequest.processFPs?.detailedDesign || 0;

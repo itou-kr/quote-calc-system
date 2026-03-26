@@ -420,9 +420,9 @@ components:
         standardDurationMonths:
           type: number
           description: 標準工期（月） 
-        processRatios:
+        displayedProcessRatios:
           type: object
-          description: 開発工程比率
+          description: 工程別比率表示用
           properties:
             basicDesign:
               type: number
@@ -438,7 +438,7 @@ components:
               description: 結合テスト
             systemTest:
               type: number
-              description: 総合テスト
+              description: 総合テスト  
         processFPs:
           type: object
           description: 開発工程FP

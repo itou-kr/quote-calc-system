@@ -348,9 +348,9 @@ paths:
                 standardDurationMonths:
                   type: number
                   description: 標準工期（月）
-                processRatios:
+                displayedProcessRatios:
                   type: object
-                  description: 開発工程比率
+                  description: 工程別比率表示用
                   properties:
                     basicDesign:
                       type: number
