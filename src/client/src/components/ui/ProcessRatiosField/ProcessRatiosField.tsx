@@ -42,7 +42,13 @@ function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
     // 自動入力がONの場合、プルダウンの値が変わったら自動的に更新
     useEffect(() => {
         if (autoProcessRatios) {
-            const defaultRatios = getProcessRatios(projectType.value, ipaValueType.value);
+            if (!projectType?.value || !ipaValueType?.value) return;
+
+            const defaultRatios = getProcessRatios(
+                projectType.value,
+                ipaValueType.value
+            );
+
             // 個別フィールドに設定することで、watchによる合計値の自動更新をトリガー
             setValue('processRatios.basicDesign' as any, defaultRatios.basicDesign as any);
             setValue('processRatios.detailedDesign' as any, defaultRatios.detailedDesign as any);

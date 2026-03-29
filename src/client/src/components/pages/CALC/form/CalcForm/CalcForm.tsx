@@ -281,26 +281,20 @@ function CalcForm(props: Props) {
 useEffect(() => {
     if (!data) return;
 
-//     const projectTypeLabel =
-//         projectTypeOptions.find(
-//             (v) => v.value === calcData.data?.projectType
-//         )?.label ?? '新規開発';
-
     const convertedData = {
         ...data,
         projectType: {
             label:
                 projectTypeOptions.find(v => v.value === data.projectType)?.label
                 ?? data.projectType,
-            value: data.projectType,
+            value: data?.projectType ?? undefined,
         },
         ipaValueType: {
             label:
                 ipaValueTypeOptions.find(v => v.value === data.ipaValueType)?.label
                 ?? data.ipaValueType,
-            value: data.ipaValueType,
+            value: data?.ipaValueType ?? undefined,
         },
-
         dataFunctions: data.dataFunctions?.map(df => ({
             name: df.name,
             fpValue: df.fpValue,
@@ -310,8 +304,8 @@ useEffect(() => {
                 label:
                     updateTypeOptions.find(v => v.value === df.updateType)?.label
                     ?? df.updateType,
-                value: df.updateType,
-            }
+                value: df?.updateType ?? undefined,
+            },
         })),
     };
 
