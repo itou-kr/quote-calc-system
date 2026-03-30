@@ -20,6 +20,7 @@ export function useCalc(viewId: ViewIdType) {
         async (data: CalcTestApplicationRequest, _: UseFormSetError<FormType>) => {
             clearAlertMessage();
 
+            console.log('工数計算前のdata', data)
             const response = await calcApi.calcTestApplication(data);
             const calcResultData = response.data;
 
@@ -32,7 +33,6 @@ export function useCalc(viewId: ViewIdType) {
                 return;
             }
 
-            console.log('response', response);
             dispatch(
                 calcStore.actions.setCalc({
                     ...data,
@@ -41,6 +41,7 @@ export function useCalc(viewId: ViewIdType) {
             );
             // 正常メッセージの表示
             setAlertMessage({ severity: 'success', message: '工数を出力しました。' });   
+            console.log('工数計算後のresponse', response);
 
             return calcResultData;
         },

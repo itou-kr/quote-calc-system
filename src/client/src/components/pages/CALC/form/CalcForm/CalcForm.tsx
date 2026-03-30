@@ -73,6 +73,14 @@ const setupYupScheme = () => {
         ipaValueType: yup.object({ label: yup.string(), value: yup.string() }).default(undefined).label('使用するIPA代表値').required(),
         // 開発工程比率自動入力フラグ
         autoProcessRatios: yup.boolean(),
+        // 工程別比率
+        processRatios: yup.object({
+            basicDesign: yup.number().label('基本設計比率').rangeCheck(0.000, 1.000),
+            detailedDesign: yup.number().label('詳細設計比率').rangeCheck(0.000, 1.000),
+            implementation: yup.number().label('製造比率').rangeCheck(0.000, 1.000),
+            integrationTest: yup.number().label('統合テスト比率').rangeCheck(0.000, 1.000),
+            systemTest: yup.number().label('システムテスト比率').rangeCheck(0.000, 1.000),
+        }),
         // データファンクション情報
         dataFunctions: yup.array().of(
             yup.object({
@@ -116,14 +124,6 @@ const setupYupScheme = () => {
         totalManMonths: yup.number(),
         // 標準工期(月)
         standardDurationMonths: yup.number(),
-        // 工程別比率
-        processRatios: yup.object({
-            basicDesign: yup.number().label('基本設計比率').rangeCheck(0.000, 1.000),
-            detailedDesign: yup.number().label('詳細設計比率').rangeCheck(0.000, 1.000),
-            implementation: yup.number().label('製造比率').rangeCheck(0.000, 1.000),
-            integrationTest: yup.number().label('統合テスト比率').rangeCheck(0.000, 1.000),
-            systemTest: yup.number().label('システムテスト比率').rangeCheck(0.000, 1.000),
-        }),
 
         // 工程別比率表示用
         displayedProcessRatios: yup.object({
@@ -215,8 +215,8 @@ function CalcForm(props: Props) {
         }),
         defaultValues: {
             projectName: '',
-            autoProductivity: true,
-            autoProcessRatios: true,
+            autoProductivity: false,
+            autoProcessRatios: false,
             productivityFPPerMonth: 10,
             projectType: { label: '新規開発', value: 'N' },
             ipaValueType: { label: '中央値', value: 'M' },
@@ -226,6 +226,13 @@ function CalcForm(props: Props) {
             dataFunctions: createDataFunctions(50),
             transactionFunctions: createTransactionFunctions(50),
             // processRatios: getProcsessRatios(projectType, ipaValueType),
+            processRatios: {
+                basicDesign: 0.205,
+                detailedDesign: 0.181,
+                implementation: 0.241,
+                integrationTest: 0.191,
+                systemTest: 0.182,
+            },
             displayedProcessRatios: {
                 basicDesign: 0,
                 detailedDesign: 0,

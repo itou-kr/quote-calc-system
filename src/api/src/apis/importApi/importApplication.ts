@@ -95,12 +95,14 @@ export const importApplication = async (
         const name = ws2.getCell(`B${row}`).value?.toString();
         if (!name) break; // 空行で終了
         
-        const raw = ws2.getCell(`C${row}`).value?.toString();
+        // const raw = ws2.getCell(`C${row}`).value?.toString();
+        const raw = ws2.getCell(`D${row}`).text;
         response.dataFunctions.push({
           name,
+          // updateType: isUpdateTypeEnum(raw) ? raw : undefined,
           updateType: isUpdateTypeEnum(raw) ? raw : undefined,
-          fpValue: Number(ws2.getCell(`D${row}`).value ?? 0),
-          remarks: ws2.getCell(`E${row}`).value?.toString() ?? '',
+          fpValue: Number(ws2.getCell(`E${row}`).value ?? 0),
+          remarks: ws2.getCell(`F${row}`).value?.toString() ?? '',
         });
       }
     }
@@ -170,8 +172,8 @@ async function validateConsistencyDetail(
   const minPercent = 0;
   const maxPercent = 1;
   // ===== 2シート目のラベル定義 =====
-  const write = "内部論理ファイル";
-  const readOnly = "外部インターフェースファイル";
+  const write = "I";
+  const readOnly = "E";
   const dataFunctionName = "データファンクション名";
   const dataFunctionType = "データファンクションの種類";
   const sheet2 = 'データファンクションシート ';
@@ -250,7 +252,6 @@ async function validateConsistencyDetail(
   //整合性チェック
   const IPA = ws1.getCell('C6').value?.toString();
   if (IPA) {
-  //console.log(IPA);
     if (IPA !== median && IPA !== average) {
       errorMessage.push('IPA代表値' + pullDownCheckMessage);
     }
@@ -344,7 +345,7 @@ async function validateConsistencyDetail(
   if (ws2.getCell('A2').value?.toString() !== 'No' ||
       ws2.getCell('B2').value?.toString() !== '名称' ||
       ws2.getCell('C2').value?.toString() !== dataFunctionType ||
-      ws2.getCell('D2').value?.toString() !== 'FP') {
+      ws2.getCell('E2').value?.toString() !== 'FP') {
     errorMessage.push('ファイルの内容が異なるため、インポートに失敗しました。');
     return;
   }
@@ -352,8 +353,9 @@ async function validateConsistencyDetail(
   //各種チェック
   for (let row = startRow; row <= ws2.rowCount; row++) {
     const name = ws2.getCell(`B${row}`).value?.toString();
-    const type = ws2.getCell(`C${row}`).value?.toString();
-    const note = ws2.getCell(`E${row}`).value?.toString();
+    // const type = ws2.getCell(`D${row}`).value?.toString();
+    const type = ws2.getCell(`D${row}`).text;
+    const note = ws2.getCell(`F${row}`).value?.toString();
     const outputRow = row - 2
     if (!name && !type) break; // データ名も種類もない場合は終了
     //===== 必須チェック =====
@@ -496,7 +498,7 @@ async function validateConsistencyDetail(
 // }
 function isUpdateTypeEnum(value: unknown): value is UpdateTypeEnum {
   return (
-    value === '内部論理ファイル' ||
-    value === '外部インターフェースファイル'
+    value === 'I' ||
+    value === 'E'
   );
 }

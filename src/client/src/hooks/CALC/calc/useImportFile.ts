@@ -1,4 +1,6 @@
 // import { useCallback } from 'react';
+import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 // import { ViewIdType } from '@front/stores/TEST/test/testStore/index';
 import { importApi } from '@front/openapi';
@@ -11,16 +13,26 @@ import type {
     CalcTestApplicationRequestIpaValueTypeEnum,
     DataFunctionUpdateType,
 } from '@front/openapi/models';
+import { useGetUpdateType } from '@front/hooks/consts';
+
 
 export const useImportFile = () => {
   const setAlertMessage = useSetAlertMessage(viewId);
   const clearAlertMessage = useClearAlertMessage(viewId);
   const dispatch = useAppDispatch();
-
+  
+  const { t } = useTranslation();
+  const getUpdateTypes = useGetUpdateType(t);
+  const updateTypeOptions = useMemo(() => getUpdateTypes(), [getUpdateTypes]);
+  
   return async (file: File): Promise<FormType | undefined> => {
     clearAlertMessage();
     const response = await importApi.importApplication(file);
     const importFileData = response.data;
+
+
+
+    // データファンクションの種類のラベルを取得
 
     const formData: FormType = {
       ...importFileData,
@@ -34,13 +46,12 @@ export const useImportFile = () => {
       },
       dataFunctions: importFileData.dataFunctions?.map(df => ({
         ...df,
-        updateType:
-          typeof df.updateType === 'string'
-            ? {
-                label: df.updateType,
-                value: df.updateType,
-              }
-            : df.updateType ?? null,
+        updateType: {
+            label:
+                updateTypeOptions.find(v => v.value === df.updateType)?.label
+                ?? df.updateType,
+            value: df?.updateType ?? undefined,
+        },
       })) ?? [],
     };
 

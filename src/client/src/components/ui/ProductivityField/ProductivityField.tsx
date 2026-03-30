@@ -23,7 +23,7 @@ export type Props<T extends FieldValues = any> = {
 function ProductivityField<T extends FieldValues = any>(props: Props<T>) {
     const { control, trigger, setValue, watch, clearErrors, t } = props;
 
-    const [autoProductivity, setAutoProductivity] = useState(true);
+    const [autoProductivity, setAutoProductivity] = useState(false);
 
     // プルダウンの値を監視
     const projectType = watch('projectType' as any);

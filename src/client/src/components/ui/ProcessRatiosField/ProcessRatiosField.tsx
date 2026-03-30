@@ -26,7 +26,7 @@ export type Props<T extends FieldValues = any> = {
 function ProcessRatiosField<T extends FieldValues = any>(props: Props<T>) {
     const { control, trigger, setValue, watch, clearErrors, t } = props;
 
-    const [autoProcessRatios, setAutoProcessRatios] = useState(true);
+    const [autoProcessRatios, setAutoProcessRatios] = useState(false);
     
     // プルダウンの値を監視
     const projectType = watch('projectType' as any);

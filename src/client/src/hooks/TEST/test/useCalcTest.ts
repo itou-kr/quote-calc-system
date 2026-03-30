@@ -32,7 +32,7 @@ export function useCalcTest(viewId: ViewIdType) {
                 return;
             }
 
-            console.log('response', response);
+            console.log('工数計算後のresponse', response);
             dispatch(calcStore.actions.setCalc(calcResultData));
 
             return calcResultData;
