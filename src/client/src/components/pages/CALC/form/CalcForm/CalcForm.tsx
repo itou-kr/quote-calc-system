@@ -66,7 +66,15 @@ const setupYupScheme = () => {
         // 生産性自動計算フラグ
         autoProductivity: yup.boolean(),
         // 生産性(FP/月)
-        productivityFPPerMonth: yup.number().rangeCheck(1, 9999),
+        productivityFPPerMonth: yup
+            .number()
+            .label('生産性(FP/月) ')
+            .required()
+            .transform((value, originalValue) =>
+                originalValue === "" ? undefined : value
+            )
+            .required()
+            .rangeCheck(1, 9999),
         // 案件種別
         projectType: yup.object({ label: yup.string(), value: yup.string() }).default(undefined).label('案件種別').required(),
         // 使用するIPA代表値
