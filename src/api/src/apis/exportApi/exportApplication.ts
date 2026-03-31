@@ -75,8 +75,8 @@ const updateTypeLabelMap: Record<string, string> = {
     const excelRow = dataStartRow + index;
       dws.getCell(`B${excelRow}`).value = dataFunctions?.[index]?.name || '';
       dws.getCell(`C${excelRow}`).value = updateTypeLabelMap[dataFunctions?.[index]?.updateType ?? ''] ?? '';;
-      dws.getCell(`D${excelRow}`).value = dataFunctions?.[index]?.fpValue || '';
-      dws.getCell(`E${excelRow}`).value = dataFunctions?.[index]?.remarks || '';
+      dws.getCell(`E${excelRow}`).value = dataFunctions?.[index]?.fpValue || '';
+      dws.getCell(`F${excelRow}`).value = dataFunctions?.[index]?.remarks || '';
   });
 
   const tws = owb.getWorksheet(3) // 3番目のシートを取得;
